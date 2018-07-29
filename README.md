@@ -7,7 +7,9 @@
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
-Reference Project, VERSION **0.3.1**
+**ec2tools**
+
+VERSION **0.3.1**
 
 * * *
 
@@ -65,6 +67,8 @@ TBD
 
 Run the installer from the cli via the following example commands
 
+* * *
+
 ### Return Image for a particular region
 
 Format:  `json` (DEFAULT)
@@ -74,6 +78,8 @@ Format:  `json` (DEFAULT)
 ```
 
 ![redhat7](./assets/redhat7.5-1region.png)
+
+* * *
 
 ### Return Image for a particular region (DETAILS)
 
@@ -85,6 +91,7 @@ Format:  `json` (DEFAULT)
 
 ![redhat7](./assets/centos7-details.png)
 
+* * *
 
 ### Return the AMI Image id for all regions
 
@@ -95,6 +102,8 @@ Format:  `json` (DEFAULT)
 ```
 
 ![aml1](./assets/aml1-allregions.png)
+
+* * *
 
 ### Return the AMI Image id for all regions (text format)
 
