@@ -43,9 +43,10 @@ See the following resources before getting started:
 * [Amazon Linux 2](https://aws.amazon.com/amazon-linux-2) 2018+
 * [Redhat](https://aws.amazon.com/partners/redhat/) 7.3, 7.4, 7.5
 * [Centos](https://aws.amazon.com/marketplace/seller-profile?id=16cb8b03-256e-4dde-8f34-1b0f377efe89) 7
-* [Ubuntu](https://aws.amazon.com/marketplace/seller-profile?id=565feec9-3d43-413e-9760-c651546613f2&ref=dtl_B01JBL2M0O) 14.04
-* [Ubuntu](https://aws.amazon.com/marketplace/seller-profile?id=565feec9-3d43-413e-9760-c651546613f2&ref=dtl_B01JBL2M0O) 16.04
-* [Ubuntu](https://aws.amazon.com/marketplace/seller-profile?id=565feec9-3d43-413e-9760-c651546613f2&ref=dtl_B01JBL2M0O) 18.04
+* [Ubuntu Trusty](https://aws.amazon.com/marketplace/search/results?x=0&y=0&searchTerms=ubuntu+14.04) 14.04
+* [Ubuntu Xenial](https://aws.amazon.com/marketplace/pp/B01JBL2M0O?qid=1532883122707) 16.04
+* [Ubuntu Bionic](https://aws.amazon.com/marketplace/search/results?x=0&y=0&searchTerms=ubuntu+18.04) 18.04
+
 [back to the top](#top)
 
 * * *
