@@ -11,7 +11,7 @@ from pyaws.core.session import authenticated, boto3_session
 from pyaws.core.script_utils import stdout_message, export_json_object
 from pyaws.core.colors import Colors
 from ec2tools.help_menu import menu_body
-from ec2tools import logd, __version__
+from ec2tools import about, logd, __version__
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -404,6 +404,14 @@ def options(parser, help_menu=False):
     return parser.parse_args()
 
 
+def package_version():
+    """
+    Prints package version and requisite PACKAGE info
+    """
+    print(about.about_object)
+    sys.exit(exit_codes['EX_OK']['Code'])
+
+
 def init_cli():
     """ Collect parameters and call main """
     try:
@@ -427,6 +435,9 @@ def init_cli():
 
     elif args.help:
         help_menu()
+
+    elif args.version:
+        package_version()
 
     elif authenticated(profile=args.profile):
         # execute ami operation

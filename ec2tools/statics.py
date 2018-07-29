@@ -15,7 +15,7 @@ Module Attributes:
 
 import inspect
 import logging
-from pyaws import __version__
+from ec2tools import __version__
 from pyaws.core.script_utils import get_os, os_parityPath
 
 
@@ -40,9 +40,9 @@ except KeyError as e:
 
 else:
     # project
-    PACKAGE = 'pyaws'
-    LICENSE = 'MIT'
-    LICENSE_DESC = 'MIT'
+    PACKAGE = 'ec2tools'
+    LICENSE = 'GPL-3'
+    LICENSE_DESC = 'General Public License Version 3'
 
     # logging parameters
     enable_logging = True

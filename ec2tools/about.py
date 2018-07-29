@@ -12,7 +12,7 @@ Returns:
 import sys
 import datetime
 from ec2tools.statics import PACKAGE, LICENSE
-from ec2tools.colors import Colors
+from pyaws.core.colors import Colors
 from ec2tools import __version__
 
 
@@ -59,5 +59,4 @@ about_object = """
 
 
     __________________________________________________________________
-
 """ + copyright
