@@ -1,0 +1,15 @@
+awscli
+boto3
+botocore
+colorama
+docutils
+jmespath
+pyaws
+Pygments
+python-dateutil
+pytz
+PyYAML
+requests
+s3transfer
+six
+twine
