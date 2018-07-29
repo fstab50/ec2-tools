@@ -23,7 +23,8 @@ logger = logd.getLogger(__version__)
 VALID_FORMATS = ('json', 'text')
 VALID_AMI_TYPES = (
         'amazonlinux1', 'amazonlinux2', 'redhat7.3', 'redhat7.4', 'redhat7.5',
-        'ubuntu14.04', 'ubuntu16.04', 'ubuntu16.10', 'ubuntu18.04', 'ubuntu18.10'
+        'ubuntu14.04', 'ubuntu16.04', 'ubuntu16.10', 'ubuntu18.04', 'ubuntu18.10',
+        'centos5', 'centos6', 'centos7'
     )
 DEFAULT_REGION = os.environ['AWS_DEFAULT_REGION']
 
@@ -143,6 +144,55 @@ def amazonlinux2(profile, region=None, detailed=False, debug=False):
                 ])
             metadata[region] = r['Images'][0]
             amis[region] = r['Images'][0]['ImageId']
+        except ClientError as e:
+            logger.exception(
+                '%s: Boto error while retrieving AMI data (%s)' %
+                (inspect.stack()[0][3], str(e)))
+            continue
+        except Exception as e:
+            logger.exception(
+                '%s: Unknown Exception occured while retrieving AMI data (%s)' %
+                (inspect.stack()[0][3], str(e)))
+            raise e
+    if detailed:
+        return metadata
+    return amis
+
+
+def centos(profile, os, region=None, detailed=False, debug=False):
+    """
+    Return latest current Redhat AMI for each region
+    Args:
+        :profile (str): profile_name
+        :region (str): if supplied as parameter, only the ami for the single
+        region specified is returned
+    Returns:
+        amis, TYPE: list:  container for metadata dict for most current instance in region
+    """
+    amis, metadata = {}, {}
+    if region:
+        regions = [region]
+    else:
+        regions = get_regions(profile=profile)
+    # retrieve ami for each region in list
+    for region in regions:
+        try:
+            client = boto3_session(service='ec2', region=region, profile=profile)
+            r = client.describe_images(
+                Owners=[CENTOS],
+                Filters=[
+                    {
+                        'Name': 'name',
+                        'Values': [
+                            'CentOS*%s x86_64*' % os
+                        ]
+                    }
+                ])
+
+            # need to find ami with latest date returned
+            newest = sorted(r['Images'], key=lambda k: k['CreationDate'])[-1]
+            metadata[region] = newest
+            amis[region] = newest['ImageId']
         except ClientError as e:
             logger.exception(
                 '%s: Boto error while retrieving AMI data (%s)' %
@@ -303,6 +353,9 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
 
         elif imagetype == 'amazonlinux2':
             latest = amazonlinux2(profile=profile, region=rgn, detailed=details, debug=debug)
+
+        elif 'centos' in imagetype:
+            latest = centos(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
 
         elif 'redhat' in imagetype:
             latest = redhat(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
