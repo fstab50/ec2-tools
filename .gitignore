@@ -102,3 +102,15 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.project
+.pydevproject
+.settings/
+
+# python-documentation
+docs/build
+docs/_build
+
+# unittest results
+tests/results
+.pytest_cache
