@@ -6,12 +6,12 @@ import re
 import sys
 import json
 import inspect
-from pyaws import logd, __version__
 from botocore.exceptions import ClientError
 from pyaws.core.session import authenticated, boto3_session
 from pyaws.core.script_utils import stdout_message, export_json_object
-from pyaws.ec2.help_menu import menu_body
 from pyaws.core.colors import Colors
+from ec2tools.help_menu import menu_body
+from ec2tools import logd, __version__
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
