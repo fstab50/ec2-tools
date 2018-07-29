@@ -23,17 +23,20 @@ import os
 import sys
 from setuptools import setup, find_packages
 from codecs import open
-import salt
+import ec2tools
 
 
 requires = [
-    'Jinja2',
-    'pdfkit',
-    'MarkupSafe',
+    'boto3',
+    'botocore',
+    'docutils',
+    'jmespath',
+    'pyaws',
     'PyYAML',
     'Pygments',
     'pytz',
-    'xmltodict'
+    's3transfer',
+    'six'
 ]
 
 
@@ -43,32 +46,30 @@ def read(fname):
 
 
 setup(
-    name='salt',
-    version=salt.__version__,
-    description='Security App Install & Configuration',
+    name='ec2tools',
+    version=ec2tools.__version__,
+    description='Scripts & Tools for use with Amazon Web Services EC2 Service',
     long_description=read('DESCRIPTION.rst'),
-    url='https://github.com/fstab50/salt',
-    author=salt.__author__,
-    author_email=salt.__email__,
+    url='https://github.com/fstab50/ec2tools',
+    author=ec2tools.__author__,
+    author_email=ec2tools.__email__,
     license='Apache',
     classifiers=[
-        'Topic :: Documentation',
+        'Topic :: System :: Systems Administration',
+        'Topic :: Utilities',
         'Development Status :: 4 - Beta',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows'
     ],
-    keywords='security application installer',
+    keywords='aws amazon amazonlinux redhat centos ami tools',
     packages=find_packages(exclude=['docs', 'scripts', 'assets']),
     install_requires=requires,
-    python_requires='>=3.4, <4',
+    python_requires='>=3.6, <4',
     entry_points={
         'console_scripts': [
-            'salt=salt.cli:init_cli',
-            'saltconfig=salt.cli:option_configure'
+            'machineimage=ec2tools.current_ami:init_cli'
         ]
     },
     zip_safe=False
