@@ -80,10 +80,10 @@ Format:  `json` (DEFAULT)
 Format:  `json` (DEFAULT)
 
 ```bash
-    $ machineimage --image redhat7.5 --region eu-west-1 --details
+    $ machineimage --image centos7 --region eu-west-1 --details
 ```
 
-![redhat7](./assets/redhat7.5-details.png)
+![redhat7](./assets/centos7-details.png)
 
 
 ### Return the AMI Image id for all regions
@@ -118,16 +118,7 @@ To display the help menu:
     $ machineimage --help
 ```
 
-[![help](./assets/help-menu.png)](https://rawgithub.com/fstab50/gensec/master/rkhunter/assets/help-menu.png)
-
-
-To display help menu for the `--configure` option:
-
-```bash
-    $ machineimage
-```
-
-[![help-configure](./assets/help-configure.png)](https://rawgithub.com/fstab50/gensec/master/rkhunter/assets/help-configure.png)
+[![help](./assets/help-menu.png)](https://rawgithub.com/fstab50/ec2tools/master/assets/help-menu.png)
 
 [back to the top](#top)
 
