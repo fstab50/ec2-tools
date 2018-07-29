@@ -11,14 +11,14 @@ from pyaws.core.colors import Colors
 PACKAGE = 'machineimage'
 PKG_ACCENT = Colors.ORANGE
 PARAM_ACCENT = Colors.WHITE
-AMI = Colors.BOLD + Colors.WHITEGRAY
+AMI = Colors.BOLD + Colors.PURPLE
 RESET = Colors.RESET
 
 synopsis_cmd = (
     Colors.RESET + PKG_ACCENT + Colors.BOLD + PACKAGE + RESET +
-    PARAM_ACCENT + ' --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + RESET + '}' +
-    PARAM_ACCENT + ' --profile ' + Colors.RESET + ' [PROFILE] ' +
-    PARAM_ACCENT + ' --region ' + Colors.RESET + ' [REGION] '
+    PARAM_ACCENT + '  --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + RESET + '}' +
+    PARAM_ACCENT + '  --profile' + Colors.RESET + ' [PROFILE]' +
+    PARAM_ACCENT + '  --region' + Colors.RESET + ' [REGION]'
     )
 
 url_doc = Colors.URL + 'http://pyaws.readthedocs.io' + Colors.RESET
@@ -32,16 +32,17 @@ menu_body = Colors.BOLD + Colors.WHITE + """
 
     """ + Colors.BOLD + Colors.WHITE + """
   SYNOPSIS""" + Colors.RESET + """
-                """ + synopsis_cmd + """
 
-                    -i, --image    <value>
-                    -p, --profile  <value>
-                   [-d, --details  ]
-                   [-f, --format    <value> ]
-                   [-n, --filename  <value> ]
-                   [-d, --debug    ]
-                   [-h, --help     ]
-                   [-V, --version  ]
+            """ + synopsis_cmd + """
+
+                            -i, --image    <value>
+                            -p, --profile  <value>
+                           [-d, --details  ]
+                           [-f, --format   <value> ]
+                           [-n, --filename <value> ]
+                           [-d, --debug    ]
+                           [-h, --help     ]
+                           [-V, --version  ]
     """ + Colors.BOLD + Colors.WHITE + """
   OPTIONS
     """ + Colors.BOLD + """
@@ -62,7 +63,6 @@ menu_body = Colors.BOLD + Colors.WHITE + """
                     - """ + AMI + """ubuntu16.04""" + RESET + """     :   Ubuntu Linux 16.04
                     - """ + AMI + """ubuntu18.04""" + RESET + """     :   Ubuntu Linux 18.04
 
-                    Default: """ + Colors.BOLD + 'list' + Colors.RESET + """
     """ + Colors.BOLD + Colors.WHITE + """
         -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local awscli
             configuration to be used when authenticating to Amazon Web Services
