@@ -9,7 +9,7 @@ Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
 **ec2tools**
 
-VERSION **0.3.1**
+VERSION: **0.3.1**
 
 * * *
 
