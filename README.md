@@ -1,11 +1,11 @@
 <a name="top"></a>
 * * *
-# Reference Project
+# ec2tools
 * * *
 
 ## Summary
 
-Utility for installing and configuring the latest version of a reference project
+Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
 Reference Project, VERSION **1.0**
 
@@ -29,8 +29,9 @@ Reference Project, VERSION **1.0**
 
 See the following resources before getting started:
 
-- Rkhunter [Project Site](http://rkhunter.sourceforge.net/) on Sourceforge
-- Rkhunter Official [README](https://sourceforge.net/p/rkhunter/rkh_code/ci/master/tree/files/README)
+- [Amazon EC2](https://aws.amazon.com/ec2)
+- [Amazon Linux AMIs](https://aws.amazon.com/amazon-linux-ami)
+- [EC2 Developer Resources](https://aws.amazon.com/ec2/developer-resources/)
 
 [back to the top](#top)
 
@@ -38,11 +39,13 @@ See the following resources before getting started:
 
 ## Dependencies
 
-* Ubuntu, Ubuntu variants, 14.04
-* Ubuntu, Ubuntu variants, 16.04+
-* Redhat, Centos v7.0+
-* [Amazon Linux](https://aws.amazon.com/amazon-linux-ami) 2017+
-
+* [Amazon Linux 1](https://aws.amazon.com/amazon-linux-ami) 2017+
+* [Amazon Linux 2](https://aws.amazon.com/amazon-linux-2) 2018+
+* [Redhat](https://aws.amazon.com/partners/redhat/) 7.3, 7.4, 7.5
+* [Centos](https://aws.amazon.com/marketplace/seller-profile?id=16cb8b03-256e-4dde-8f34-1b0f377efe89) 7
+* [Ubuntu](https://aws.amazon.com/marketplace/seller-profile?id=565feec9-3d43-413e-9760-c651546613f2&ref=dtl_B01JBL2M0O) 14.04
+* [Ubuntu](https://aws.amazon.com/marketplace/seller-profile?id=565feec9-3d43-413e-9760-c651546613f2&ref=dtl_B01JBL2M0O) 16.04
+* [Ubuntu](https://aws.amazon.com/marketplace/seller-profile?id=565feec9-3d43-413e-9760-c651546613f2&ref=dtl_B01JBL2M0O) 18.04
 [back to the top](#top)
 
 * * *
@@ -51,16 +54,7 @@ See the following resources before getting started:
 
 the following are details:
 
-* **C Library**: `skdet`
-    - required for specialized rootkit detection
-    - compiles, installs
-
-* **Uninstall Utility**
-    - Installs uninstall utility in local config directory should you ever need to remove Rkhunter
-
-* **Configuration File**
-    - generates local configuration file required for uninstall
-
+TBD
 
 [back to the top](#top)
 
@@ -71,7 +65,7 @@ the following are details:
 Run the installer from the cli via the following command:
 
 ```bash
-    $ sudo sh rkhunter-install.sh
+    $ machineimage --image redhat7.5 --region eu-west-1
 ```
 
 Installation directory is set using the `--layout` parameter:
@@ -93,7 +87,7 @@ Installation directory is set using the `--layout` parameter:
 To display the help menu:
 
 ```bash
-    $ sh rkhunter-install.sh --help
+    $ machineimage --help
 ```
 
 [![help](./assets/help-menu.png)](https://rawgithub.com/fstab50/gensec/master/rkhunter/assets/help-menu.png)
@@ -102,7 +96,7 @@ To display the help menu:
 To display help menu for the `--configure` option:
 
 ```bash
-    $ sh rkhunter-install.sh --configure
+    $ machineimage
 ```
 
 [![help-configure](./assets/help-configure.png)](https://rawgithub.com/fstab50/gensec/master/rkhunter/assets/help-configure.png)
