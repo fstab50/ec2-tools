@@ -1,13 +1,13 @@
 <a name="top"></a>
 * * *
-# ec2tools
+# ec2tools | machineimage
 * * *
 
 ## Summary
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
-Reference Project, VERSION **1.0**
+Reference Project, VERSION **0.3.1**
 
 * * *
 
@@ -63,21 +63,48 @@ TBD
 
 ## Instructions
 
-Run the installer from the cli via the following command:
+Run the installer from the cli via the following example commands
+
+### Return Image for a particular region
+
+Format:  `json` (DEFAULT)
 
 ```bash
     $ machineimage --image redhat7.5 --region eu-west-1
 ```
 
-Installation directory is set using the `--layout` parameter:
+![redhat7](./assets/redhat7.5-1region.png)
+
+### Return Image for a particular region (DETAILS)
+
+Format:  `json` (DEFAULT)
 
 ```bash
-
-    $ sudo sh rkhunter-install.sh --layout /usr    
-
-        # install directory /usr/bin
-
+    $ machineimage --image redhat7.5 --region eu-west-1 --details
 ```
+
+![redhat7](./assets/redhat7.5-details.png)
+
+
+### Return the AMI Image id for all regions
+
+Format:  `json` (DEFAULT)
+
+```bash
+    $ machineimage --image amazonlinux1
+```
+
+![aml1](./assets/aml1-allregions.png)
+
+### Return the AMI Image id for all regions (text format)
+
+Format:  `text`
+
+```bash
+    $ machineimage --image amazonlinux2
+```
+
+![aml1](./assets/aml2-text.png)
 
 [back to the top](#top)
 
