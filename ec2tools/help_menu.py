@@ -16,9 +16,9 @@ RESET = Colors.RESET
 
 synopsis_cmd = (
     Colors.RESET + PKG_ACCENT + Colors.BOLD + PACKAGE + RESET +
-    PARAM_ACCENT + '  --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + RESET + '}' +
-    PARAM_ACCENT + '  --profile ' + Colors.RESET + ' [PROFILE] ' +
-    PARAM_ACCENT + '  --region ' + Colors.RESET + ' [REGION] '
+    PARAM_ACCENT + ' --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + RESET + '}' +
+    PARAM_ACCENT + ' --profile ' + Colors.RESET + ' [PROFILE] ' +
+    PARAM_ACCENT + ' --region ' + Colors.RESET + ' [REGION] '
     )
 
 url_doc = Colors.URL + 'http://pyaws.readthedocs.io' + Colors.RESET
@@ -61,19 +61,18 @@ menu_body = Colors.BOLD + Colors.WHITE + """
 
                     Default: """ + Colors.BOLD + 'list' + Colors.RESET + """
     """ + Colors.BOLD + Colors.WHITE + """
-        -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local
-            awscli config for which you want to rotate access keys
+        -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local awscli
+            configuration to be used when authenticating to Amazon Web Services
     """ + Colors.BOLD + Colors.WHITE + """
-        -a, --auto""" + Colors.RESET + """ : Suppress output to stdout when """ + PACKAGE + """ triggered via a sched-
-            uler such as cron or by some other automated means to rotate keys
-            on a periodic schedule.
+        -d, --details""" + Colors.RESET + """ : Output all fields associated with each individual AMI
+            identifier returned
     """ + Colors.BOLD + Colors.WHITE + """
-        -c, --configure""" + Colors.RESET + """ :  Configure parameters to custom values. If the local
-            config file does not exist, option writes a new local configuration
+        -f, --format""" + Colors.RESET + """ <value>:  Output format, json or plain text (DEFAULT: json)
     """ + Colors.BOLD + Colors.WHITE + """
-        -d, --debug""" + Colors.RESET + """ : when True, do not write to the local awscli configuration
-            file(s). Instead, write to a temporary location for testing the int-
-            grity of the credentials file format that is written to disk.
+        -n, --filename""" + Colors.RESET + """ <value>: Write output to a filesystem object with a name
+            specified in the --filename parameter
+    """ + Colors.BOLD + Colors.WHITE + """
+        -d, --debug""" + Colors.RESET + """ :  Turn on verbose log output
     """ + Colors.BOLD + Colors.WHITE + """
         -V, --version""" + Colors.RESET + """ : Print package version
     """ + Colors.BOLD + Colors.WHITE + """
