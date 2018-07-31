@@ -324,19 +324,28 @@ def os_version(imageType):
 
 
 def format_text(json_object):
-    """ Formats json object into text format """
+    """
+    Summary:
+        Formats json object into text format
+    Args:
+        :json_object (json):  object with json schema
+    Returns:
+        text object | empty string upon failure
+    """
     block = ''
     try:
         for k,v in json_object.items():
-            row = '%s:\t%s\n' % (str(k), str(v))
+            key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
+            value = Colors.GOLD3 + str(v) + Colors.RESET
+            row = '%s:\t%s\n' % (key, value)
             block += row
-        print(block.strip())
     except KeyError as e:
         logger.exception(
             '%s: json_object does not appear to be json structure. Error (%s)' %
             (inspect.stack()[0][3], str(e))
             )
-    return True
+        return ''
+    return block.strip()
 
 
 def main(profile, imagetype, format, details, debug, filename='', rgn=None):
@@ -369,13 +378,17 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
                 r = export_json_object(dict_obj=latest, logging=False)
             else:
                 print(json.dumps(latest, indent=4))
-                r = True
+                return True
 
         elif format == 'json' and filename:
             r = export_json_object(dict_obj=latest, filename=filename)
 
         elif format == 'text' and not filename:
-            r = format_text(latest)
+            print(format_text(latest))
+            return True
+
+        elif format == 'text' and filename:
+            r = write_to_file(text=format_text(latest), file=filename)
 
     except Exception as e:
         logger.exception(
@@ -410,6 +423,19 @@ def package_version():
     """
     print(about.about_object)
     sys.exit(exit_codes['EX_OK']['Code'])
+
+
+def write_to_file(text, file):
+    """ Writes text object to the local filesystem """
+    try:
+        with open(file, 'w') as f1:
+            f1.write(text)
+    except OSError as e:
+        logger.exception(
+            '%s: Problem writing %s to local filesystem' %
+            (inspect.stack()[0][3], file))
+        return False
+    return True
 
 
 def init_cli():
