@@ -323,7 +323,7 @@ def os_version(imageType):
     return ''.join(re.split('(\d+)', imageType)[1:])
 
 
-def format_text(json_object):
+def format_text(json_object, file=None):
     """
     Summary:
         Formats json object into text format
@@ -335,8 +335,14 @@ def format_text(json_object):
     block = ''
     try:
         for k,v in json_object.items():
-            key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
-            value = Colors.GOLD3 + str(v) + Colors.RESET
+            # format k,v depending if writing to the screen (tty) or fs
+            if is_tty() or not file:
+                key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
+                value = Colors.GOLD3 + str(v) + Colors.RESET
+            else:
+                key = str(k)
+                value = str(v)
+            if k == json_object[-1]
             row = '%s:\t%s\n' % (key, value)
             block += row
     except KeyError as e:
@@ -388,7 +394,7 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
             return True
 
         elif format == 'text' and filename:
-            r = write_to_file(text=format_text(latest), file=filename)
+            r = write_to_file(text=format_text(latest, filename), file=filename)
 
     except Exception as e:
         logger.exception(
