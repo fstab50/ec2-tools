@@ -332,17 +332,18 @@ def format_text(json_object, file=None):
     Returns:
         text object | empty string upon failure
     """
+
     block = ''
+
     try:
         for k,v in json_object.items():
             # format k,v depending if writing to the screen (tty) or fs
-            if is_tty() or not file:
+            if is_tty() and file is None:
                 key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
                 value = Colors.GOLD3 + str(v) + Colors.RESET
             else:
                 key = str(k)
                 value = str(v)
-            if k == json_object[-1]
             row = '%s:\t%s\n' % (key, value)
             block += row
     except KeyError as e:
