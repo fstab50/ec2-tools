@@ -344,7 +344,7 @@ def format_text(json_object, file=None):
             else:
                 key = str(k)
                 value = str(v)
-            row = '%s:\t%s\n' % (key, value)
+            row = '%s \t%s\n' % (key, value)
             block += row
     except KeyError as e:
         logger.exception(
@@ -481,6 +481,18 @@ def init_cli():
                         format=args.format, filename=args.filename,
                         rgn=args.region, details=args.details, debug=args.debug
                     )
+            else:
+                stdout_message(
+                    'Invalid AWS region code %s.  Region must be one of:' %
+                        (Colors.RED + args.region + Colors.RESET),
+                    prefix='WARN',
+                    severity='WARNING'
+                    )
+                for region in get_regions(args.profile):
+                    print('\t\t' + region)
+                print('\n')
+                sys.exit(exit_codes['E_BADARG']['Code'])
+
         elif args.image and not args.region:
             main(
                     profile=args.profile, imagetype=args.image,
