@@ -67,7 +67,7 @@ menu_body = Colors.BOLD + Colors.WHITE + """
         -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local awscli
             configuration to be used when authenticating to Amazon Web Services
     """ + Colors.BOLD + Colors.WHITE + """
-        -d, --details""" + Colors.RESET + """ : Output all fields associated with each individual AMI
+        -d, --details""" + Colors.RESET + """ : Output all metadata associated with each individual AMI
             identifier returned
     """ + Colors.BOLD + Colors.WHITE + """
         -f, --format""" + Colors.RESET + """ <value>:  Output format, json or plain text (DEFAULT: json)
