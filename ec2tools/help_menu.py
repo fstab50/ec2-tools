@@ -11,7 +11,7 @@ from pyaws.core.colors import Colors
 PACKAGE = 'machineimage'
 PKG_ACCENT = Colors.ORANGE
 PARAM_ACCENT = Colors.WHITE
-AMI = Colors.BOLD + Colors.PURPLE
+AMI = Colors.DARKCYAN
 RESET = Colors.RESET
 
 synopsis_cmd = (
@@ -63,22 +63,23 @@ menu_body = Colors.BOLD + Colors.WHITE + """
                     - """ + AMI + """ubuntu14.04""" + RESET + """     :   Ubuntu Linux 14.04
                     - """ + AMI + """ubuntu16.04""" + RESET + """     :   Ubuntu Linux 16.04
                     - """ + AMI + """ubuntu18.04""" + RESET + """     :   Ubuntu Linux 18.04
-
     """ + Colors.BOLD + Colors.WHITE + """
-        -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local awscli
-            configuration to be used when authenticating to Amazon Web Services
+        -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local
+            awscli configuration to  be  used when authenticating to Amazon
+            Web Services
     """ + Colors.BOLD + Colors.WHITE + """
-        -d, --details""" + Colors.RESET + """ : Output all metadata associated with each individual AMI
-            identifier returned
+        -d, --details""" + Colors.RESET + """ : Output all metadata associated with each individual
+            AMI identifier returned
     """ + Colors.BOLD + Colors.WHITE + """
-        -f, --format""" + Colors.RESET + """ <value>:  Output format, json or plain text (DEFAULT: json)
+        -f, --format""" + Colors.RESET + """ (string):  Output format, json or  plain text (DEFAULT:
+            json)
     """ + Colors.BOLD + Colors.WHITE + """
-        -n, --filename""" + Colors.RESET + """ <value>: Write output to a filesystem object with a name
-            specified in the --filename parameter
+        -n, --filename""" + Colors.RESET + """ <value>:  Write output to a filesystem object with a
+            name specified in the --filename parameter
     """ + Colors.BOLD + Colors.WHITE + """
-        -r, --region""" + Colors.RESET + """ <value>: Amazon Web Services Region Code. When provided as
-            a parameter, """ + PACKAGE + """ returns the AMI image only for a particular
-            AWS region.  Examples: ap-northeast-1 (Tokyo, Japan)
+        -r, --region""" + Colors.RESET + """ <value>: Amazon Web Services Region Code. When provided
+            as a parameter, """ + PACKAGE + """ returns  the AMI  image only for  a
+            particular AWS region.  Examples: ap-northeast-1 (Tokyo, Japan)
     """ + Colors.BOLD + Colors.WHITE + """
         -d, --debug""" + Colors.RESET + """ :  Turn on verbose log output
     """ + Colors.BOLD + Colors.WHITE + """

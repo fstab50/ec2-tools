@@ -40,7 +40,7 @@ def help_menu():
     Displays help menu contents
     """
     print(
-        Colors.BOLD + '\n\t\t\t  ' + 'machineimage' + Colors.RESET +
+        Colors.BOLD + '\n\t\t\t' + 'machineimage' + Colors.RESET +
         ' help contents'
         )
     sys.stdout.write(menu_body)
