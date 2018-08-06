@@ -27,16 +27,27 @@ import ec2tools
 
 
 requires = [
-    'boto3',
-    'botocore',
-    'docutils',
-    'jmespath',
-    'pyaws',
-    'PyYAML',
-    'Pygments',
-    'pytz',
-    's3transfer',
-    'six'
+    'boto3==1.7.70',
+    'botocore==1.10.70',
+    'certifi==2018.4.16',
+    'chardet==3.0.4',
+    'colorama==0.3.9',
+    'docutils==0.14',
+    'idna==2.7',
+    'jmespath==0.9.3',
+    'pkginfo==1.4.2',
+    'pyaws==0.1.18',
+    'Pygments==2.2.0',
+    'python-dateutil==2.7.3',
+    'pytz==2018.5',
+    'PyYAML==3.13',
+    'requests==2.19.1',
+    'requests-toolbelt==0.8.0',
+    's3transfer==0.1.13',
+    'six==1.11.0',
+    'tqdm==4.24.0',
+    'twine==1.11.0',
+    'urllib3==1.23'
 ]
 
 

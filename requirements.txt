@@ -1,4 +1,3 @@
-awscli
 boto3
 botocore
 colorama
@@ -9,7 +8,6 @@ Pygments
 python-dateutil
 pytz
 PyYAML
-requests
 s3transfer
 six
 twine
