@@ -336,7 +336,7 @@ def format_text(json_object, file=None):
     block = ''
 
     try:
-        for k,v in json_object.items():
+        for k, v in json_object.items():
             # format k,v depending if writing to the screen (tty) or fs
             if is_tty() and file is None:
                 key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
@@ -483,10 +483,10 @@ def init_cli():
                     )
             else:
                 stdout_message(
-                    'Invalid AWS region code %s.  Region must be one of:' %
+                        'Invalid AWS region code %s. Region must be one of:' %
                         (Colors.RED + args.region + Colors.RESET),
-                    prefix='WARN',
-                    severity='WARNING'
+                        prefix='WARN',
+                        severity='WARNING'
                     )
                 for region in get_regions(args.profile):
                     print('\t\t' + region)
