@@ -19,7 +19,7 @@ VERSION_FILE = $(CUR_DIR)/$(PROJECT)/_version.py
 
 .PHONY: fresh-install fresh-test-install deploy-test deploy-prod
 
-zero-source-install: clean setup-venv source-install   ## Install (source: local). Zero prebuild artifacts
+zero-source-install: clean source-install   ## Install (source: local). Zero prebuild artifacts
 
 zero-test-install: clean setup-venv test-install  ## Install (source: testpypi). Zero prebuild artifacts
 
@@ -96,7 +96,7 @@ test-install:  ## Install (source: testpypi). Build artifacts exist
 
 
 .PHONY: source-install
-source-install:    ## Install (source: local source). Build artifacts exist
+source-install:  setup-venv  ## Install (source: local source). Build artifacts exist
 	if [ ! -e $(VENV_DIR) ]; then $(MAKE) clean; fi; \
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
 	$(PIP_CALL) install .
