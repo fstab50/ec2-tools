@@ -162,12 +162,9 @@ To display the help menu:
     $ machineimage  --help
 ```
 
-[![help](./assets/help-menu.png)](https://rawgithub.com/fstab50/ec2tools/master/assets/help-menu.png)
-
 <p align="center">
   <img src="https://rawgithub.com/fstab50/ec2tools/master/assets/help-menu.png" alt="ec2tools help"/>
 </p>
-
 
 
 [back to the top](#top)
