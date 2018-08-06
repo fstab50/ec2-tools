@@ -7,7 +7,7 @@
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
-**ec2tools**
+[ec2tools](https://pypi.org/project/ec2tools)
 
 Version:	0.3.12
 
@@ -68,6 +68,8 @@ See the following resources before getting started:
 
 ## Supported Operating Systems
 
+Returns most current Amazon Machine Image ID for the following Operating System Types:
+
 * [Amazon Linux 1](https://aws.amazon.com/amazon-linux-ami) 2017+
 * [Amazon Linux 2](https://aws.amazon.com/amazon-linux-2) 2018+
 * [Redhat](https://aws.amazon.com/partners/redhat/) 7.3, 7.4, 7.5
@@ -82,11 +84,11 @@ See the following resources before getting started:
 
 ## Installation
 
-Install **ec2tools** via pip:
+Install [ec2tools](https://pypi.org/project/ec2tools) via pip:
 
 ```bash
 
-$ pip install ec2tools
+$ pip install ec2tools --user
 
 ```
 
@@ -102,10 +104,12 @@ Run the installer from the cli via the following example commands
 
 ### Return Image for a particular region
 
-Format:  `json` (DEFAULT)
+Format:  `json`
+
+(JSON is default format)
 
 ```bash
-    $ machineimage --image redhat7.5 --region eu-west-1
+    $ machineimage  --image redhat7.5  --region eu-west-1
 ```
 
 ![redhat7](./assets/redhat7.5-1region.png)
@@ -114,10 +118,10 @@ Format:  `json` (DEFAULT)
 
 ### Return Image for a particular region (DETAILS)
 
-Format:  `json` (DEFAULT)
+Format:  `json`
 
 ```bash
-    $ machineimage --image centos7 --region eu-west-1 --details
+    $ machineimage  --image centos7  --region eu-west-1  --details
 ```
 
 ![redhat7](./assets/centos7-details.png)
@@ -126,10 +130,10 @@ Format:  `json` (DEFAULT)
 
 ### Return the AMI Image id for all regions
 
-Format:  `json` (DEFAULT)
+Format:  `json`
 
 ```bash
-    $ machineimage --image amazonlinux1
+    $ machineimage  --image amazonlinux1
 ```
 
 ![aml1](./assets/aml1-allregions.png)
@@ -141,7 +145,7 @@ Format:  `json` (DEFAULT)
 Format:  `text`
 
 ```bash
-    $ machineimage --image amazonlinux2
+    $ machineimage  --image amazonlinux2
 ```
 
 ![aml1](./assets/aml2-text.png)
