@@ -17,30 +17,28 @@ RESET = Colors.RESET
 synopsis_cmd = (
     Colors.RESET + PKG_ACCENT + Colors.BOLD + PACKAGE + RESET +
     PARAM_ACCENT + '  --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + RESET + '}' +
-    PARAM_ACCENT + '  --profile' + Colors.RESET + ' [PROFILE]' +
-    PARAM_ACCENT + '  --region' + Colors.RESET + ' [REGION]'
+    PARAM_ACCENT + ' --profile' + Colors.RESET + ' <value>' +
+    PARAM_ACCENT + ' --region' + Colors.RESET + ' <value>'
     )
 
-url_doc = Colors.URL + 'http://pyaws.readthedocs.io' + Colors.RESET
-url_sc = Colors.URL + 'https://bitbucket.org/blakeca00/keyup' + Colors.RESET
+url_sc = Colors.URL + 'https://github.com/fstab50/ec2tools' + Colors.RESET
 
 menu_body = Colors.BOLD + Colors.WHITE + """
   DESCRIPTION""" + Colors.RESET + """
 
             Return latest Amazon Machine Image (AMI) in a Region
             Source Code:  """ + url_sc + """
-
     """ + Colors.BOLD + Colors.WHITE + """
   SYNOPSIS""" + Colors.RESET + """
 
-            """ + synopsis_cmd + """
+          """ + synopsis_cmd + """
 
-                            -i, --image    <value>
-                            -p, --profile  <value>
+                            -i, --image   <value>
                            [-d, --details  ]
-                           [-f, --format   <value> ]
                            [-n, --filename <value> ]
-                           [-r, --region <value> ]
+                           [-f, --format   <value> ]
+                           [-p, --profile <value> ]
+                           [-r, --region   <value> ]
                            [-d, --debug    ]
                            [-h, --help     ]
                            [-V, --version  ]
@@ -66,25 +64,26 @@ menu_body = Colors.BOLD + Colors.WHITE + """
     """ + Colors.BOLD + Colors.WHITE + """
         -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local
             awscli configuration to  be  used when authenticating to Amazon
-            Web Services
+            Web Services. If omitted, defaults to "default" profilename.
     """ + Colors.BOLD + Colors.WHITE + """
         -d, --details""" + Colors.RESET + """ : Output all metadata associated with each individual
-            AMI identifier returned
+            Amazon Machine Image identifier returned.
     """ + Colors.BOLD + Colors.WHITE + """
         -f, --format""" + Colors.RESET + """ (string):  Output format, json or  plain text (DEFAULT:
-            json)
+            json).
     """ + Colors.BOLD + Colors.WHITE + """
         -n, --filename""" + Colors.RESET + """ <value>:  Write output to a filesystem object with a
-            name specified in the --filename parameter
+            name specified in the --filename parameter.
     """ + Colors.BOLD + Colors.WHITE + """
         -r, --region""" + Colors.RESET + """ <value>: Amazon Web Services Region Code. When provided
             as a parameter, """ + PACKAGE + """ returns  the AMI  image only for  a
-            particular AWS region.  Examples: ap-northeast-1 (Tokyo, Japan)
+            particular AWS region.  Examples: ap-northeast-1 (Tokyo, Japan).
+            If region omitted, returns Amazon Machine Images for all regions.
     """ + Colors.BOLD + Colors.WHITE + """
-        -d, --debug""" + Colors.RESET + """ :  Turn on verbose log output
+        -d, --debug""" + Colors.RESET + """ :  Turn on verbose log output.
     """ + Colors.BOLD + Colors.WHITE + """
-        -V, --version""" + Colors.RESET + """ : Print package version
+        -V, --version""" + Colors.RESET + """ : Print package version.
     """ + Colors.BOLD + Colors.WHITE + """
-        -h, --help""" + Colors.RESET + """ : Show this help message and exit
+        -h, --help""" + Colors.RESET + """ : Show this help message and exit.
 
     """
