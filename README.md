@@ -17,7 +17,8 @@ VERSION: **0.3.1**
 
 * [Getting Started](#getting-started)
 * [Dependencies](#dependencies)
-* [Details](#details)
+* [Supported Operation Systems](#supported-operating-systems)
+* [Installation](#installation)
 * [Instructions](#instructions)
 * [Help](#help)
 * [Author & Copyright](#author--copyright)
@@ -41,6 +42,33 @@ See the following resources before getting started:
 
 ## Dependencies
 
+* [Python 3.6+](https://www.python.org) is required.
+* [Amazon Web Services](https://aws.amazon.com) Account
+* An IAM user or Role with at least read-only permissions (sample IAM policy below)
+
+```json
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:Describe*"
+            ],
+            "Resource": "*"
+        }
+    ]
+ }
+
+```
+
+[back to the top](#top)
+
+* * *
+
+## Supported Operating Systems
+
 * [Amazon Linux 1](https://aws.amazon.com/amazon-linux-ami) 2017+
 * [Amazon Linux 2](https://aws.amazon.com/amazon-linux-2) 2018+
 * [Redhat](https://aws.amazon.com/partners/redhat/) 7.3, 7.4, 7.5
@@ -53,11 +81,15 @@ See the following resources before getting started:
 
 * * *
 
-## Details
+## Installation
 
-the following are details:
+Install **ec2tools** via pip:
 
-TBD
+```bash
+
+$ pip install ec2tools
+
+```
 
 [back to the top](#top)
 
