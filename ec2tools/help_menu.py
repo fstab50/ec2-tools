@@ -17,8 +17,8 @@ RESET = Colors.RESET
 synopsis_cmd = (
     Colors.RESET + PKG_ACCENT + Colors.BOLD + PACKAGE + RESET +
     PARAM_ACCENT + '  --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + RESET + '}' +
-    PARAM_ACCENT + ' --profile' + Colors.RESET + ' <value>' +
-    PARAM_ACCENT + ' --region' + Colors.RESET + ' <value>'
+    PARAM_ACCENT + '  --profile' + Colors.RESET + ' <value>' +
+    PARAM_ACCENT + '  --region' + Colors.RESET + ' <value>'
     )
 
 url_sc = Colors.URL + 'https://github.com/fstab50/ec2tools' + Colors.RESET
