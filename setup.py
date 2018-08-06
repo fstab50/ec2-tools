@@ -39,15 +39,9 @@ requires = [
     'pyaws==0.1.18',
     'Pygments==2.2.0',
     'python-dateutil==2.7.3',
-    'pytz==2018.5',
     'PyYAML==3.13',
-    'requests==2.19.1',
-    'requests-toolbelt==0.8.0',
     's3transfer==0.1.13',
-    'six==1.11.0',
-    'tqdm==4.24.0',
-    'twine==1.11.0',
-    'urllib3==1.23'
+    'six==1.11.0'
 ]
 
 
