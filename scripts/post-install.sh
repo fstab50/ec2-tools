@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Post-Install Script: pyaws 
+# Post-Install Script: ec2tools
 #
 
 # globals
@@ -46,11 +46,11 @@ function std_message(){
 
 
 if [ $(which rsyslog) ]; then
-    LOGGER="rsyslog"    
+    LOGGER="rsyslog"
     # configure rsyslog facility
-    echo -e '\n# added by pyaws installer' >> /etc/rsyslog.d/50-default.conf 
-    echo -e 'local7.*      -/var/log/pyaws.log' >> /etc/rsyslog.d/50-default.conf 
-    
+    echo -e '\n# added by ec2tools installer' >> /etc/rsyslog.d/50-default.conf
+    echo -e 'local7.*      -/var/log/ec2tools.log' >> /etc/rsyslog.d/50-default.conf
+
 elif [ $(which syslog-ng) ]; then
     LOGGER="syslog-ng"
     # configure syslog-ng facility
@@ -71,7 +71,7 @@ if [ $(which systemctl) ]; then
 
 elif [ $(which service?) ]; then
     # init = upstart
-    
+
 elif [ $(which /etc/init.d) ]; then
     # init = init.d
 
@@ -81,20 +81,18 @@ fi
 $RESTART_LOGGER
 
 # test configuration
-$log -p "$facility.info" "pyaws installer test message"
+$log -p "$facility.info" "ec2tools installer test message"
 
 # confirm test results
-if [ $(grep pyaws /var/log/pyaws.log) ]; then
+if [ $(grep ec2tools /var/log/ec2tools.log) ]; then
 
-    msg="[INFO]: pyaws post installation completed successfully"
+    msg="[INFO]: ec2tools post installation completed successfully"
     $log -p "$facility.info" "$msg"
     std_message "$msg" INFO
 else
-    std_message "pyaws post installation was unable to configure system logger" WARN
+    std_message "ec2tools post installation was unable to configure system logger" WARN
 fi
 
 
 # --- end ---#
 exit 0
-
-

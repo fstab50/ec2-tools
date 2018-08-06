@@ -18,7 +18,7 @@ from botocore.exceptions import ClientError, ProfileNotFound
 # test imports
 sys.path.insert(0, os.path.abspath('../'))
 from tests import environment
-from pyaws.statics import PACKAGE
+from ec2tools.statics import PACKAGE
 
 # global objects
 config = ConfigParser()

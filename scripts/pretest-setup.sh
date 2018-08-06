@@ -12,7 +12,7 @@
 #       pkg:        script name reported in logs will be the basename of the caller
 #
 
-PROJECT='pyaws'
+PROJECT='ec2tools'
 pkg=$(basename $0)                                      # pkg (script) full name
 pkg_root="$(echo $pkg | awk -F '.' '{print $1}')"       # pkg without file extention
 pkg_path=$(cd $(dirname $0); pwd -P)                    # location of pkg
@@ -24,7 +24,7 @@ tests_dir=$ROOT'/tests'
 test_assets=$ROOT'/tests/assets'
 test_credential_file="$test_assets/test-user-credentials.ini"
 log_dir="$HOME/logs"
-log_file="$log_dir/pyaws-testsetup.log"
+log_file="$log_dir/ec2tools-testsetup.log"
 PROFILE='gcreds-da-atos'
 VERSION='1.0'
 
@@ -163,7 +163,7 @@ function depcheck(){
     fi
 
     ## check for required cli tools ##
-    binary_depcheck awk grep aws pyaws jq python3
+    binary_depcheck awk grep aws jq python3
 
     ## check python version ##
     python_version_depcheck "3.0" "3.6"
@@ -330,7 +330,7 @@ function update_credentials(){
     ## refreshes credentials in local awscli configuration ##
     local user="$1"
     #
-    pyaws --profile $PROFILE --user-name $user --operation up
+    keyup --profile $PROFILE --user-name $user --operation up
     std_message "Completed credential update for user $user" "INFO" $log_file
 }
 
@@ -339,7 +339,7 @@ function update_credentials_bulk(){
     declare -a users=("${!1}")
     #
     for user in ${users[@]}; do
-        pyaws --profile $PROFILE --user-name $user --operation up
+        keyup --profile $PROFILE --user-name $user --operation up
         std_message "Completed credential update for user $user" "INFO" $log_file
     done
 }
@@ -353,7 +353,7 @@ if [ $test_user0 ]; then
     presetup_check $test_user0
 fi
 
-std_message "${title}pyaws${bodytext} Automated Testing Setup Check -- Start" "INFO"  $log_file
+std_message "${title}ec2tools${bodytext} Automated Testing Setup Check -- Start" "INFO"  $log_file
 
 # check dependencies
 aws_default_region

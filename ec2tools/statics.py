@@ -1,6 +1,6 @@
 """
 Summary:
-    pyaws Project-level Defaults and Settings
+    Project-level Defaults and Settings:  ec2tools
 
     - **Local Default Settings**: Local defaults for your specific installation are derived from settings found in:
 
