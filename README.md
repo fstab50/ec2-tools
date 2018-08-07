@@ -104,9 +104,8 @@ Run the installer from the cli via the following example commands
 
 ### Return Image for a particular region
 
-Format:  `json`
+Format:  `json` (default)
 
-(JSON is default format)
 
 ```bash
     $ machineimage  --image redhat7.5  --region eu-west-1
@@ -145,7 +144,9 @@ Format:  `json`
 Format:  `text`
 
 ```bash
-    $ machineimage  --image amazonlinux2
+
+    $ machineimage   --image amazonlinux2   --format text
+
 ```
 
 ![aml1](./assets/aml2-text.png)
