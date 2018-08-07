@@ -20,13 +20,14 @@ except Exception:
 
 # globals
 logger = logd.getLogger(__version__)
+DEFAULT_REGION = os.environ['AWS_DEFAULT_REGION']
 VALID_FORMATS = ('json', 'text')
 VALID_AMI_TYPES = (
-        'amazonlinux1', 'amazonlinux2', 'redhat7.3', 'redhat7.4', 'redhat7.5',
+        'amazonlinux1', 'amazonlinux2',
+        'redhat7.3', 'redhat7.4', 'redhat7.5',
         'ubuntu14.04', 'ubuntu16.04', 'ubuntu16.10', 'ubuntu18.04', 'ubuntu18.10',
         'centos5', 'centos6', 'centos7'
     )
-DEFAULT_REGION = os.environ['AWS_DEFAULT_REGION']
 
 # AWS Marketplace Owner IDs
 UBUNTU = '099720109477'
@@ -59,6 +60,17 @@ def get_regions(profile):
             (inspect.stack()[0][3], str(e)))
         raise e
     return [x['RegionName'] for x in client.describe_regions()['Regions']]
+
+
+def newest_ami(image_list):
+    """
+    Summary:
+        Returns metadata for the most recent amazon machine image returned
+        for a region from boto3
+    """
+    if image_list:
+        return sorted(image_list, key=lambda k: k['CreationDate'])[-1]
+    return {}
 
 
 def amazonlinux1(profile, region=None, detailed=False, debug=False):
@@ -238,10 +250,9 @@ def redhat(profile, os, region=None, detailed=False, debug=False):
                     }
                 ])
 
-            # need to find ami with latest date returned
-            newest = sorted(r['Images'], key=lambda k: k['CreationDate'])[-1]
+            newest = newest_ami(r['Images'])
             metadata[region] = newest
-            amis[region] = newest['ImageId']
+            amis[region] = newest.get('ImageId', 'unavailable')
         except ClientError as e:
             logger.exception(
                 '%s: Boto error while retrieving AMI data (%s)' %
