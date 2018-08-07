@@ -46,7 +46,7 @@ else:
 
     # logging parameters
     enable_logging = True
-    log_mode = 'FILE'
+    log_mode = 'STREAM'
     log_filename = PACKAGE + '.log'
     log_dir = os_parityPath(user_home + '/' + 'logs')
     log_path = os_parityPath(log_dir + '/' + log_filename)
