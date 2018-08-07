@@ -108,6 +108,7 @@ def amazonlinux1(profile, region=None, detailed=False, debug=False):
                 ])
 
             # need to find ami with latest date returned
+            debug_message(r, region, debug)
             newest = newest_ami(r['Images'])
             metadata[region] = newest
             amis[region] = newest.get('ImageId', 'unavailable')
@@ -162,6 +163,7 @@ def amazonlinux2(profile, region=None, detailed=False, debug=False):
                 ])
 
             # need to find ami with latest date returned
+            debug_message(r, region, debug)
             newest = newest_ami(r['Images'])
             metadata[region] = newest
             amis[region] = newest.get('ImageId', 'unavailable')
@@ -211,6 +213,7 @@ def centos(profile, os, region=None, detailed=False, debug=False):
                 ])
 
             # need to find ami with latest date returned
+            debug_message(r, region, debug)
             newest = newest_ami(r['Images'])
             metadata[region] = newest
             amis[region] = newest.get('ImageId', 'unavailable')
@@ -259,6 +262,8 @@ def redhat(profile, os, region=None, detailed=False, debug=False):
                     }
                 ])
 
+            # need to find ami with latest date returned
+            debug_message(r, region, debug)
             newest = newest_ami(r['Images'])
             metadata[region] = newest
             amis[region] = newest.get('ImageId', 'unavailable')
