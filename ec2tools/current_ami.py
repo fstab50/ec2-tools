@@ -36,6 +36,16 @@ CENTOS = '679593333241'
 REDHAT = '679593333241'
 
 
+def debug_message(response, rgn, mode):
+    """
+    Prints debug output
+    """
+    if mode:
+        stdout_message('REGION: %s' % rgn)
+        print(json.dumps(response, indent=4))
+    return True
+
+
 def help_menu():
     """
     Displays help menu contents
@@ -60,17 +70,6 @@ def get_regions(profile):
             (inspect.stack()[0][3], str(e)))
         raise e
     return [x['RegionName'] for x in client.describe_regions()['Regions']]
-
-
-def newest_ami(image_list):
-    """
-    Summary:
-        Returns metadata for the most recent amazon machine image returned
-        for a region from boto3
-    """
-    if image_list:
-        return sorted(image_list, key=lambda k: k['CreationDate'])[-1]
-    return {}
 
 
 def amazonlinux1(profile, region=None, detailed=False, debug=False):
@@ -103,8 +102,11 @@ def amazonlinux1(profile, region=None, detailed=False, debug=False):
                         ]
                     }
                 ])
-            metadata[region] = r['Images'][0]
-            amis[region] = r['Images'][0]['ImageId']
+
+            # need to find ami with latest date returned
+            newest = newest_ami(r['Images'])
+            metadata[region] = newest
+            amis[region] = newest.get('ImageId', 'unavailable')
         except ClientError as e:
             logger.exception(
                 '%s: Boto error while retrieving AMI data (%s)' %
@@ -154,8 +156,11 @@ def amazonlinux2(profile, region=None, detailed=False, debug=False):
                         ]
                     }
                 ])
-            metadata[region] = r['Images'][0]
-            amis[region] = r['Images'][0]['ImageId']
+
+            # need to find ami with latest date returned
+            newest = newest_ami(r['Images'])
+            metadata[region] = newest
+            amis[region] = newest.get('ImageId', 'unavailable')
         except ClientError as e:
             logger.exception(
                 '%s: Boto error while retrieving AMI data (%s)' %
@@ -202,9 +207,9 @@ def centos(profile, os, region=None, detailed=False, debug=False):
                 ])
 
             # need to find ami with latest date returned
-            newest = sorted(r['Images'], key=lambda k: k['CreationDate'])[-1]
+            newest = newest_ami(r['Images'])
             metadata[region] = newest
-            amis[region] = newest['ImageId']
+            amis[region] = newest.get('ImageId', 'unavailable')
         except ClientError as e:
             logger.exception(
                 '%s: Boto error while retrieving AMI data (%s)' %
@@ -299,11 +304,10 @@ def ubuntu(profile, os, region=None, detailed=False, debug=False):
                 ])
 
             # need to find ami with latest date returned
-            if debug:
-                print(json.dumps(r, indent=4))
-            newest = sorted(r['Images'], key=lambda k: k['CreationDate'])[-1]
+            debug_message(r, regon, debug)
+            newest = newest_ami(r['Images'])
             metadata[region] = newest
-            amis[region] = newest['ImageId']
+            amis[region] = newest.get('ImageId', 'unavailable')
         except ClientError as e:
             logger.exception(
                 '%s: Boto error while retrieving AMI data (%s)' %
@@ -330,7 +334,9 @@ def is_tty():
 
 
 def os_version(imageType):
-    """ Returns the version when provided redhat AMI type """
+    """
+    Returns the version when provided redhat AMI type
+    """
     return ''.join(re.split('(\d+)', imageType)[1:])
 
 
@@ -433,6 +439,17 @@ def options(parser, help_menu=False):
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
     return parser.parse_args()
+
+
+def newest_ami(image_list):
+    """
+    Summary:
+        Returns metadata for the most recent amazon machine image returned
+        for a region from boto3
+    """
+    if image_list:
+        return sorted(image_list, key=lambda k: k['CreationDate'])[-1]
+    return {}
 
 
 def package_version():
