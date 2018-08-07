@@ -71,7 +71,7 @@ Returns most current Amazon Machine Image ID for the following Operating System 
 * [Amazon Linux 1](https://aws.amazon.com/amazon-linux-ami) 2017+
 * [Amazon Linux 2](https://aws.amazon.com/amazon-linux-2) 2018+
 * [Redhat](https://aws.amazon.com/partners/redhat/) 7.3, 7.4, 7.5
-* [Centos](https://aws.amazon.com/marketplace/seller-profile?id=16cb8b03-256e-4dde-8f34-1b0f377efe89) 7
+* [Centos](https://aws.amazon.com/marketplace/seller-profile?id=16cb8b03-256e-4dde-8f34-1b0f377efe89) 5, 6, 7
 * [Ubuntu Trusty](https://aws.amazon.com/marketplace/search/results?x=0&y=0&searchTerms=ubuntu+14.04) 14.04
 * [Ubuntu Xenial](https://aws.amazon.com/marketplace/pp/B01JBL2M0O?qid=1532883122707) 16.04
 * [Ubuntu Bionic](https://aws.amazon.com/marketplace/search/results?x=0&y=0&searchTerms=ubuntu+18.04) 18.04
