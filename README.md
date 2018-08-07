@@ -7,9 +7,7 @@
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
-[ec2tools](https://pypi.org/project/ec2tools)
-
-Version:	0.5.2
+[ec2tools](https://pypi.org/project/ec2tools), Version:	0.5.2
 
 * * *
 
@@ -102,7 +100,7 @@ Run the installer from the cli via the following example commands
 
 * * *
 
-### Return Image for a particular region
+#### Return Image for a particular region
 
 Format:  `json` (default)
 
