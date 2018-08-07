@@ -115,7 +115,7 @@ Format:  `json` (default)
 
 * * *
 
-### Return Image for a particular region (DETAILS)
+#### Return Image for a Particular Region (DETAILS)
 
 Format:  `json`
 
@@ -127,7 +127,7 @@ Format:  `json`
 
 * * *
 
-### Return the AMI Image id for all regions
+#### Return the AMI Image Ids for All Regions
 
 Format:  `json`
 
@@ -139,7 +139,7 @@ Format:  `json`
 
 * * *
 
-### Return the AMI Image id for all regions (text format)
+#### Return the AMI Image Ids for All Regions (text format)
 
 Format:  `text`
 
