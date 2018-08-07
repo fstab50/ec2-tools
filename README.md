@@ -100,7 +100,7 @@ Run the installer from the cli via the following example commands
 
 * * *
 
-#### Return Image for a particular region
+#### Return Image for a Particular Region
 
 Format:  `json` (default)
 
@@ -113,7 +113,7 @@ Format:  `json` (default)
 
 * * *
 
-#### Return Image for a Particular Region (DETAILS)
+#### Return Image for a Particular Region (details)
 
 Format:  `json`
 
