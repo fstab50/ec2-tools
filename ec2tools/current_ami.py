@@ -41,7 +41,11 @@ def debug_message(response, rgn, mode):
     Prints debug output
     """
     if mode:
-        stdout_message('REGION: %s' % rgn)
+        stdout_message(
+                message='REGION: %s' % rgn,
+                prefix='DBUG',
+                severity='WARNING'
+            )
         print(json.dumps(response, indent=4))
     return True
 
@@ -304,7 +308,7 @@ def ubuntu(profile, os, region=None, detailed=False, debug=False):
                 ])
 
             # need to find ami with latest date returned
-            debug_message(r, regon, debug)
+            debug_message(r, region, debug)
             newest = newest_ami(r['Images'])
             metadata[region] = newest
             amis[region] = newest.get('ImageId', 'unavailable')
@@ -484,11 +488,11 @@ def init_cli():
         sys.exit(exit_codes['E_MISC']['Code'])
 
     if args.debug:
-        print('profile is: ' + args.profile)
-        print('image type: ' + args.image)
-        print('format: ' + args.format)
-        print('filename: ' + args.filename)
-        print('debug flag: %b', str(args.debug))
+        stdout_message(message='profile is: %s' % args.profile, prefix='DBUG', severity='WARNING')
+        stdout_message(message='image type: %s' % args.image, prefix='DBUG', severity='WARNING')
+        stdout_message(message='format: %s' % args.format, prefix='DBUG', severity='WARNING')
+        stdout_message(message='filename: %s' % args.filename, prefix='DBUG', severity='WARNING')
+        stdout_message(message='debug flag: %s' % str(args.debug), prefix='DBUG', severity='WARNING')
 
     if len(sys.argv) == 1:
         help_menu()
