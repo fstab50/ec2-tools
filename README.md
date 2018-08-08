@@ -112,7 +112,7 @@ Format:  `json` (default)
     $ machineimage  --image redhat7.5  --region eu-west-1
 ```
 
-![redhat7](./assets/redhat7.5-1region.png)
+[![redhat7](./assets/redhat7.5-1region.png)](https://rawgithub.com/fstab50/ec2tools/master/assets/redhat7.5-1region.png)
 
 * * *
 
@@ -124,7 +124,7 @@ Format:  `json`
     $ machineimage  --image centos7  --region eu-west-1  --details
 ```
 
-![redhat7](./assets/centos7-details.png)
+[![redhat7](./assets/centos7-details.png)](https://rawgithub.com/fstab50/ec2tools/master/assets/centos7-details.png)
 
 * * *
 
@@ -150,7 +150,7 @@ Format:  `text`
 
 ```
 
-![aml1](./assets/aml2-text.png)
+[![aml1](./assets/aml2-text.png)](https://rawgithub.com/fstab50/ec2tools/master/assets/aml2-text.png)
 
 [back to the top](#top)
 
