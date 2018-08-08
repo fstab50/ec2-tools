@@ -137,7 +137,7 @@ Format:  `json`
 
 * * *
 
-#### Return the AMI Image Ids for All Regions (text format)
+#### Return the AMI Image Ids for All Regions
 
 Format:  `text`
 
