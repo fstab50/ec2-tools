@@ -1,6 +1,6 @@
 <a name="top"></a>
 * * *
-# ec2tools 
+# ec2tools
 * * *
 
 ## Summary
@@ -18,7 +18,7 @@ Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
 * [Getting Started](#getting-started)
 * [Dependencies](#dependencies)
-* [Supported Operation Systems](#supported-operating-systems)
+* [Supported Operating Systems](#supported-operating-systems)
 * [Installation](#installation)
 * [Instructions](#instructions)
 * [Help](#help)
@@ -101,7 +101,7 @@ $ pip install ec2tools --user
 
 Run the installer from the cli via the following example commands
 
-* * *
+--
 
 #### Return Image for a Particular Region
 
