@@ -136,7 +136,7 @@ Format:  `json`
     $ machineimage  --image amazonlinux1
 ```
 
-![aml1](./assets/aml1-allregions.png)
+[![aml1](./assets/aml1-allregions.png)](https://rawgithub.com/fstab50/ec2tools/master/assets/aml1-allregions.png)
 
 * * *
 
