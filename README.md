@@ -101,7 +101,7 @@ $ pip install ec2tools --user
 
 Run the installer from the cli via the following example commands
 
---
+::
 
 #### Return Image for a Particular Region
 
@@ -116,7 +116,7 @@ Format:  `json` (default)
 
 * * *
 
-#### Return Image for a Particular Region (details)
+#### Return Image & Metadata for a Particular Region
 
 Format:  `json`
 
