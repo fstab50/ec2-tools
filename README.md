@@ -1,11 +1,13 @@
 <a name="top"></a>
 * * *
-# ec2tools | machineimage
+# ec2tools | Scripts for Use with EC2
 * * *
 
 ## Summary
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
+
+* `machineimage`
 
 [ec2tools](https://pypi.org/project/ec2tools), Version:	0.5.4
 
