@@ -1,6 +1,6 @@
 <a name="top"></a>
 * * *
-# ec2tools | Scripts for Use with EC2
+# ec2tools 
 * * *
 
 ## Summary
