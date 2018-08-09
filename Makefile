@@ -102,6 +102,12 @@ source-install:  setup-venv  ## Install (source: local source). Build artifacts 
 	$(PIP_CALL) install .
 
 
+.PHONY: update-source-install
+update-source-install:    ## Update Install (source: local source).
+	if [ -e $(VENV_DIR) ]; then \
+	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; fi
+
+
 .PHONY: help
 help:   ## Print help index
 	@printf "\n\033[0m %-15s\033[0m %-13s\u001b[37;1m%-15s\u001b[0m\n\n" " " "make targets: " $(PROJECT)
