@@ -26,7 +26,7 @@ VALID_AMI_TYPES = (
         'amazonlinux1', 'amazonlinux2',
         'redhat7.3', 'redhat7.4', 'redhat7.5',
         'ubuntu14.04', 'ubuntu16.04', 'ubuntu16.10', 'ubuntu18.04', 'ubuntu18.10',
-        'centos5', 'centos6', 'centos7'
+        'centos6', 'centos7'
     )
 
 # AWS Marketplace Owner IDs

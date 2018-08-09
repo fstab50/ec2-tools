@@ -52,7 +52,6 @@ menu_body = Colors.BOLD + Colors.WHITE + """
 
                     - """ + AMI + """amazonlinux1""" + RESET + """    :   Amazon Linux v1 (2018)
                     - """ + AMI + """amazonlinux2""" + RESET + """    :   Amazon Linux v2 (2017.12+)
-                    - """ + AMI + """centos5""" + RESET + """         :   CentOS 5 (RHEL 5+)
                     - """ + AMI + """centos6""" + RESET + """         :   CentOS 6 (RHEL 6+)
                     - """ + AMI + """centos7""" + RESET + """         :   CentOS 7 (RHEL 7+)
                     - """ + AMI + """redhat7.3""" + RESET + """       :   Redhat Enterprise Linux 7.3
