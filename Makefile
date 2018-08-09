@@ -1,3 +1,9 @@
+#
+#	 Makefile, ver 1.6
+#
+# --- declarations  --------------------------------------------------------------------------------
+
+
 PROJECT := ec2tools
 CUR_DIR = $(shell pwd)
 PYTHON_VERSION := python3
@@ -14,7 +20,7 @@ REQUIREMENT = $(CUR_DIR)/requirements.txt
 VERSION_FILE = $(CUR_DIR)/$(PROJECT)/_version.py
 
 
-# --- rollup targets  ----------------------------------------------------------
+# --- rollup targets  ------------------------------------------------------------------------------
 
 
 .PHONY: fresh-install fresh-test-install deploy-test deploy-prod
@@ -28,7 +34,7 @@ deploy-test: clean testpypi  ## Deploy (testpypi), generate all prebuild artifac
 deploy-prod: clean pypi   ## Deploy (pypi), generate all prebuild artifacts
 
 
-# --- targets ------------------------------------------------------------------
+# --- targets -------------------------------------------------------------------------------------
 
 
 .PHONY: pre-build
