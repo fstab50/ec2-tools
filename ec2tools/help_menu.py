@@ -50,16 +50,18 @@ menu_body = Colors.BOLD + Colors.WHITE + """
 
                 EC2 Amazon Machine Image (AMI) OS_TYPE:
 
-                    - """ + AMI + """amazonlinux1""" + RESET + """   ::   Amazon Linux v1 (2018)
-                    - """ + AMI + """amazonlinux2""" + RESET + """   ::   Amazon Linux v2 (2017.12+)
-                    - """ + AMI + """centos6""" + RESET + """        ::   CentOS 6 (RHEL 6+)
-                    - """ + AMI + """centos7""" + RESET + """        ::   CentOS 7 (RHEL 7+)
-                    - """ + AMI + """redhat7.3""" + RESET + """      ::   Redhat Enterprise Linux 7.3
-                    - """ + AMI + """redhat7.4""" + RESET + """      ::   Redhat Enterprise Linux 7.4
-                    - """ + AMI + """redhat7.5""" + RESET + """      ::   Redhat Enterprise Linux 7.5
-                    - """ + AMI + """ubuntu14.04""" + RESET + """    ::   Ubuntu Linux 14.04
-                    - """ + AMI + """ubuntu16.04""" + RESET + """    ::   Ubuntu Linux 16.04
-                    - """ + AMI + """ubuntu18.04""" + RESET + """    ::   Ubuntu Linux 18.04
+                    - """ + AMI + """amazonlinux1""" + RESET + """   :  Amazon Linux v1 (2018)
+                    - """ + AMI + """amazonlinux2""" + RESET + """   :  Amazon Linux v2 (2017.12+)
+                    - """ + AMI + """centos6""" + RESET + """        :  CentOS 6 (RHEL 6+)
+                    - """ + AMI + """centos7""" + RESET + """        :  CentOS 7 (RHEL 7+)
+                    - """ + AMI + """redhat7.3""" + RESET + """      :  Redhat Enterprise Linux 7.3
+                    - """ + AMI + """redhat7.4""" + RESET + """      :  Redhat Enterprise Linux 7.4
+                    - """ + AMI + """redhat7.5""" + RESET + """      :  Redhat Enterprise Linux 7.5
+                    - """ + AMI + """ubuntu14.04""" + RESET + """    :  Ubuntu Linux 14.04
+                    - """ + AMI + """ubuntu16.04""" + RESET + """    :  Ubuntu Linux 16.04
+                    - """ + AMI + """ubuntu18.04""" + RESET + """    :  Ubuntu Linux 18.04
+                    - """ + AMI + """windowsSrv2012""" + RESET + """ :  Microsoft Windows Srv 2012 R2
+                    - """ + AMI + """windowsSrv2016""" + RESET + """ :  Microsoft Windows Srv 2016
     """ + Colors.BOLD + Colors.WHITE + """
         -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local
             awscli configuration to  be  used when authenticating to Amazon

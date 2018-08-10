@@ -26,14 +26,16 @@ VALID_AMI_TYPES = (
         'amazonlinux1', 'amazonlinux2',
         'redhat7.3', 'redhat7.4', 'redhat7.5',
         'ubuntu14.04', 'ubuntu16.04', 'ubuntu16.10', 'ubuntu18.04', 'ubuntu18.10',
-        'centos6', 'centos7'
+        'centos6', 'centos7',
+        'windowsServer2012', 'windowsSrv2012', 'windowsServer2016', 'windowsSrv2016'
     )
 
 # AWS Marketplace Owner IDs
-UBUNTU = '099720109477'
 AMAZON = '137112412989'
 CENTOS = '679593333241'
 REDHAT = '679593333241'
+UBUNTU = '099720109477'
+MICROSOFT = '801119661308'
 
 
 def debug_message(response, rgn, mode):
@@ -332,6 +334,59 @@ def ubuntu(profile, os, region=None, detailed=False, debug=False):
     return amis
 
 
+def windows(profile, os, region=None, detailed=False, debug=False):
+    """
+    Return latest current Microsoft Windows Server AMI for each region
+    Args:
+        :profile (str): profile_name
+        :region (str): if supplied as parameter, only the ami for the single
+        region specified is returned
+    Returns:
+        amis, TYPE: list:  container for metadata dict for most current instance in region
+
+        "Name": "Windows_Server-2016-English-Full-Base-2018.07.11"
+
+    """
+    amis, metadata = {}, {}
+    if region:
+        regions = [region]
+    else:
+        regions = get_regions(profile=profile)
+    # retrieve ami for each region in list
+    for region in regions:
+        try:
+            client = boto3_session(service='ec2', region=region, profile=profile)
+            r = client.describe_images(
+                Owners=[MICROSOFT],
+                Filters=[
+                    {
+                        'Name': 'name',
+                        'Values': [
+                            'Windows_Server*%s*English*Base*' % os
+                        ]
+                    }
+                ])
+
+            # need to find ami with latest date returned
+            debug_message(r, region, debug)
+            newest = newest_ami(r['Images'])
+            metadata[region] = newest
+            amis[region] = newest.get('ImageId', 'unavailable')
+        except ClientError as e:
+            logger.exception(
+                '%s: Boto error while retrieving AMI data (%s)' %
+                (inspect.stack()[0][3], str(e)))
+            continue
+        except Exception as e:
+            logger.exception(
+                '%s: Unknown Exception occured while retrieving AMI data (%s)' %
+                (inspect.stack()[0][3], str(e)))
+            raise e
+    if detailed:
+        return metadata
+    return amis
+
+
 def is_tty():
     """
     Summary:
@@ -390,20 +445,23 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
         json (dict) | text (str)
     """
     try:
-        if imagetype == 'amazonlinux1':
+        if imagetype.startswith('amazonlinux1'):
             latest = amazonlinux1(profile=profile,  region=rgn, detailed=details, debug=debug)
 
-        elif imagetype == 'amazonlinux2':
+        elif imagetype.startswith('amazonlinux2'):
             latest = amazonlinux2(profile=profile, region=rgn, detailed=details, debug=debug)
 
-        elif 'centos' in imagetype:
+        elif imagetype.startswith('centos'):
             latest = centos(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
 
-        elif 'redhat' in imagetype:
+        elif imagetype.startswith('redhat'):
             latest = redhat(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
 
-        elif 'ubuntu' in imagetype:
+        elif imagetype.startswith('ubuntu'):
             latest = ubuntu(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
+
+        elif imagetype.startswith('windows'):
+            latest = windows(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
 
         # return appropriate response format
         if format == 'json' and not filename:
