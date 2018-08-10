@@ -446,22 +446,56 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
     """
     try:
         if imagetype.startswith('amazonlinux1'):
-            latest = amazonlinux1(profile=profile,  region=rgn, detailed=details, debug=debug)
+            latest = amazonlinux1(
+                        profile=profile,
+                        region=rgn,
+                        detailed=details,
+                        debug=debug
+                    )
 
         elif imagetype.startswith('amazonlinux2'):
-            latest = amazonlinux2(profile=profile, region=rgn, detailed=details, debug=debug)
+            latest = amazonlinux2(
+                        profile=profile,
+                        region=rgn,
+                        detailed=details,
+                        debug=debug
+                    )
 
         elif imagetype.startswith('centos'):
-            latest = centos(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
+            latest = centos(
+                        profile=profile,
+                        os=os_version(imagetype),
+                        region=rgn,
+                        detailed=details,
+                        debug=debug
+                    )
 
         elif imagetype.startswith('redhat'):
-            latest = redhat(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
+            latest = redhat(
+                        profile=profile,
+                        os=os_version(imagetype),
+                        region=rgn,
+                        detailed=details,
+                        debug=debug
+                    )
 
         elif imagetype.startswith('ubuntu'):
-            latest = ubuntu(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
+            latest = ubuntu(
+                        profile=profile,
+                        os=os_version(imagetype),
+                        region=rgn,
+                        detailed=details,
+                        debug=debug
+                    )
 
         elif imagetype.startswith('windows'):
-            latest = windows(profile=profile, os=os_version(imagetype), region=rgn, detailed=details, debug=debug)
+            latest = windows(
+                        profile=profile,
+                        os=os_version(imagetype),
+                        region=rgn,
+                        detailed=details,
+                        debug=debug
+                    )
 
         # return appropriate response format
         if format == 'json' and not filename:
