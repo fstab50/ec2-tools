@@ -348,7 +348,7 @@ def windows(profile, os, region=None, detailed=False, debug=False):
 
     """
     if os == '2012':
-        filter_criteria = 'Windows_Server*%s*R2*English*' % os
+        filter_criteria = 'Windows_Server-%s-R2*English*Base*' % os
     else:
         filter_criteria = 'Windows_Server*%s*English*Base*' % os
 
