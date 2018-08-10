@@ -62,6 +62,7 @@ menu_body = Colors.BOLD + Colors.WHITE + """
                     - """ + AMI + """ubuntu18.04""" + RESET + """    :  Ubuntu Linux 18.04
                     - """ + AMI + """windowsSrv2012""" + RESET + """ :  Microsoft Windows Srv 2012 R2
                     - """ + AMI + """windowsSrv2016""" + RESET + """ :  Microsoft Windows Srv 2016
+                    
     """ + Colors.BOLD + Colors.WHITE + """
         -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local
             awscli configuration to  be  used when authenticating to Amazon
