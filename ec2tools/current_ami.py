@@ -27,7 +27,7 @@ VALID_AMI_TYPES = (
         'redhat7.3', 'redhat7.4', 'redhat7.5',
         'ubuntu14.04', 'ubuntu16.04', 'ubuntu16.10', 'ubuntu18.04', 'ubuntu18.10',
         'centos6', 'centos7',
-        'windowsServer2012', 'windowsSrv2012', 'windowsServer2016', 'windowsSrv2016'
+        'windows2012', 'windowsServer2012', 'windows2016', 'windowsServer2016'
     )
 
 # AWS Marketplace Owner IDs
@@ -347,6 +347,11 @@ def windows(profile, os, region=None, detailed=False, debug=False):
         "Name": "Windows_Server-2016-English-Full-Base-2018.07.11"
 
     """
+    if os == '2012':
+        filter_criteria = 'Windows_Server*%s*R2*English*' % os
+    else:
+        filter_criteria = 'Windows_Server*%s*English*Base*' % os
+
     amis, metadata = {}, {}
     if region:
         regions = [region]
@@ -362,7 +367,7 @@ def windows(profile, os, region=None, detailed=False, debug=False):
                     {
                         'Name': 'name',
                         'Values': [
-                            'Windows_Server*%s*English*Base*' % os
+                            filter_criteria
                         ]
                     }
                 ])
