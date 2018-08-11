@@ -7,7 +7,7 @@
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
-* [ec2tools](https://pypi.org/project/ec2tools), Version: 0.5.7
+* [ec2tools](https://pypi.org/project/ec2tools), Version: 0.5.8
 
 Current Scripts:
 
