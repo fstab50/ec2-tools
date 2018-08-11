@@ -10,6 +10,7 @@ import os
 import sys
 import inspect
 
+
 PACKAGE = 'ec2tools'
 
 
