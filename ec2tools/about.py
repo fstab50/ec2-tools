@@ -12,7 +12,7 @@ Returns:
 import sys
 import datetime
 from ec2tools.statics import PACKAGE, LICENSE
-from pyaws.core.colors import Colors
+from pyaws.colors import Colors
 from ec2tools import __version__
 
 

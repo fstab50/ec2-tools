@@ -6,7 +6,7 @@ Help Menu
 
 """
 
-from pyaws.core.colors import Colors
+from pyaws.colors import Colors
 
 PACKAGE = 'machineimage'
 PKG_ACCENT = Colors.ORANGE
