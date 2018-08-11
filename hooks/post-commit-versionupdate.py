@@ -11,12 +11,23 @@ import sys
 import inspect
 
 
-PACKAGE = 'ec2tools'
+def packagename(filename):
+    with open(filename) as p1:
+        for line in p1.readlines():
+            if 'PACKAGE' in line:
+                return line.split(':')[1].strip()
+                break
 
 
-sys.path.insert(0, os.path.abspath(PACKAGE))
-from _version import __version__
-sys.path.pop(0)
+PACKAGE = packagename('DESCRIPTION.rst') or None
+
+if PACKAGE is None:
+    print('Problem executing post-commit-hook (%s). Exit' % __file__)
+    sys.exit(1)
+else:
+    sys.path.insert(0, os.path.abspath(PACKAGE))
+    from _version import __version__
+    sys.path.pop(0)
 
 
 try:
@@ -35,5 +46,4 @@ except OSError as e:
             '%s: Error while reading or writing post-commit-hook' %
             inspect.stack()[0][3]
         )
-
 sys.exit(0)
