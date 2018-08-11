@@ -16,7 +16,7 @@ Module Attributes:
 import inspect
 import logging
 from ec2tools import __version__
-from pyaws.core.script_utils import get_os, os_parityPath
+from pyaws.script_utils import get_os, os_parityPath
 
 
 logger = logging.getLogger(__version__)

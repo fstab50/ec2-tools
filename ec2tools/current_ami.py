@@ -9,7 +9,7 @@ import inspect
 from botocore.exceptions import ClientError
 from pyaws.session import authenticated, boto3_session
 from pyaws.colors import Colors
-from pyaws.core.script_utils import stdout_message, export_json_object
+from pyaws.script_utils import stdout_message, export_json_object
 from ec2tools.help_menu import menu_body
 from ec2tools import about, logd, __version__
 
