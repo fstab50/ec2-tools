@@ -8,21 +8,31 @@
 """
 import os
 import sys
+import inspect
 
 PACKAGE = 'ec2tools'
-from PACKAGE._version import __version__
-
-#sys.path.insert(0, os.path.abspath(PACKAGE))
-#from PACKAGE._version import __version__
-#sys.path.pop(0)
 
 
-with open('README.md', 'a') as f1:
-    f2 = f1.readlines()
-    for line in f2:
-        if 'Version:' in line:
-            prepend = line.split(' ')[0]
-            line = prepend + ', Version: ' + __version__
-            f2.write(line)
+sys.path.insert(0, os.path.abspath(PACKAGE))
+from _version import __version__
+sys.path.pop(0)
+
+
+try:
+    with open('README.md') as f1:
+        lines = f1.readlines()
+        for index, line in enumerate(lines):
+            if 'Version:' in line:
+                newline = line.split(' ')[0] + ' Version: ' + __version__
+                lines[index] = newline
+                break
+        f1.close()
+        with open('README.md', 'w') as f3:
+            f3.writelines(lines)
+except OSError as e:
+    print(
+            '%s: Error while reading or writing post-commit-hook' %
+            inspect.stack()[0][3]
+        )
 
 sys.exit(0)
