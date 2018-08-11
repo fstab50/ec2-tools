@@ -7,7 +7,10 @@
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
-[ec2tools](https://pypi.org/project/ec2tools), Version: 0.5.7
+* pypi.python.org:  [ec2tools](https://pypi.org/project/ec2tools), Version: 0.5.7
+
+Current Scripts:
+
 * `machineimage` : Returns the most current Amazon Machine Image Id in a region
 
 
