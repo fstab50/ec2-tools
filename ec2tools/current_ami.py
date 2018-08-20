@@ -6,6 +6,8 @@ import re
 import sys
 import json
 import inspect
+import itertools
+from collections import OrderedDict
 from botocore.exceptions import ClientError
 from pyaws.session import authenticated, boto3_session
 from pyaws.colors import Colors
@@ -564,6 +566,21 @@ def package_version():
     """
     print(about.about_object)
     sys.exit(exit_codes['EX_OK']['Code'])
+
+
+def unwrap_dict(doc):
+    def unwrap_results(doc, name=None):
+        out = []
+        if 'someKey' in doc:
+            return [name, doc['test-case']] if isinstance(doc['test-case'], list) else [name, [doc['test-case']]]
+        if isinstance(doc, list):
+            out.extend(itertools.chain(*[unwrap_results(x, name) for x in doc]))
+        elif isinstance(doc, dict):
+            out.extend(itertools.chain(*[unwrap_results(x, name) for x in doc.values()]))
+        return out
+
+    result = unwrap_results(doc)
+    return OrderedDict(zip(result[::2], result[1::2]))
 
 
 def write_to_file(text, file):
