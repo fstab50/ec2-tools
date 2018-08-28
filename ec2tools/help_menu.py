@@ -82,8 +82,8 @@ menu_body = Colors.BOLD + Colors.WHITE + """
             as parameter, """ + PACKAGE + """ returns the Amazon Machine image only
             for a particular AWS region.  Region code examples:
 
-                    - """ + PKG_ACCENT + """ap-northeast-1""" + RESET + """ (Tokyo, Japan)
-                    - """ + PKG_ACCENT + """us-east-1""" + RESET + """      (North Virginia, USA)
+                        - """ + BD + """ap-northeast-1""" + RESET + """  (Tokyo, Japan)
+                        - """ + BD + """eu-central-1""" + RESET + """    (Frankfurt, Germany)
 
             If the region parameter is omitted, """ + PACKAGE + """ returns Amazon
             Machine Images for all regions.
@@ -93,5 +93,4 @@ menu_body = Colors.BOLD + Colors.WHITE + """
         -V, --version""" + Colors.RESET + """ : Print package version.
     """ + Colors.BOLD + Colors.WHITE + """
         -h, --help""" + Colors.RESET + """ : Show this help message and exit.
-
     """

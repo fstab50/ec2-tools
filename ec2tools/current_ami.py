@@ -62,8 +62,8 @@ def help_menu():
         Colors.BOLD + '\n\t\t\t' + 'machineimage' + Colors.RESET +
         ' help contents'
         )
-    sys.stdout.write(menu_body)
-    return
+    sys.stdout.write(menu_body + '\n')
+    sys.exit(exit_codes['EX_OK']['Code'])
 
 
 def get_regions(profile):
