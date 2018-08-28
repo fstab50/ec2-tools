@@ -46,10 +46,10 @@ menu_body = Colors.BOLD + Colors.WHITE + """
     """ + Colors.BOLD + Colors.WHITE + """
   OPTIONS
     """ + Colors.BOLD + """
-        -i, --image""" + Colors.RESET + """ (string) : Amazon Machine Image Operating System type.
-            Return the latest AMI of the type specified from the list below.
+        -i, --image""" + Colors.RESET + """  (string):  Amazon  Machine  Image Operating System type
+            Returns the latest AMI of the type specified from the list below
 
-                      """ + BD + """EC2 Amazon Machine Images (AMI)""" + RESET + """:
+                      """ + BD + """Amazon EC2 Machine Images (AMI)""" + RESET + """:
 
                   - """ + AMI + """amazonlinux1""" + RESET + """  :  Amazon Linux v1 (2018)
                   - """ + AMI + """amazonlinux2""" + RESET + """  :  Amazon Linux v2 (2017.12+)
@@ -65,23 +65,28 @@ menu_body = Colors.BOLD + Colors.WHITE + """
                   - """ + AMI + """windows2016""" + RESET + """   :  Microsoft Windows Server 2016
 
     """ + Colors.BOLD + Colors.WHITE + """
-        -p, --profile""" + Colors.RESET + """ (string) : Profile name of an IAM user from the local
-            awscli configuration to  be  used when authenticating to Amazon
-            Web Services. If omitted, defaults to "default" profilename.
+        -p, --profile""" + Colors.RESET + """  (string):  Profile name of an IAM user present in the
+            local awscli configuration to be used when authenticating to AWS
+            If omitted, defaults to "default" profilename.
     """ + Colors.BOLD + Colors.WHITE + """
-        -d, --details""" + Colors.RESET + """ : Output all metadata associated with each individual
+        -d, --details""" + Colors.RESET + """:  Output all metadata  associated with each individual
             Amazon Machine Image identifier returned.
     """ + Colors.BOLD + Colors.WHITE + """
         -f, --format""" + Colors.RESET + """ (string):  Output format, json or  plain text (DEFAULT:
             json).
     """ + Colors.BOLD + Colors.WHITE + """
-        -n, --filename""" + Colors.RESET + """ <value>:  Write output to a filesystem object with a
+        -n, --filename""" + Colors.RESET + """  <value>:  Write output to a filesystem object with a
             name specified in the --filename parameter.
     """ + Colors.BOLD + Colors.WHITE + """
         -r, --region""" + Colors.RESET + """ <value>: Amazon Web Services Region Code. When provided
-            as a parameter, """ + PACKAGE + """ returns  the AMI  image only for  a
-            particular AWS region.  Examples: ap-northeast-1 (Tokyo, Japan).
-            If region omitted, returns Amazon Machine Images for all regions.
+            as parameter, """ + PACKAGE + """ returns the Amazon Machine image only
+            for a particular AWS region.  Region code examples:
+
+                    - """ + PKG_ACCENT + """ap-northeast-1""" + RESET + """ (Tokyo, Japan)
+                    - """ + PKG_ACCENT + """us-east-1""" + RESET + """      (North Virginia, USA)
+
+            If the region parameter is omitted, """ + PACKAGE + """ returns Amazon
+            Machine Images for all regions.
     """ + Colors.BOLD + Colors.WHITE + """
         -d, --debug""" + Colors.RESET + """ :  Turn on verbose log output.
     """ + Colors.BOLD + Colors.WHITE + """
