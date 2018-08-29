@@ -85,7 +85,7 @@ menu_body = Colors.BOLD + Colors.WHITE + """
                         - """ + BD + """ap-northeast-1""" + RESET + """  (Tokyo, Japan)
                         - """ + BD + """eu-central-1""" + RESET + """    (Frankfurt, Germany)
 
-            If the region parameter is omitted, """ + PACKAGE + """ returns Amazon
+            If the region parameter is omitted,  """ + PACKAGE + """ returns Amazon
             Machine Images for all regions.
     """ + Colors.BOLD + Colors.WHITE + """
         -d, --debug""" + Colors.RESET + """ :  Turn on verbose log output.
