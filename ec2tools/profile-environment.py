@@ -111,5 +111,5 @@ def init_cli():
                     temp['KeyPairs'] = rk[rgn]
                     container[region] = temp
                 export_json_object(container, args.outputfile or DEFAULT_OUTPUTFILE)
-        stdout_message('Profile run complete')
+            stdout_message('Profile run complete')
         sys.exit(exit_codes['EX_OK']['Code'])
