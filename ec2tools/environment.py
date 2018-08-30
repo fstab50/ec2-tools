@@ -164,7 +164,7 @@ def init_cli():
         stdout_message(str(e), 'ERROR')
         sys.exit(exit_codes['EX_OK']['Code'])
 
-    DEFAULT_OUTPUTFILE = get_account_alias(parse_profiles(args.profile or 'default')) + '-profile.json'
+    DEFAULT_OUTPUTFILE = get_account_alias(parse_profiles(args.profile or 'default')) + '.profile'
 
     if len(sys.argv) == 1:
         help_menu()
