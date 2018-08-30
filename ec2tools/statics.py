@@ -78,15 +78,19 @@ else:
     }
 
     try:
-        if os.path.exists(config_filepath):
+
+        if not os.path.exists(config_dir):
+            os.mkdir(config_dir)
+            os.chmod(config_dir, 0o755)
+
+        elif os.path.exists(config_filepath):
             # parse config file
             local_config = read_local_config(cfg=config_filepath)
             # fail to read, set to default config
             if not local_config:
                 local_config = seed_config
-        else:
-            os.mkdir(config_dir)
-            os.chmod(config_dir, 0o755)
+
+        elif not os.path.exists(config_filepath):
             local_config = seed_config
 
     except OSError as e:
