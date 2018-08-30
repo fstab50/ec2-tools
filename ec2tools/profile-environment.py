@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import json
 import argparse
 import inspect
 import boto3
 from botocore.exceptions import ClientError
 from pyaws.script_utils import stdout_message, export_json_object
-from pyaws.session import authenticated, boto3_session
+from pyaws.session import authenticated, boto3_session, parse_profiles
 from ec2tools import logd, __version__
 
 try:
@@ -25,6 +26,54 @@ if os.getenv('AWS_DEFAULT_REGION') is None:
     os.environ['AWS_DEFAULT_REGION'] = default_region
 else:
     default_region = os.getenv('AWS_DEFAULT_REGION')
+
+
+def help_menu():
+    """ Displays command line parameter options """
+    menu = '''
+                        help menu
+                        ---------
+
+DESCRIPTION
+
+        Code returns AWS Price data metrics for AWS Lambda
+
+OPTIONS
+
+        $ python3 get_price.py  [OPTIONS]
+
+                [-e, --element   <value> ]
+                [-f, --filename  <value> ]
+                [-r, --region   <value> ]
+                [-d, --debug     ]
+                [-h, --help      ]
+
+        -e, --element (string):  Data Return Type.  Data element
+            returned when one of the following specified:
+
+                - compute  :  AWS Lambda Compute Price ($/GB-s)
+                - transfer :  AWS Lambda Bandwidth Price ($/GB)
+                - request  :  Price per request ($/req)
+                - edge     :  Compute Price Lambda Edge ($/GB-s)
+
+        If no --element specified, the entire pricing json object
+        for the region returned
+
+        -f, --filename (string):  Name of output file. Valid when
+            a data element is NOT specified and you want the entire
+            pricing json object returned and persisted to the
+            filesystem.  No effect when --element given.
+
+        -r, --region (string):  Region for which you want to return
+            pricing.  If no region parameter specified, defaults to
+            eu-west-1
+
+        -d, --debug: Debug mode, verbose output.
+
+        -h, --help: Print this menu
+    '''
+    print(menu)
+    return True
 
 
 def get_account_alias(profile):
@@ -103,7 +152,7 @@ def init_cli():
     """
     Initializes commandline script
     """
-    parser = argparse.ArgumentParser(add_help=True)
+    parser = argparse.ArgumentParser(add_help=False)
 
     try:
         args = options(parser)
@@ -114,27 +163,35 @@ def init_cli():
     DEFAULT_OUTPUTFILE = get_account_alias(args.profile or 'default') + '-profile.json'
 
     if len(sys.argv) == 1:
-        #help_menu()
+        help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
     elif args.help:
-        #help_menu()
+        help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
     else:
-        if authenticated(profile=args.profile):
+        if authenticated(profile=parse_profiles(args.profile)):
             container = {}
-            rb = profile_subnets(args.profile)
-            rs = profile_securitygroups(args.profile)
-            rk = profile_keypairs()
+            rb = profile_subnets(parse_profiles(args.profile))
+            rs = profile_securitygroups(parse_profiles(args.profile))
+            rk = profile_keypairs(parse_profiles(args.profile))
 
             if rb and rs and rk:
                 for region in get_regions():
                     temp = {}
-                    temp['Subnets'] = rb[rgn]
-                    temp['SecurityGroups'] = rs[rgn]
-                    temp['KeyPairs'] = rk[rgn]
+                    temp['Subnets'] = rb[region]
+                    temp['SecurityGroups'] = rs[region]
+                    temp['KeyPairs'] = rk[region]
                     container[region] = temp
-                export_json_object(container, args.outputfile or DEFAULT_OUTPUTFILE)
+                if args.outputfile:
+                    export_json_object(container, args.outputfile or DEFAULT_OUTPUTFILE)
+                else:
+                    export_json_object(container)
             stdout_message('Profile run complete')
-        sys.exit(exit_codes['EX_OK']['Code'])
+        return True
+    return False
+
+
+if __name__ == '__main__':
+    sys.exit(init_cli())
