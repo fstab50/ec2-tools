@@ -140,7 +140,7 @@ def options(parser):
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
-    parser.add_argument("-o", "--outputfile", nargs='?', required=False)
+    parser.add_argument("-o", "--outputfile", dest='outputfile', action='store_true', required=False)
     parser.add_argument("-a", "--auto", dest='auto', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
@@ -185,7 +185,7 @@ def init_cli():
                     temp['KeyPairs'] = rk[region]
                     container[region] = temp
                 if args.outputfile:
-                    export_json_object(container, args.outputfile or DEFAULT_OUTPUTFILE)
+                    export_json_object(container, DEFAULT_OUTPUTFILE)
                 else:
                     export_json_object(container)
             stdout_message('Profile run complete')
