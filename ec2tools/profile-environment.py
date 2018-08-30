@@ -9,6 +9,7 @@ import boto3
 from botocore.exceptions import ClientError
 from pyaws.script_utils import stdout_message, export_json_object
 from pyaws.session import authenticated, boto3_session, parse_profiles
+from pyaws.colors import Colors
 from ec2tools import logd, __version__
 
 try:
