@@ -19,8 +19,10 @@ except Exception:
 
 # globals
 logger = logd.getLogger(__version__)
+act = Colors.ORANGE
+bd = Colors.BOLD + Colors.WHITE
+rst = Colors.RESET
 
-# globals
 # set region default
 if os.getenv('AWS_DEFAULT_REGION') is None:
     default_region = 'us-east-2'
@@ -35,43 +37,31 @@ def help_menu():
                         help menu
                         ---------
 
-DESCRIPTION
+''' + bd + '''DESCRIPTION''' + rst + '''
 
         Code returns AWS Price data metrics for AWS Lambda
 
-OPTIONS
+''' + bd + '''OPTIONS''' + rst + '''
 
-        $ python3 get_price.py  [OPTIONS]
+            $ ''' + act + '''profilenvironment''' + rst + '''  --profile <PROFILE> [--outputfile]
 
-                [-e, --element   <value> ]
-                [-f, --filename  <value> ]
-                [-r, --region   <value> ]
-                [-d, --debug     ]
-                [-h, --help      ]
+                         -p, --profile  <value>
+                        [-r, --region   <value> ]
+                        [-d, --debug     ]
+                        [-h, --help      ]
 
-        -e, --element (string):  Data Return Type.  Data element
-            returned when one of the following specified:
-
-                - compute  :  AWS Lambda Compute Price ($/GB-s)
-                - transfer :  AWS Lambda Bandwidth Price ($/GB)
-                - request  :  Price per request ($/req)
-                - edge     :  Compute Price Lambda Edge ($/GB-s)
-
-        If no --element specified, the entire pricing json object
-        for the region returned
-
-        -f, --filename (string):  Name of output file. Valid when
+    ''' + bd + '''-f''' + rst + ''', ''' + bd + '''--filename''' + rst + ''' (string):  Name of output file. Valid when
             a data element is NOT specified and you want the entire
             pricing json object returned and persisted to the
             filesystem.  No effect when --element given.
 
-        -r, --region (string):  Region for which you want to return
+    ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + ''' (string):  Region for which you want to return
             pricing.  If no region parameter specified, defaults to
             eu-west-1
 
-        -d, --debug: Debug mode, verbose output.
+    -d, --debug: Debug mode, verbose output.
 
-        -h, --help: Print this menu
+    -h, --help: Print this menu
     '''
     print(menu)
     return True
@@ -142,7 +132,6 @@ def options(parser):
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
     parser.add_argument("-o", "--outputfile", dest='outputfile', action='store_true', required=False)
-    parser.add_argument("-a", "--auto", dest='auto', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
