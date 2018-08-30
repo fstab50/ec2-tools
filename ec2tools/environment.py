@@ -46,22 +46,24 @@ def help_menu():
             $ ''' + act + '''profilenvironment''' + rst + '''  --profile <PROFILE> [--outputfile]
 
                          -p, --profile  <value>
+                        [-o, --outputfile ]
                         [-r, --region   <value> ]
                         [-d, --debug     ]
                         [-h, --help      ]
 
-    ''' + bd + '''-f''' + rst + ''', ''' + bd + '''--filename''' + rst + ''' (string):  Name of output file. Valid when
-            a data element is NOT specified and you want the entire
-            pricing json object returned and persisted to the
-            filesystem.  No effect when --element given.
+    ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + ''' (string): IAM username corresponding
+        to a profilename from local awscli configuration
+
+    ''' + bd + '''-o''' + rst + ''', ''' + bd + '''--outputfile''' + rst + ''' (string):  Name of output file. Valid when
+        a data element is NOT specified and you want the entire
+        pricing json object returned and persisted to the
 
     ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + ''' (string):  Region for which you want to return
-            pricing.  If no region parameter specified, defaults to
-            eu-west-1
+        pricing.  If no region specified, profiles all AWS regions.
 
-    -d, --debug: Debug mode, verbose output.
+    ''' + bd + '''-d''' + rst + ''', ''' + bd + '''--debug''' + rst + ''': Debug mode, verbose output.
 
-    -h, --help: Print this menu
+    ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this menu
     '''
     print(menu)
     return True
