@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 
 import os
-import argparse
 import json
+import argparse
+import inspect
 import boto3
 from botocore.exceptions import ClientError
-from pyaws.script_utils import authenticated, stdout_message, export_json_object
-from pyaws.session import boto3_session
-from pyaws.core import oscodes_unix as exit_codes
+from pyaws.script_utils import stdout_message, export_json_object
+from pyaws.session import authenticated, boto3_session
+from ec2tools import logd, __version__
 
+try:
+    from pyaws.core.oscodes_unix import exit_codes
+except Exception:
+    from pyaws.core.oscodes_win import exit_codes    # non-specific os-safe codes
+
+# globals
+logger = logd.getLogger(__version__)
 
 # globals
 # set region default
@@ -27,15 +35,21 @@ def get_account_alias(profile):
 
 def get_regions():
     client = boto3_session('ec2')
-    return [x['RegionName'] for x in ec2.describe_regions()['Regions'] if 'cn' not in x['RegionName']]
+    return [x['RegionName'] for x in client.describe_regions()['Regions'] if 'cn' not in x['RegionName']]
 
 
 def profile_subnets(profile):
     """ Profiles all subnets in an account """
     temp = {}
     for rgn in get_regions():
-        client = boto3_session('ec2', region=rgn, profile=profile)
-        temp[region] = [x['SubnetId'] for x in client.describe_subnets()['Subnets']]
+        try:
+            client = boto3_session('ec2', region=rgn, profile=profile)
+            temp[rgn] = [x['SubnetId'] for x in client.describe_subnets()['Subnets']]
+        except ClientError as e:
+            logger.warning(
+                '{}: Unable to retrieve subnets for region {}'.format(inspect.stack()[0][3], rgn)
+                )
+            continue
     return temp
 
 
@@ -43,16 +57,28 @@ def profile_securitygroups(profile):
     """ Profiles securitygroups in an aws account """
     temp = {}
     for rgn in get_regions():
-        client = boto3_session('ec2', region=rgn, profile=profile)
-        temp[region] = [x['GroupName'] for x in client.describe_securitygroups()['SecurityGroups']]
+        try:
+            client = boto3_session('ec2', region=rgn, profile=profile)
+            temp[rgn] = [x['GroupName'] for x in client.describe_security_groups()['SecurityGroups']]
+        except ClientError as e:
+            logger.warning(
+                '{}: Unable to retrieve securitygroups for region {}'.format(inspect.stack()[0][3], rgn)
+                )
+            continue
     return temp
 
 
 def profile_keypairs(profile):
     keypairs = {}
     for rgn in get_regions():
-        client = boto3_session('ec2', region=rgn, profile=profile)
-        keypairs[region] = [x['KeyName'] for x in client.describe_key_pairs()['KeyPairs']]
+        try:
+            client = boto3_session('ec2', region=rgn, profile=profile)
+            keypairs[rgn] = [x['KeyName'] for x in client.describe_key_pairs()['KeyPairs']]
+        except ClientError as e:
+            logger.warning(
+                '{}: Unable to retrieve keypairs for region {}'.format(inspect.stack()[0][3], rgn)
+                )
+            continue
     return keypairs
 
 
@@ -67,7 +93,6 @@ def options(parser):
                               required=False, help="type (default: %(default)s)")
     parser.add_argument("-o", "--outputfile", nargs='?', required=False)
     parser.add_argument("-a", "--auto", dest='auto', action='store_true', required=False)
-    parser.add_argument("-c", "--configure", dest='configure', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
@@ -89,11 +114,11 @@ def init_cli():
     DEFAULT_OUTPUTFILE = get_account_alias(args.profile or 'default') + '-profile.json'
 
     if len(sys.argv) == 1:
-        help_menu()
+        #help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
     elif args.help:
-        help_menu()
+        #help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
     else:
