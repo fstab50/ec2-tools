@@ -23,7 +23,7 @@ logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 bd = Colors.BOLD + Colors.WHITE
 rst = Colors.RESET
-FILE_PATH = local_config['CONFIG']['CONFIG_PATH']
+FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
 
 # set region default
 if os.getenv('AWS_DEFAULT_REGION') is None:
