@@ -14,12 +14,13 @@ Module Attributes:
 """
 import os
 import inspect
-from ec2tools import logd, __version__
+import logging
+from ec2tools import __version__
 from pyaws.script_utils import get_os, os_parityPath, read_local_config
 
 
-logger = logd.getLogger(__version__)
-
+logger = logging.getLogger(__version__)
+logger.setLevel(logging.INFO)
 
 # --  project-level DEFAULTS  ------------------------------------------------
 
@@ -87,7 +88,7 @@ else:
             os.mkdir(config_dir)
             os.chmod(config_dir, 0o755)
             local_config = seed_config
-            
+
     except OSError as e:
         logger.exception(
             '%s: Error when attempting to access or create local log and config %s' %
