@@ -173,9 +173,9 @@ def init_cli():
     else:
         if authenticated(profile=args.profile):
             container = {}
-            rb = profile_subnets(args.profile)
-            rs = profile_securitygroups(args.profile)
-            rk = profile_keypairs(args.profile)
+            rb = profile_subnets(profile=args.profile)
+            rs = profile_securitygroups(profile=args.profile)
+            rk = profile_keypairs(profile=args.profile)
 
             if rb and rs and rk:
                 for region in get_regions():
