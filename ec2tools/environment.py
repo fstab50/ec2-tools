@@ -71,6 +71,16 @@ def help_menu():
     return True
 
 
+def is_tty():
+    """
+    Summary:
+        Determines if output is displayed to the screen or redirected
+    Returns:
+        True if tty terminal | False is redirected, TYPE: bool
+    """
+    return sys.stdout.isatty()
+
+
 def get_account_alias(profile):
     """ Returns account alias """
     client = boto3_session(service='iam', profile=profile)
@@ -154,7 +164,7 @@ def init_cli():
         stdout_message(str(e), 'ERROR')
         sys.exit(exit_codes['EX_OK']['Code'])
 
-    DEFAULT_OUTPUTFILE = get_account_alias(args.profile or 'default') + '-profile.json'
+    DEFAULT_OUTPUTFILE = get_account_alias(parse_profiles(args.profile or 'default')) + '-profile.json'
 
     if len(sys.argv) == 1:
         help_menu()
@@ -180,9 +190,9 @@ def init_cli():
                     container[region] = temp
                 if args.outputfile:
                     export_json_object(container, FILE_PATH + '/' + DEFAULT_OUTPUTFILE)
-                else:
-                    export_json_object(container)
-            stdout_message('Profile run complete')
+                elif is_tty():
+                    export_json_object(container, logging=False)
+                    stdout_message('AWS Account profile complete')
         return True
     return False
 
