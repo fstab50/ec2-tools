@@ -18,10 +18,12 @@ except Exception:
     from pyaws.core.oscodes_win import exit_codes    # non-specific os-safe codes
 
 # globals
+module = inspect.getmodule(inspect.stack()[0][0]).__file__
 logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 bd = Colors.BOLD + Colors.WHITE
 rst = Colors.RESET
+
 
 # set region default
 if os.getenv('AWS_DEFAULT_REGION') is None:
