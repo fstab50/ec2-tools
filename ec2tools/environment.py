@@ -43,13 +43,13 @@ def help_menu():
 
 ''' + bd + '''OPTIONS''' + rst + '''
 
-            $ ''' + act + '''profilenvironment''' + rst + '''  --profile <PROFILE> [--outputfile]
+        $ ''' + act + '''profilenvironment''' + rst + '''  --profile <PROFILE> [--outputfile]
 
-                         -p, --profile  <value>
-                        [-o, --outputfile ]
-                        [-r, --region   <value> ]
-                        [-d, --debug     ]
-                        [-h, --help      ]
+                     -p, --profile  <value>
+                    [-o, --outputfile ]
+                    [-r, --region   <value> ]
+                    [-d, --debug     ]
+                    [-h, --help      ]
 
     ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + ''' (string): IAM username corresponding
         to a profilename from local awscli configuration
