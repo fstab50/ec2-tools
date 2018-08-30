@@ -63,7 +63,8 @@ setup(
     python_requires='>=3.6, <4',
     entry_points={
         'console_scripts': [
-            'machineimage=ec2tools.current_ami:init_cli'
+            'machineimage=ec2tools.current_ami:init_cli',
+            'profilenvironment=ec2tools.environment:init_cli'
         ]
     },
     zip_safe=False
