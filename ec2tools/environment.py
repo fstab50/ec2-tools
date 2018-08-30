@@ -5,11 +5,11 @@ import sys
 import json
 import argparse
 import inspect
-import boto3
 from botocore.exceptions import ClientError
 from pyaws.script_utils import stdout_message, export_json_object
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws.colors import Colors
+from ec2tools.statics import local_config
 from ec2tools import logd, __version__
 
 try:
@@ -23,7 +23,7 @@ logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 bd = Colors.BOLD + Colors.WHITE
 rst = Colors.RESET
-
+FILE_PATH = local_config['CONFIG']['CONFIG_PATH']
 
 # set region default
 if os.getenv('AWS_DEFAULT_REGION') is None:
@@ -179,7 +179,7 @@ def init_cli():
                     temp['KeyPairs'] = rk[region]
                     container[region] = temp
                 if args.outputfile:
-                    export_json_object(container, DEFAULT_OUTPUTFILE)
+                    export_json_object(container, FILE_PATH + '/' + DEFAULT_OUTPUTFILE)
                 else:
                     export_json_object(container)
             stdout_message('Profile run complete')
