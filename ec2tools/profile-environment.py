@@ -171,11 +171,11 @@ def init_cli():
         sys.exit(exit_codes['EX_OK']['Code'])
 
     else:
-        if authenticated(profile=parse_profiles(args.profile)):
+        if authenticated(profile=args.profile):
             container = {}
-            rb = profile_subnets(parse_profiles(args.profile))
-            rs = profile_securitygroups(parse_profiles(args.profile))
-            rk = profile_keypairs(parse_profiles(args.profile))
+            rb = profile_subnets(args.profile)
+            rs = profile_securitygroups(args.profile)
+            rk = profile_keypairs(args.profile)
 
             if rb and rs and rk:
                 for region in get_regions():
