@@ -12,15 +12,13 @@ Module Attributes:
     - config_path (TYPE str):
         default for stsaval config files, includes config_dir (~/.stsaval)
 """
-
+import os
 import inspect
-import logging
-from ec2tools import __version__
-from pyaws.script_utils import get_os, os_parityPath
+from ec2tools import logd, __version__
+from pyaws.script_utils import get_os, os_parityPath, read_local_config
 
 
-logger = logging.getLogger(__version__)
-logger.setLevel(logging.INFO)
+logger = logd.getLogger(__version__)
 
 
 # --  project-level DEFAULTS  ------------------------------------------------
@@ -44,6 +42,12 @@ else:
     LICENSE = 'GPL-3'
     LICENSE_DESC = 'General Public License Version 3'
 
+    # configuration info
+    config_file = 'configuration.json'
+    config_root = user_home + '/' + '.config'
+    config_dir = config_root + '/' + PACKAGE
+    config_filepath = config_dir + '/' + config_file
+
     # logging parameters
     enable_logging = True
     log_mode = 'STREAM'
@@ -51,7 +55,7 @@ else:
     log_dir = os_parityPath(user_home + '/' + 'logs')
     log_path = os_parityPath(log_dir + '/' + log_filename)
 
-    local_config = {
+    seed_config = {
         "PROJECT": {
             "PACKAGE": PACKAGE,
             "CONFIG_VERSION": __version__,
@@ -64,5 +68,29 @@ else:
             "LOG_PATH": log_path,
             "LOG_MODE": log_mode,
             "SYSLOG_FILE": False
+        },
+        "CONFIG": {
+            "CONFIG_ROOT": config_root,
+            "CONFIG_DIR": config_dir,
+            "CONFIG_FILE": config_filepath
         }
     }
+
+    try:
+        if os.path.exists(config_filepath):
+            # parse config file
+            local_config = read_local_config(cfg=config_filepath)
+            # fail to read, set to default config
+            if not local_config:
+                local_config = seed_config
+        else:
+            os.mkdir(config_dir)
+            os.chmod(config_dir, 0o755)
+            local_config = seed_config
+            
+    except OSError as e:
+        logger.exception(
+            '%s: Error when attempting to access or create local log and config %s' %
+            (inspect.stack()[0][3], str(e))
+        )
+        raise e
