@@ -180,11 +180,11 @@ def show_information(display):
             print('\n\tProfiles present locally:\n')
             for index, file in enumerate(profiles):
                 print('\t\t({}):  {}'.format(index + 1, Colors.BRIGHTPURPLE + file + rst))
-            answer = input('\nSelect an option to display [quit]:  ')
+            answer = input('\n\tSelect an option to display [quit]:  ')
             if answer:
-                return file_contents(profiles[int(answer) - 1])
-            else:
-                return True
+                if int(answer) in range(1, index + 2):
+                    return file_contents(profiles[int(answer) - 1])
+            return True
         else:
             print('\n\tNo Profiles found locally.\n')
     return True
