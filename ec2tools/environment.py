@@ -41,7 +41,8 @@ def help_menu():
 
 ''' + bd + '''DESCRIPTION''' + rst + '''
 
-        Code returns AWS Price data metrics for AWS Lambda
+        Profile AWS Account Environment.  Collects Subnets,
+        SecurityGroups, and ssh Keypairs for all AWS regions.
 
 ''' + bd + '''OPTIONS''' + rst + '''
 
