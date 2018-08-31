@@ -101,7 +101,14 @@ def profile_subnets(profile):
     for rgn in get_regions():
         try:
             client = boto3_session('ec2', region=rgn, profile=profile)
-            temp[rgn] = [x['SubnetId'] for x in client.describe_subnets()['Subnets']]
+            r = client.describe_subnets()['Subnets']
+            temp[rgn] = [
+                    {
+
+                        x['SubnetId']: [x['AvailabilityZone'], 'Public' if x['MapPublicIpOnLaunch'] else 'Private']
+
+                    } for x in r
+                ]
         except ClientError as e:
             logger.warning(
                 '{}: Unable to retrieve subnets for region {}'.format(inspect.stack()[0][3], rgn)
