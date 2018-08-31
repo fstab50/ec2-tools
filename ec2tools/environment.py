@@ -177,16 +177,16 @@ def init_cli():
     else:
         if authenticated(profile=parse_profiles(args.profile)):
             container = {}
-            rb = profile_subnets(profile=parse_profiles(args.profile))
-            rs = profile_securitygroups(profile=parse_profiles(args.profile))
-            rk = profile_keypairs(profile=parse_profiles(args.profile))
+            r_subnets = profile_subnets(profile=parse_profiles(args.profile))
+            r_sgs = profile_securitygroups(profile=parse_profiles(args.profile))
+            r_keypairs = profile_keypairs(profile=parse_profiles(args.profile))
 
-            if rb and rs and rk:
+            if r_subnets and r_sgs and r_keypairs:
                 for region in get_regions():
                     temp = {}
-                    temp['Subnets'] = rb[region]
-                    temp['SecurityGroups'] = rs[region]
-                    temp['KeyPairs'] = rk[region]
+                    temp['Subnets'] = r_subnets[region]
+                    temp['SecurityGroups'] = r_sgs[region]
+                    temp['KeyPairs'] = r_keypairs[region]
                     container[region] = temp
                 if args.outputfile:
                     export_json_object(container, FILE_PATH + '/' + DEFAULT_OUTPUTFILE)
