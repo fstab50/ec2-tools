@@ -45,7 +45,7 @@ def help_menu():
 
 ''' + bd + '''OPTIONS''' + rst + '''
 
-        $ ''' + act + '''profilenvironment''' + rst + '''  --profile <PROFILE> [--outputfile]
+        $ ''' + act + '''profilenviron''' + rst + '''  --profile <PROFILE> [--outputfile]
 
                      -p, --profile  <value>
                     [-o, --outputfile ]
