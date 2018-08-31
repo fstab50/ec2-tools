@@ -118,17 +118,17 @@ def profile_subnets(profile):
 
 def profile_securitygroups(profile):
     """ Profiles securitygroups in an aws account """
-    temp = {}
+    sgs = {}
     for rgn in get_regions():
         try:
             client = boto3_session('ec2', region=rgn, profile=profile)
-            temp[rgn] = [x['GroupName'] for x in client.describe_security_groups()['SecurityGroups']]
+            sgs[rgn] = [x['GroupName'] for x in client.describe_security_groups()['SecurityGroups']]
         except ClientError as e:
             logger.warning(
                 '{}: Unable to retrieve securitygroups for region {}'.format(inspect.stack()[0][3], rgn)
                 )
             continue
-    return temp
+    return sgs
 
 
 def profile_keypairs(profile):
