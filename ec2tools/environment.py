@@ -134,8 +134,8 @@ def profile_securitygroups(profile):
                             'Description': x['Description'],
                             'GroupName': x['GroupName'],
                             'VpcId': x['VpcId']
-                        } for x in r
-                    }
+                        }
+                    } for x in r
                 ]
         except ClientError as e:
             logger.warning(
