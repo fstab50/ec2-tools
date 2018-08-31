@@ -105,11 +105,11 @@ def profile_subnets(profile):
             temp[rgn] = [
                     {
                         x['SubnetId']: {
-                                'State': x['State'],
                                 'AvailabilityZone': x['AvailabilityZone'],
                                 'CidrBlock': x['CidrBlock'],
-                                'VpcId': x['VpcId'],
-                                'IpAddresses': 'Public' if x['MapPublicIpOnLaunch'] else 'Private'
+                                'State': x['State'],
+                                'IpAddresses': 'Public' if x['MapPublicIpOnLaunch'] else 'Private',
+                                'VpcId': x['VpcId']
                             }
                     } for x in r
                 ]
@@ -127,7 +127,16 @@ def profile_securitygroups(profile):
     for rgn in get_regions():
         try:
             client = boto3_session('ec2', region=rgn, profile=profile)
-            sgs[rgn] = [x['GroupName'] for x in client.describe_security_groups()['SecurityGroups']]
+            r = client.describe_security_groups()['SecurityGroups']
+            sgs[rgn] = [
+                    {
+                        x['GroupId']: {
+                            'Description': x['Description'],
+                            'GroupName': x['GroupName'],
+                            'VpcId': x['VpcId']
+                        } for x in r
+                    }
+                ]
         except ClientError as e:
             logger.warning(
                 '{}: Unable to retrieve securitygroups for region {}'.format(inspect.stack()[0][3], rgn)
