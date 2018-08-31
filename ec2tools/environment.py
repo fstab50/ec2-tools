@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 import argparse
 import inspect
 from botocore.exceptions import ClientError
@@ -162,15 +163,30 @@ def options(parser):
     return parser.parse_args()
 
 
+def file_contents(content):
+    with open(FILE_PATH + '/' + content) as f1:
+        f2 = f1.read()
+        f3 = json.loads(f2)
+        export_json_object(f3, logging=False)
+    return True
+
+
 def show_information(display):
     """ Displays information to user """
     if os.path.exists(FILE_PATH) and display in ('files', 'profiles'):
         files = os.listdir(FILE_PATH)
         profiles = list(filter(lambda x: x.endswith('.profile'), files))
-        print('\n\tProfiles present locally:\n')
-        for index, file in enumerate(profiles):
-            print('\t\t({}):  {}'.format(index + 1, act + file + rst))
-        print('\n')
+        if profiles:
+            print('\n\tProfiles present locally:\n')
+            for index, file in enumerate(profiles):
+                print('\t\t({}):  {}'.format(index + 1, Colors.BRIGHTPURPLE + file + rst))
+            answer = input('\nSelect an option to display [quit]:  ')
+            if answer:
+                return file_contents(profiles[int(answer) - 1])
+            else:
+                return True
+        else:
+            print('\n\tNo Profiles found locally.\n')
     return True
 
 
