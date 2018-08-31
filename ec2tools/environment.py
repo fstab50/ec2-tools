@@ -104,9 +104,13 @@ def profile_subnets(profile):
             r = client.describe_subnets()['Subnets']
             temp[rgn] = [
                     {
-
-                        x['SubnetId']: [x['AvailabilityZone'], 'Public' if x['MapPublicIpOnLaunch'] else 'Private']
-
+                        x['SubnetId']: {
+                                'State': x['State'],
+                                'AvailabilityZone': x['AvailabilityZone'],
+                                'CidrBlock': x['CidrBlock'],
+                                'VpcId': x['VpcId'],
+                                'IpAddresses': 'Public' if x['MapPublicIpOnLaunch'] else 'Private'
+                            }
                     } for x in r
                 ]
         except ClientError as e:
