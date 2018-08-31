@@ -63,6 +63,8 @@ def help_menu():
     ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + ''' (string):  Region for which you want to return
         pricing.  If no region specified, profiles all AWS regions.
 
+    ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--show''' + rst + ''' {profiles | ?}:  Display user information
+
     ''' + bd + '''-d''' + rst + ''', ''' + bd + '''--debug''' + rst + ''': Debug mode, verbose output.
 
     ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this menu
@@ -147,9 +149,19 @@ def options(parser):
                               required=False, help="type (default: %(default)s)")
     parser.add_argument("-o", "--outputfile", dest='outputfile', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
+    parser.add_argument("-s", "--show", dest='show', nargs='?', required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
     return parser.parse_args()
+
+
+def show_information(display):
+    """ Displays information to user """
+    if os.path.exists(FILE_PATH) and display in ('files', 'profiles'):
+        files = os.listdir(FILE_PATH)
+        profiles = list(filter(lambda x: x.endswith('.profile'), files))
+        export_json_object(profiles, logging=False)
+    return True
 
 
 def init_cli():
@@ -173,6 +185,9 @@ def init_cli():
     elif args.help:
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
+
+    elif args.show:
+        return show_information(args.show)
 
     else:
         if authenticated(profile=parse_profiles(args.profile)):
