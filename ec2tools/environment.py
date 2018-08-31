@@ -167,7 +167,10 @@ def show_information(display):
     if os.path.exists(FILE_PATH) and display in ('files', 'profiles'):
         files = os.listdir(FILE_PATH)
         profiles = list(filter(lambda x: x.endswith('.profile'), files))
-        export_json_object(profiles, logging=False)
+        print('\n\tProfiles present locally:\n')
+        for index, file in enumerate(profiles):
+            print('\t\t({}):  {}'.format(index + 1, act + file + rst))
+        print('\n')
     return True
 
 
