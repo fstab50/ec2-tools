@@ -237,8 +237,8 @@ def init_cli():
     else:
         if authenticated(profile=parse_profiles(args.profile)):
             container = {}
-            container['AccountId'] = get_account_identifier(parse_profiles(profile), returnAlias=False)
-            container['AccountAlias'] = get_account_identifier(parse_profiles(profile))
+            container['AccountId'] = get_account_identifier(parse_profiles(args.profile), returnAlias=False)
+            container['AccountAlias'] = get_account_identifier(parse_profiles(args.profile))
             r_subnets = profile_subnets(profile=parse_profiles(args.profile))
             r_sgs = profile_securitygroups(profile=parse_profiles(args.profile))
             r_keypairs = profile_keypairs(profile=parse_profiles(args.profile))
