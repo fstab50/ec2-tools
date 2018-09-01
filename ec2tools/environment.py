@@ -84,10 +84,14 @@ def is_tty():
     return sys.stdout.isatty()
 
 
-def get_account_alias(profile):
+def get_account_identifier(profile, returnAlias=True):
     """ Returns account alias """
     client = boto3_session(service='iam', profile=profile)
-    return client.list_account_aliases()['AccountAliases'][0]
+    alias = client.list_account_aliases()['AccountAliases'][0]
+    if alias and returnAlias:
+        return alias
+    client = boto3_session(service='sts', profile=profile)
+    return client.get_caller_identity()['Account']
 
 
 def get_regions():
@@ -217,7 +221,7 @@ def init_cli():
         stdout_message(str(e), 'ERROR')
         sys.exit(exit_codes['EX_OK']['Code'])
 
-    DEFAULT_OUTPUTFILE = get_account_alias(parse_profiles(args.profile or 'default')) + '.profile'
+    DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
 
     if len(sys.argv) == 1:
         help_menu()
@@ -233,6 +237,8 @@ def init_cli():
     else:
         if authenticated(profile=parse_profiles(args.profile)):
             container = {}
+            container['AccountId'] = get_account_identifier(parse_profiles(profile), returnAlias=False)
+            container['AccountAlias'] = get_account_identifier(parse_profiles(profile))
             r_subnets = profile_subnets(profile=parse_profiles(args.profile))
             r_sgs = profile_securitygroups(profile=parse_profiles(args.profile))
             r_keypairs = profile_keypairs(profile=parse_profiles(args.profile))
