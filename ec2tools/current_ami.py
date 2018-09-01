@@ -311,7 +311,7 @@ def ubuntu(profile, os, region=None, detailed=False, debug=False):
                     {
                         'Name': 'name',
                         'Values': [
-                            '*%s*' % os
+                            'ubuntu/images/hvm-ssd/*%s*' % os
                         ]
                     }
                 ])
