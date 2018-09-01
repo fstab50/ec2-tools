@@ -190,7 +190,9 @@ def show_information(display):
         files = os.listdir(FILE_PATH)
         profiles = list(filter(lambda x: x.endswith('.profile'), files))
         if profiles:
-            print('\n\tProfiles present locally:\n')
+            print('\t_______________________________________________________\n')
+            print(bd + '\t\t\tLocal AWS Account Profiles' + rst)
+            print('\t_______________________________________________________\n')
             for index, file in enumerate(profiles):
                 print('\t\t({}):  {}'.format(index + 1, Colors.BRIGHTPURPLE + file + rst))
             answer = input('\n\tSelect an option to display [quit]:  ')
