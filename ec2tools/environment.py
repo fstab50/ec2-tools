@@ -227,10 +227,14 @@ def show_information(display):
     """
     def valid(input):
         try:
-            if isinstance(int(answer), int) or isinstance(float(answer), float):
+            if userchoice_mapping(input) is None:
+                stdout_message('Please choose a letter associated with one of the choices.')
+                return False
+            elif isinstance(int(input), int) or isinstance(float(input), float):
                 stdout_message('You must choose a letter')
                 return False
         except ValueError:
+            # valid string
             pass
         return True
 
