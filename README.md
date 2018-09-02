@@ -13,7 +13,7 @@ Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
 * `machineimage` : Returns the most current Amazon Machine Image Id in a region
 
-* `profilenviron` : Profiles an AWS Account to precompile metadata in each region for use
+* `profileaccount` : Profiles an AWS Account to precompile metadata in each region for use
 at a later time when provisioning EC2 instances.  Account data is saved as a local file and
 contains regional data for:
 
