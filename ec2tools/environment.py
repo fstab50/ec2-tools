@@ -83,7 +83,16 @@ def is_tty():
 
 
 def get_account_identifier(profile, returnAlias=True):
-    """ Returns account alias """
+    """
+    Summary:
+        Returns account alias
+    Args:
+        :profile (str): profilename present in local awscli configuration
+        :returnAlias (bool): when True (default), returns the account alias if one
+         exists.  If False, returns the AWS AccountId number (12 digit integer sequence)
+    Returns:
+        aws account alias (str) or aws account id number (str)
+    """
     client = boto3_session(service='iam', profile=profile)
     alias = client.list_account_aliases()['AccountAliases'][0]
     if alias and returnAlias:
