@@ -38,8 +38,8 @@ else:
 def help_menu():
     """ Displays command line parameter options """
     menu = '''
-                        help menu
-                        ---------
+                      ''' + bd + CALLER + rst + ''' help
+                      ------------------
 
 ''' + bd + '''DESCRIPTION''' + rst + '''
 
@@ -207,6 +207,7 @@ def show_information(display):
             if answer:
                 if int(answer) in range(1, index + 2):
                     return file_contents(profiles[int(answer) - 1])
+            print('\n')
             return True
         else:
             print('\n\tNo Profiles found locally.\n')
