@@ -109,7 +109,7 @@ $ pip install ec2tools --user
 
 ## Instructions
 
-Run the installer from the cli via the following example commands
+Example command line interface commands for `machineimage`
 
 ::
 
