@@ -10,7 +10,7 @@ from pyaws.script_utils import stdout_message, export_json_object, userchoice_ma
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws.colors import Colors
 from ec2tools.statics import local_config
-from ec2tools import logd, __version__
+from ec2tools import about, logd, __version__
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -192,6 +192,14 @@ def file_contents(content):
     return True
 
 
+def package_version():
+    """
+    Prints package version and requisite PACKAGE info
+    """
+    print(about.about_object)
+    sys.exit(exit_codes['EX_OK']['Code'])
+
+
 def show_information(display):
     """ Displays information to user """
     if os.path.exists(FILE_PATH) and display in ('files', 'profiles'):
@@ -238,6 +246,9 @@ def init_cli():
     elif args.help:
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
+
+    elif args.version:
+        package_version()
 
     elif ('--show' in sys.argv or '-s' in sys.argv) and args.show is None:
         stdout_message('You must specify a value when using the --show option. Example: \
