@@ -256,6 +256,7 @@ def show_information(display):
                         return file_contents(profiles[int(userchoice_mapping(answer)) - 1])
                         return True
                     else:
+                        # user answer out of selection range
                         stdout_message('Please choose a letter associated with one of the choices.')
     return False
 
