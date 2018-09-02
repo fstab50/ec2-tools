@@ -6,7 +6,7 @@ import json
 import argparse
 import inspect
 from botocore.exceptions import ClientError
-from pyaws.script_utils import stdout_message, export_json_object
+from pyaws.script_utils import stdout_message, export_json_object, userchoice_mapping
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws.colors import Colors
 from ec2tools.statics import local_config
@@ -202,11 +202,11 @@ def show_information(display):
             print(bd + '\t\t\tLocal AWS Account Profiles' + rst)
             print('\t_______________________________________________________\n')
             for index, file in enumerate(profiles):
-                print('\t\t({}):  {}'.format(index + 1, Colors.BRIGHTPURPLE + file + rst))
+                print('\t\t({}):  {}'.format(userchoice_mapping(index + 1), Colors.BRIGHTPURPLE + file + rst))
             answer = input('\n\tSelect an option to display [quit]:  ')
             if answer:
-                if int(answer) in range(1, index + 2):
-                    return file_contents(profiles[int(answer) - 1])
+                if int(userchoice_mapping(answer)) in range(1, index + 2):
+                    return file_contents(profiles[int(userchoice_mapping(answer)) - 1])
             print('\n')
             return True
         else:
@@ -236,7 +236,7 @@ def init_cli():
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
-    elif args.show is None:
+    elif ('--show' in sys.argv or '-s' in sys.argv) and args.show is None:
         stdout_message('You must specify a value when using the --show option. Example: \
         \n\n\t\t$  %s  --show profiles' % (act + CALLER + rst))
 
