@@ -13,6 +13,12 @@ Current Scripts:
 
 * `machineimage` : Returns the most current Amazon Machine Image Id in a region
 
+* `profilenviron` : Profiles an AWS Account to precompile metadata in each region on:
+
+    - Subnets
+    - Security Groups
+    - SSH Keypairs
+
 
 * * *
 
