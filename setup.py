@@ -64,7 +64,7 @@ setup(
     entry_points={
         'console_scripts': [
             'machineimage=ec2tools.current_ami:init_cli',
-            'profilenviron=ec2tools.environment:init_cli'
+            'profileaccount=ec2tools.environment:init_cli'
         ]
     },
     zip_safe=False
