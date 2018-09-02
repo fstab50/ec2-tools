@@ -38,7 +38,7 @@ else:
 def help_menu():
     """ Displays command line parameter options """
     menu = '''
-                  ''' + bd + CALLER + rst + ''' help contents                  
+                  ''' + bd + CALLER + rst + ''' help contents
 
 ''' + bd + '''DESCRIPTION''' + rst + '''
 
@@ -201,29 +201,59 @@ def package_version():
     sys.exit(exit_codes['EX_OK']['Code'])
 
 
+def precheck(parameters):
+    """ Validates user supplied parameters """
+    for arg in sys.argv[1:]:
+        if arg.startswith('-') or arg.startswith('--'):
+            if arg not in (
+                '--profile', '-p', '-o', '--outputfile', '-d', '--debug', '-s', '--show',
+                '-V', '--version', '-h', '--help'
+            ):
+                stdout_message(
+                    message=f'Unrecognized option ({arg}). Exit',
+                    prefix='WARN',
+                    severity='warning'
+                )
+                return False
+    return True
+
+
 def show_information(display):
-    """ Displays information to user """
+    """
+    Summary:
+        Displays information to user
+    Returns:
+        Success or Failure, TYPE: bool
+    """
+    def valid(input):
+        try:
+            if isinstance(int(answer), int) or isinstance(float(answer), float):
+                stdout_message('You must choose a letter')
+                return False
+        except ValueError:
+            pass
+        return True
+
     if os.path.exists(FILE_PATH) and display in ('files', 'profiles'):
         files = os.listdir(FILE_PATH)
         profiles = list(filter(lambda x: x.endswith('.profile'), files))
         if profiles:
+            # display user menu
             print('\t_______________________________________________________\n')
             print(bd + '\t\t\tLocal AWS Account Profiles' + rst)
             print('\t_______________________________________________________\n')
             for index, file in enumerate(profiles):
                 print('\t\t({}):  {}'.format(userchoice_mapping(index + 1), Colors.BRIGHTPURPLE + file + rst))
             answer = input('\n\tSelect an option to display [quit]:  ')
+            # process user input
             if answer:
-                if type(answer) is int or float or None:
-                    stdout_message('You must choose a letter')
-                    return False
-                elif int(userchoice_mapping(answer)) in range(1, index + 2):
-                    return file_contents(profiles[int(userchoice_mapping(answer)) - 1])
-            print('\n')
-            return True
-        else:
-            print('\n\tNo Profiles found locally.\n')
-    return True
+                if valid(answer):
+                    if int(userchoice_mapping(answer)) in range(1, index + 2):
+                        return file_contents(profiles[int(userchoice_mapping(answer)) - 1])
+                        return True
+                    else:
+                        stdout_message('Please choose a letter associated with one of the choices.')
+    return False
 
 
 def init_cli():
@@ -233,14 +263,17 @@ def init_cli():
     parser = argparse.ArgumentParser(add_help=False)
 
     try:
+
         args = options(parser)
+
     except Exception as e:
         stdout_message(str(e), 'ERROR')
         sys.exit(exit_codes['EX_OK']['Code'])
 
-    DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
+    if not precheck(args):
+        sys.exit(exit_codes['E_DEPENDENCY']['Code'])
 
-    if len(sys.argv) == 1:
+    elif len(sys.argv) == 1:
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
@@ -258,10 +291,11 @@ def init_cli():
     elif args.show:
         return show_information(args.show)
 
-    else:
+    elif args.profile:
         if authenticated(profile=parse_profiles(args.profile)):
 
             container = {}
+            default_outputfile = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
 
             # add aws account identifiers
             container['AccountId'] = get_account_identifier(parse_profiles(args.profile), returnAlias=False)
@@ -281,11 +315,14 @@ def init_cli():
                     temp['KeyPairs'] = r_keypairs[region]
                     container[region] = temp
                 if args.outputfile:
-                    export_json_object(container, FILE_PATH + '/' + DEFAULT_OUTPUTFILE)
+                    export_json_object(container, FILE_PATH + '/' + default_outputfile)
                 elif is_tty():
                     export_json_object(container, logging=False)
                     stdout_message('AWS Account profile complete')
         return True
+
+    else:
+        stdout_message('Unrecognized option. Exit')
     return False
 
 
