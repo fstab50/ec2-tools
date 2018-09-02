@@ -205,7 +205,10 @@ def show_information(display):
                 print('\t\t({}):  {}'.format(userchoice_mapping(index + 1), Colors.BRIGHTPURPLE + file + rst))
             answer = input('\n\tSelect an option to display [quit]:  ')
             if answer:
-                if int(userchoice_mapping(answer)) in range(1, index + 2):
+                if type(answer) is int or float or None:
+                    stdout_message('You must choose a letter')
+                    return False
+                elif int(userchoice_mapping(answer)) in range(1, index + 2):
                     return file_contents(profiles[int(userchoice_mapping(answer)) - 1])
             print('\n')
             return True
