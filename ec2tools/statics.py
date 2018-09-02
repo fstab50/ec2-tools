@@ -29,7 +29,7 @@ try:
 
     env_info = get_os(detailed=True)
     OS = env_info['os_type']
-    user_home = env_info['HOME']
+    user_home = env_info['HOME'] or os.getenv('HOME')
 
 except KeyError as e:
     logger.critical(
