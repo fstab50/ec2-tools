@@ -24,6 +24,8 @@ act = Colors.ORANGE
 bd = Colors.BOLD + Colors.WHITE
 rst = Colors.RESET
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
+CALLER = 'profilenviron'
+
 
 # set region default
 if os.getenv('AWS_DEFAULT_REGION') is None:
@@ -46,7 +48,7 @@ def help_menu():
 
 ''' + bd + '''OPTIONS''' + rst + '''
 
-        $ ''' + act + '''profilenviron''' + rst + '''  --profile <PROFILE> [--outputfile]
+        $ ''' + act + CALLER + rst + '''  --profile <PROFILE> [--outputfile]
 
                      -p, --profile  <value>
                     [-o, --outputfile ]
@@ -233,9 +235,11 @@ def init_cli():
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
+    elif args.show is None:
+        stdout_message('You must specify a value when using the --show option. Example: \
+        \n\n\t\t$  %s  --show profiles' % (act + CALLER + rst))
+
     elif args.show:
-        print('args.show: %s' % args.show)
-        sys.exit(0)
         return show_information(args.show)
 
     else:
