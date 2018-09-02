@@ -54,15 +54,17 @@ def help_menu():
                     [-d, --debug     ]
                     [-h, --help      ]
 
-    ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + ''' (string): IAM username corresponding
-        to a profilename from local awscli configuration
+    ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + '''  (string):  IAM username or Role corresponding
+        to a profile name from local awscli configuration
 
-    ''' + bd + '''-o''' + rst + ''', ''' + bd + '''--outputfile''' + rst + ''' (string):  Name of output file. Valid when
-        a data element is NOT specified and you want the entire
-        pricing json object returned and persisted to the
+    ''' + bd + '''-o''' + rst + ''', ''' + bd + '''--outputfile''' + rst + ''' (string):  When parameter present, produces
+        a local json file containing metadata gathered about the
+        AWS Account designated by --profile during profiling.
 
-    ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + ''' (string):  Region for which you want to return
-        pricing.  If no region specified, profiles all AWS regions.
+    ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + '''  (string):   Region code designating a specific
+        AWS region to profile.  If no region specified, profiles
+        all AWS regions in the AWS Account designated by profile
+        name provided with --profile.
 
     ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--show''' + rst + ''' {profiles | ?}:  Display user information
 
@@ -232,6 +234,8 @@ def init_cli():
         sys.exit(exit_codes['EX_OK']['Code'])
 
     elif args.show:
+        print('args.show: %s' % args.show)
+        sys.exit(0)
         return show_information(args.show)
 
     else:
