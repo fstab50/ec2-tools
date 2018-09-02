@@ -154,10 +154,8 @@ def init_cli():
         stdout_message('You must specify a value when using the --show option. Example: \
         \n\n\t\t$  %s  --show profiles' % (act + CALLER + rst))
 
-    elif args.show:
-        return show_information(args.show)
-
     elif args.profile:
+
         if authenticated(profile=parse_profiles(args.profile)):
 
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
