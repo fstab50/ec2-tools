@@ -8,6 +8,7 @@ import inspect
 from botocore.exceptions import ClientError
 from pyaws.script_utils import stdout_message, export_json_object, userchoice_mapping
 from pyaws.session import authenticated, boto3_session, parse_profiles
+from pyaws.ec2 import get_regions, default_region
 from pyaws.colors import Colors
 from ec2tools.statics import local_config
 from ec2tools import about, logd, __version__
@@ -25,14 +26,6 @@ bd = Colors.BOLD + Colors.WHITE
 rst = Colors.RESET
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
 CALLER = 'profileaccount'
-
-
-# set region default
-if os.getenv('AWS_DEFAULT_REGION') is None:
-    default_region = 'us-east-2'
-    os.environ['AWS_DEFAULT_REGION'] = default_region
-else:
-    default_region = os.getenv('AWS_DEFAULT_REGION')
 
 
 def help_menu():
@@ -97,11 +90,6 @@ def get_account_identifier(profile, returnAlias=True):
         return alias
     client = boto3_session(service='sts', profile=profile)
     return client.get_caller_identity()['Account']
-
-
-def get_regions():
-    client = boto3_session('ec2')
-    return [x['RegionName'] for x in client.describe_regions()['Regions'] if 'cn' not in x['RegionName']]
 
 
 def profile_subnets(profile):
@@ -300,7 +288,8 @@ def init_cli():
         if authenticated(profile=parse_profiles(args.profile)):
 
             container = {}
-            default_outputfile = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
+            default_outputfile = get_account_identifier(parse_profiles(args.profile)) + '.profile'
+            dregion = default_region(args.profile)
 
             # add aws account identifiers
             container['AccountId'] = get_account_identifier(parse_profiles(args.profile), returnAlias=False)
