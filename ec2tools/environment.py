@@ -244,13 +244,19 @@ def init_cli():
 
     else:
         if authenticated(profile=parse_profiles(args.profile)):
+
             container = {}
+
+            # add aws account identifiers
             container['AccountId'] = get_account_identifier(parse_profiles(args.profile), returnAlias=False)
             container['AccountAlias'] = get_account_identifier(parse_profiles(args.profile))
+
+            # profile the account
             r_subnets = profile_subnets(profile=parse_profiles(args.profile))
             r_sgs = profile_securitygroups(profile=parse_profiles(args.profile))
             r_keypairs = profile_keypairs(profile=parse_profiles(args.profile))
 
+            # assemble profile data into single json schema
             if r_subnets and r_sgs and r_keypairs:
                 for region in get_regions():
                     temp = {}
