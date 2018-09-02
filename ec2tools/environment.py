@@ -68,11 +68,13 @@ def help_menu():
         all AWS regions in the AWS Account designated by profile
         name provided with --profile.
 
-    ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--show''' + rst + ''' {profiles | ?}:  Display user information
-
     ''' + bd + '''-d''' + rst + ''', ''' + bd + '''--debug''' + rst + ''': Debug mode, verbose output.
 
-    ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this menu
+    ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this help menu
+
+    ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--show''' + rst + ''' {profiles | ?}:  Display user information
+
+    ''' + bd + '''-V''' + rst + ''', ''' + bd + '''--version''' + rst + ''': Print package version and License information
     '''
     print(menu)
     return True
