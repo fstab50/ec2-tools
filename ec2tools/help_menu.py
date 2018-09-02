@@ -88,9 +88,9 @@ menu_body = Colors.BOLD + Colors.WHITE + """
             If the region parameter is omitted,  """ + PACKAGE + """ returns Amazon
             Machine Images for all regions.
     """ + Colors.BOLD + Colors.WHITE + """
-        -d, --debug""" + Colors.RESET + """ :  Turn on verbose log output.
+        -d, --debug""" + Colors.RESET + """:  Turn on verbose log output.
     """ + Colors.BOLD + Colors.WHITE + """
-        -V, --version""" + Colors.RESET + """ : Print package version.
+        -V, --version""" + Colors.RESET + """:  Print package version and License information.
     """ + Colors.BOLD + Colors.WHITE + """
-        -h, --help""" + Colors.RESET + """ : Show this help message and exit.
+        -h, --help""" + Colors.RESET + """:  Show this help message and exit.
     """

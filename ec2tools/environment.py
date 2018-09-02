@@ -24,7 +24,7 @@ act = Colors.ORANGE
 bd = Colors.BOLD + Colors.WHITE
 rst = Colors.RESET
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
-CALLER = 'profilenviron'
+CALLER = 'profileaccount'
 
 
 # set region default
@@ -38,8 +38,7 @@ else:
 def help_menu():
     """ Displays command line parameter options """
     menu = '''
-                      ''' + bd + CALLER + rst + ''' help
-                      ------------------
+                  ''' + bd + CALLER + rst + ''' help contents                  
 
 ''' + bd + '''DESCRIPTION''' + rst + '''
 
