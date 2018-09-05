@@ -31,42 +31,42 @@ CALLER = 'profileaccount'
 def help_menu():
     """ Displays command line parameter options """
     menu = '''
-                  ''' + bd + CALLER + rst + ''' help contents
+                    ''' + bd + CALLER + rst + ''' help contents
 
-''' + bd + '''DESCRIPTION''' + rst + '''
+  ''' + bd + '''DESCRIPTION''' + rst + '''
 
-        Profile AWS Account Environment.  Collects Subnets,
-        SecurityGroups, and ssh Keypairs for all AWS regions.
+          Profile AWS Account Environment.  Collects Subnets,
+          SecurityGroups, and ssh Keypairs for all AWS regions.
 
-''' + bd + '''OPTIONS''' + rst + '''
+  ''' + bd + '''OPTIONS''' + rst + '''
+  
+            $ ''' + act + CALLER + rst + '''  --profile <PROFILE> [--outputfile]
 
-        $ ''' + act + CALLER + rst + '''  --profile <PROFILE> [--outputfile]
+                         -p, --profile  <value>
+                        [-o, --outputfile ]
+                        [-r, --region   <value> ]
+                        [-d, --debug     ]
+                        [-h, --help      ]
 
-                     -p, --profile  <value>
-                    [-o, --outputfile ]
-                    [-r, --region   <value> ]
-                    [-d, --debug     ]
-                    [-h, --help      ]
+        ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + '''  (string):  IAM username or Role corresponding
+            to a profile name from local awscli configuration
 
-    ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + '''  (string):  IAM username or Role corresponding
-        to a profile name from local awscli configuration
+        ''' + bd + '''-o''' + rst + ''', ''' + bd + '''--outputfile''' + rst + ''' (string):  When parameter present, produces
+            a local json file containing metadata gathered about the
+            AWS Account designated by --profile during profiling.
 
-    ''' + bd + '''-o''' + rst + ''', ''' + bd + '''--outputfile''' + rst + ''' (string):  When parameter present, produces
-        a local json file containing metadata gathered about the
-        AWS Account designated by --profile during profiling.
+        ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + '''  (string):   Region code designating a specific
+            AWS region to profile.  If no region specified, profiles
+            all AWS regions in the AWS Account designated by profile
+            name provided with --profile.
 
-    ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + '''  (string):   Region code designating a specific
-        AWS region to profile.  If no region specified, profiles
-        all AWS regions in the AWS Account designated by profile
-        name provided with --profile.
+        ''' + bd + '''-d''' + rst + ''', ''' + bd + '''--debug''' + rst + ''': Debug mode, verbose output.
 
-    ''' + bd + '''-d''' + rst + ''', ''' + bd + '''--debug''' + rst + ''': Debug mode, verbose output.
+        ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this help menu
 
-    ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this help menu
+        ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--show''' + rst + ''' {profiles | ?}:  Display user information
 
-    ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--show''' + rst + ''' {profiles | ?}:  Display user information
-
-    ''' + bd + '''-V''' + rst + ''', ''' + bd + '''--version''' + rst + ''': Print package version and License information
+        ''' + bd + '''-V''' + rst + ''', ''' + bd + '''--version''' + rst + ''': Print package version and License information
     '''
     print(menu)
     return True
