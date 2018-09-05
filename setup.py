@@ -7,7 +7,7 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-see: https://www.apache.org/licenses/LICENSE-2.0
+see: https://www.gnu.org/licenses/#GPL
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -53,7 +53,7 @@ setup(
         'Topic :: Utilities',
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3.6',
-        'License :: OSI Approved :: Apache Software License',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows'
     ],
