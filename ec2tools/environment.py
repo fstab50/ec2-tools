@@ -39,7 +39,7 @@ def help_menu():
           SecurityGroups, and ssh Keypairs for all AWS regions.
 
   ''' + bd + '''OPTIONS''' + rst + '''
-  
+
             $ ''' + act + CALLER + rst + '''  --profile <PROFILE> [--outputfile]
 
                          -p, --profile  <value>
@@ -103,12 +103,12 @@ def get_account_identifier(profile, returnAlias=True):
 
 def profile_subnets(profile):
     """ Profiles all subnets in an account """
-    temp = {}
+    subnets = {}
     for rgn in get_regions():
         try:
             client = boto3_session('ec2', region=rgn, profile=profile)
             r = client.describe_subnets()['Subnets']
-            temp[rgn] = [
+            subnets[rgn] = [
                     {
                         x['SubnetId']: {
                                 'AvailabilityZone': x['AvailabilityZone'],
@@ -124,7 +124,7 @@ def profile_subnets(profile):
                 '{}: Unable to retrieve subnets for region {}'.format(inspect.stack()[0][3], rgn)
                 )
             continue
-    return temp
+    return subnets
 
 
 def profile_securitygroups(profile):
