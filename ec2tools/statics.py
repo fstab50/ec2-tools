@@ -45,9 +45,9 @@ else:
 
     # configuration info
     config_file = 'configuration.json'
-    config_root = user_home + '/' + '.config'
-    config_dir = config_root + '/' + PACKAGE
-    config_filepath = config_dir + '/' + config_file
+    config_root = os_parityPath(user_home + '/' + '.config')
+    config_dir = os_parityPath(config_root + '/' + PACKAGE)
+    config_filepath = os_parityPath(config_dir + '/' + config_file)
 
     # logging parameters
     enable_logging = True
