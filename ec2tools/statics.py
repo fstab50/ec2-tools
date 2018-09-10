@@ -80,7 +80,7 @@ else:
     try:
 
         if not os.path.exists(config_dir):
-            os.mkdir(config_dir)
+            os.makedirs(config_dir)
             os.chmod(config_dir, 0o755)
 
         elif os.path.exists(config_filepath):
