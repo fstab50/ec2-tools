@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PACKAGE='pyaws'
+PACKAGE='ec2tools'
 VERSION="$1"
 PIP_CALL=$(which pip3)
 GIT=$(which git)
