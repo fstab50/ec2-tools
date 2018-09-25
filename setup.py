@@ -29,7 +29,7 @@ import ec2tools
 requires = [
     'boto3>=1.7.1',
     'botocore>=1.10.1',
-    'pyaws==0.2.15',
+    'pyaws==0.2.17',
     'Pygments>=2.2.0'
 ]
 
