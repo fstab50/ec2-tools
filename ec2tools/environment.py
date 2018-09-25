@@ -6,7 +6,7 @@ import json
 import argparse
 import inspect
 from botocore.exceptions import ClientError
-from pyaws.script_utils import stdout_message, export_json_object, userchoice_mapping
+from pyaws.utils import stdout_message, export_json_object, userchoice_mapping
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws.ec2 import get_regions, default_region
 from pyaws.colors import Colors

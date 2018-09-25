@@ -8,7 +8,7 @@ import inspect
 import boto3
 from botocore.exceptions import ClientError
 from veryprettytable import VeryPrettyTable
-from pyaws.script_utils import stdout_message, export_json_object, userchoice_mapping
+from pyaws.utils import stdout_message, export_json_object, userchoice_mapping
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws.colors import Colors
 from ec2tools.statics import local_config
