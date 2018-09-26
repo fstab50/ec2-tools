@@ -3,13 +3,34 @@
 # ec2tools
 * * *
 
+## Contents
+
+* [Summary](#summary)
+* [Contents](#contents)
+* [Getting Started](#getting-started)
+* [Dependencies](#dependencies)
+* [Supported Operating Systems](#supported-operating-systems)
+* [Installation](#installation)
+* [Instructions](#instructions)
+* [Help](#help)
+* [Author & Copyright](#author--copyright)
+* [License](#license)
+* [Disclaimer](#disclaimer)
+
+* * *
+
 ## Summary
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
 * [ec2tools](https://pypi.org/project/ec2tools), Version: 0.6.9
 
-**Current Scripts**:
+
+* * *
+
+## Contents
+
+Current Scripts contained in this version of **ec2tools**:
 
 * `machineimage` : Returns the most current Amazon Machine Image Id in a region
 
@@ -21,20 +42,6 @@ contains regional data for:
     - Security Groups
     - SSH Keypairs
 
-
-* * *
-
-## Contents
-
-* [Getting Started](#getting-started)
-* [Dependencies](#dependencies)
-* [Supported Operating Systems](#supported-operating-systems)
-* [Installation](#installation)
-* [Instructions](#instructions)
-* [Help](#help)
-* [Author & Copyright](#author--copyright)
-* [License](#license)
-* [Disclaimer](#disclaimer)
 
 * * *
 
