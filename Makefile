@@ -106,11 +106,10 @@ source-install:  setup-venv  ## Install (source: local source). Build artifacts 
 
 
 .PHONY: update-source-install
-update-source-install:    ## Update Install (source: local source).
+update-source-install:     ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
-	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; 
-	else \
- 	@echo "No virtualenv built - nothing to update"; fi
+	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; else \
+ 	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi
 
 
 .PHONY: help
