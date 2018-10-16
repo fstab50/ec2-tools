@@ -14,7 +14,10 @@ syslog.setLevel(logging.DEBUG)
 
 def mode_assignment(arg):
     """
-    Translates arg to enforce proper assignment
+    Summary.
+
+        Translates arg to enforce proper assignment
+
     """
     arg = arg.upper()
     stream_args = ('STREAM', 'CONSOLE', 'STDOUT')
@@ -29,7 +32,8 @@ def mode_assignment(arg):
 
 def getLogger(*args, **kwargs):
     """
-    Summary:
+    Summary.
+
         custom format logger
 
     Args:
@@ -41,8 +45,8 @@ def getLogger(*args, **kwargs):
 
     Returns:
         logger object | TYPE: logging
-    """
 
+    """
     log_mode = local_config['LOGGING']['LOG_MODE']
 
     # log format - file
@@ -75,7 +79,6 @@ def getLogger(*args, **kwargs):
                 # file handler
                 f_handler = logging.FileHandler(local_config['LOGGING']['LOG_PATH'])
                 f_formatter = logging.Formatter(file_format, asctime_format)
-                #f_formatter = logging.Formatter('%(asctime)s %(processName)s %(name)s [%(levelname)-5s]: %(message)s', asctime_format)
                 f_handler.setFormatter(f_formatter)
                 logger.addHandler(f_handler)
                 logger.setLevel(logging.DEBUG)
