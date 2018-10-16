@@ -1,5 +1,5 @@
 #
-#	 Makefile, ver 1.6.2
+#	 Makefile, ver 1.7.0
 #
 # --- declarations  --------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ pre-build:    ## Remove residual build artifacts
 
 
 .PHONY: setup-venv
-setup-venv:    ## Create and activiate python venv
+setup-venv:  pre-build   ## Create and activiate python venv
 	$(PYTHON3_PATH) -m venv $(VENV_DIR)
 	. $(VENV_DIR)/bin/activate && $(PIP_CALL) install -U setuptools pip && \
 	$(PIP_CALL) install -r $(REQUIREMENT)
@@ -88,22 +88,19 @@ pypi: clean build    ## Deploy to pypi without regenerating prebuild artifacts
 
 
 .PHONY: install
-install:    ## Install (source: pypi). Build artifacts exist
-	if [ ! -e $(VENV_DIR) ]; then $(MAKE) setup-venv; fi; \
+install:  setup-venv  ## Install (source: pypi). Build artifacts exist
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
 	$(PIP_CALL) install -U $(PROJECT)
 
 
 .PHONY: test-install
-test-install:  ## Install (source: testpypi). Build artifacts exist
-	if [ ! -e $(VENV_DIR) ]; then $(MAKE) setup-venv; fi; \
+test-install:  setup-venv ## Install (source: testpypi). Build artifacts exist
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
 	$(PIP_CALL) install -U $(PROJECT) --extra-index-url https://test.pypi.org/simple/
 
 
 .PHONY: source-install
 source-install:  setup-venv  ## Install (source: local source). Build artifacts exist
-	if [ ! -e $(VENV_DIR) ]; then $(MAKE) clean; fi; \
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
 	$(PIP_CALL) install .
 
@@ -111,7 +108,9 @@ source-install:  setup-venv  ## Install (source: local source). Build artifacts 
 .PHONY: update-source-install
 update-source-install:    ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
-	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; fi
+	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; 
+	else \
+ 	@echo "No virtualenv built - nothing to update"; fi
 
 
 .PHONY: help
