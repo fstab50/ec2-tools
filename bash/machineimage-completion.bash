@@ -154,7 +154,7 @@ function _complete_commitlog_subcommands(){
 }
 
 
-function _branchdiff_completions(){
+function _machineimage_completions(){
     ##
     ##  Completion structures for branchdiff exectuable
     ##
@@ -163,7 +163,6 @@ function _branchdiff_completions(){
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     initcmd="${COMP_WORDS[COMP_CWORD-2]}"
-    #echxo "cur: $cur, prev: $prev"
 
     # initialize vars
     COMPREPLY=()
@@ -171,9 +170,7 @@ function _branchdiff_completions(){
     numoptions=0
 
     # option strings
-    commands='--branch --code --commit-log --debug --help --version'
-    commitlog_subcommands='detail history summary'
-    operations='--branch --code'
+    commands='--debug --details --help --image --profile --filename --format --region --version'
     norepo_commands='--help --version'
 
 
