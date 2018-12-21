@@ -3,3 +3,4 @@ botocore
 pyaws
 Pygments
 twine
+veryprettytable
