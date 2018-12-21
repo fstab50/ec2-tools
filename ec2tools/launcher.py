@@ -162,7 +162,7 @@ def init_cli():
 
             subnets = get_contents(DEFAULT_OUTPUTFILE)['us-east-2']['Subnets']
             x = VeryPrettyTable()
-            x.field_names = [bd + 'Choice' + rst, bd + 'SubnetId' + rst, bd + 'AZ' + rst, bd + 'CIDR' + rst, bd + 'IpAssignment' + rst, bd + 'State'+ rst, bd + 'VpcId' + rst]
+            x.field_names = [bd + 'Choice' + rst, bd + 'SubnetId' + rst, bd + 'AZ' + rst, bd + 'CIDR' + rst, bd + 'Ip Assignment' + rst, bd + 'State'+ rst, bd + 'VpcId' + rst]
             for index, row in enumerate(subnets):
                 for k,v in row.items():
                     x.add_row([str(index + 1), k, v['AvailabilityZone'], v['CidrBlock'], v['IpAddresses'], v['State'], v['VpcId']])
