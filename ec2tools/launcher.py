@@ -161,12 +161,45 @@ def init_cli():
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
 
             subnets = get_contents(DEFAULT_OUTPUTFILE)['us-east-2']['Subnets']
+
+            # setup table
             x = VeryPrettyTable()
-            x.field_names = [bd + 'Choice' + rst, bd + 'SubnetId' + rst, bd + 'AZ' + rst, bd + 'CIDR' + rst, bd + 'Ip Assignment' + rst, bd + 'State'+ rst, bd + 'VpcId' + rst]
+            x.field_names = [
+                bd + 'Choice' + rst, bd + 'SubnetId' + rst,
+                bd + 'AZ' + rst, bd + 'CIDR' + rst,
+                bd + 'Ip Assignment' + rst, bd + 'State'+ rst,
+                bd + 'VpcId' + rst
+            ]
+
+
+            # populate table
+            lookup = {}
             for index, row in enumerate(subnets):
                 for k,v in row.items():
-                    x.add_row([str(index + 1), k, v['AvailabilityZone'], v['CidrBlock'], v['IpAddresses'], v['State'], v['VpcId']])
+
+                    lookup[index] = k
+
+                    x.add_row(
+                        [
+                            str(index + 1),
+                            k,
+                            v['AvailabilityZone'],
+                            v['CidrBlock'],
+                            v['IpAddresses'],
+                            v['State'],
+                            v['VpcId']
+                        ]
+                    )
             print(x)
+
+            choice = input('Type a letter to select a subnet [%s -- \'a\']: ' % lookup[0]) or 'a'
+            subnet = lookup[userchoice_mapping(choice) - 1]
+
+            default = x.
+            q1 = ('\n\tSelect a subnet ' + Colors.RESET + '[%s] ').expandtabs(8) % default
+            sys.stdout.write(ACCENT)
+            response_q4 = input(q4b) or default
+            selection = read()
         return True
     return False
 
