@@ -160,15 +160,16 @@ def get_subnet(account_file, region):
         subnet id chosen by user
 
     """
-    max_len = 30
     # setup table
-    x = VeryPrettyTable()
+    x = VeryPrettyTable(border=True, header=True, padding_width=2)
+    field_max_width = 30
+
     x.field_names = [
         bd + '#' + rst,
         bd + 'SubnetId' + rst,
         bd + 'AZ' + rst,
         bd + 'CIDR' + rst,
-        bd + 'Ip Assignment' + rst,
+        bd + 'Ip Assign' + rst,
         bd + 'State'+ rst,
         bd + 'VpcId' + rst
     ]
@@ -240,13 +241,12 @@ def range_test(min, max, value):
 
 def profile_securitygroups(profile, region):
     """ Profiles securitygroups in an aws account """
-    sgs = {}
-    regions = region or get_regions()
+    sgs = []
 
     try:
         client = boto3_session('ec2', region=region, profile=profile)
         r = client.describe_security_groups()['SecurityGroups']
-        sgs[region] = [
+        sgs.append([
                 {
                     x['GroupId']: {
                         'Description': x['Description'],
@@ -254,12 +254,12 @@ def profile_securitygroups(profile, region):
                         'VpcId': x['VpcId']
                     }
                 } for x in r
-            ]
+            ])
     except ClientError as e:
         logger.warning(
             '{}: Unable to retrieve securitygroups for region {}'.format(inspect.stack()[0][3], rgn)
             )
-    return sgs[region]
+    return sgs
 
 
 def sg_lookup(profile, region):
@@ -276,10 +276,11 @@ def sg_lookup(profile, region):
         securitygroup ID chosen by user
 
     """
-    sgs = profile_securitygroups(profile, region)
-    max_len = 40
+    x = VeryPrettyTable(border=True, header=True, padding_width=2)
+    field_max_width = 40
 
-    x = VeryPrettyTable()
+    sgs = profile_securitygroups(profile, region)
+
     x.field_names = [
         bd + ' # ' + rst,
         bd + 'SecurityGroupId' + rst,
@@ -305,7 +306,7 @@ def sg_lookup(profile, region):
                     k,
                     v['GroupName'],
                     v['VpcId'],
-                    v['Description'][:max_len],
+                    v['Description'][:field_max_width],
                 ]
             )
 
