@@ -80,6 +80,15 @@ def help_menu():
     return True
 
 
+def display_table(table, tabspaces=4):
+    """Print Table Object offset from left by tabspaces"""
+    indent = ('\t').expandtabs(tabspaces)
+    table_str = table.get_string()
+    for e in table_str.split('\n'):
+        print(indent + e)
+    return True
+
+
 def is_tty():
     """
     Summary:
@@ -190,16 +199,11 @@ def init_cli():
                             v['VpcId']
                         ]
                     )
-            print(x)
 
-            choice = input('Type a letter to select a subnet [%s -- \'a\']: ' % lookup[0]) or 'a'
+            display_table(x)
+            choice = input('\n\Select a subnet [%s -- \'a\']: '.expandtabs(8) % lookup[0]) or 'a'
             subnet = lookup[userchoice_mapping(choice) - 1]
 
-            default = x.
-            q1 = ('\n\tSelect a subnet ' + Colors.RESET + '[%s] ').expandtabs(8) % default
-            sys.stdout.write(ACCENT)
-            response_q4 = input(q4b) or default
-            selection = read()
         return True
     return False
 
