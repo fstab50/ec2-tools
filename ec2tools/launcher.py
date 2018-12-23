@@ -119,7 +119,7 @@ def options(parser):
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
-    parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
+    parser.add_argument("-d", "--debug", dest='debug', action='store_true', default=False, required=False)
     parser.add_argument("-i", "--image", dest='imagetype', type=str, choices=current_ami.VALID_AMI_TYPES, required=False)
     parser.add_argument("-n", "--number", dest='instance_ct', nargs='?', default='1', required=False)
     parser.add_argument("-r", "--region", dest='regioncode', nargs='?', default=None, required=False)
@@ -262,7 +262,7 @@ def profile_securitygroups(profile, region):
     return sgs[0]
 
 
-def sg_lookup(profile, region):
+def sg_lookup(profile, region, debug):
     """
     Summary.
 
@@ -290,8 +290,9 @@ def sg_lookup(profile, region):
             if len(v['Description']) > max_desc:
                 max_desc = len(v['GroupName'])
 
-    print('max_gn = {}'.format(max_gn))
-    print('max_desc = {}'.format(max_desc))
+    if debug:
+        print('max_gn = {}'.format(max_gn))
+        print('max_desc = {}'.format(max_desc))
 
     # GroupName header
     tabspaces_gn = int(max_gn / 4 ) - int(len('GroupName') / 2) + padding
@@ -392,7 +393,8 @@ def init_cli():
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
             subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
-            securitygroup = sg_lookup(parse_profiles(args.profile), regioncode)
+            securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, debug)
+
         return True
     return False
 
