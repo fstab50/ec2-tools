@@ -276,9 +276,11 @@ def sg_lookup(profile, region):
         securitygroup ID chosen by user
 
     """
-    x = VeryPrettyTable(border=True, header=True, padding_width=2)
+    padding = 2
     field_max_width = 50
     max_gn, max_desc = 10, 10         # starting value to find max length of a table field (chars)
+
+    x = VeryPrettyTable(border=True, header=True, padding_width=padding)
 
     sgs = profile_securitygroups(profile, region)
     for index, row in enumerate(sgs):
@@ -288,21 +290,29 @@ def sg_lookup(profile, region):
             if len(v['Description']) > max_desc:
                 max_desc = len(v['GroupName'])
 
-    tabspaces_gn = int(max_gn / 4 )
-    tabspaces_desc = int(max_desc / 4)
+    print('max_gn = {}'.format(max_gn))
+    print('max_desc = {}'.format(max_desc))
+
+    # GroupName header
+    tabspaces_gn = int(max_gn / 4 ) - int(len('GroupName') / 2) + padding
+    tab_gn = '\t'.expandtabs(tabspaces_gn)
+
+    # Description header
+    tabspaces_desc = int(max_desc / 4) - int(len('Description') / 2) + padding
+    tab_desc = '\t'.expandtabs(tabspaces_desc)
 
     x.field_names = [
         bd + ' # ' + rst,
         bd + 'SecurityGroupId' + rst,
-        bd + 'GroupName' + rst,
+        tab_gn + bd + 'GroupName' + rst,
         bd + 'VpcId' + rst,
-        bd + 'Description' + rst
+        tab_desc + bd + 'Description' + rst
     ]
 
     # cell alignment
     x.align = 'c'
-    x.align[bd + 'GroupName' + rst] = 'l'
-    x.align[bd + 'Description' + rst] = 'l'
+    x.align[tab_gn + bd + 'GroupName' + rst] = 'l'
+    x.align[tab_desc + bd + 'Description' + rst] = 'l'
 
     # populate table
     lookup = {}
