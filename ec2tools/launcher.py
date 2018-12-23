@@ -259,7 +259,7 @@ def profile_securitygroups(profile, region):
         logger.warning(
             '{}: Unable to retrieve securitygroups for region {}'.format(inspect.stack()[0][3], rgn)
             )
-    return sgs
+    return sgs[0]
 
 
 def sg_lookup(profile, region):
