@@ -17,6 +17,7 @@ from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
 from ec2tools import current_ami, logd, __version__
+from ec2tools.environment import profile_securitygroups, profile_keypairs, profile_subnets
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -221,6 +222,59 @@ def range_test(min, max, value):
     return False
 
 
+def sg_lookup(profile, region):
+    """Returns securitygroup user selection in given region"""
+    sgs = profile_securitygroups(profile)[region]
+
+    x = VeryPrettyTable()
+    x.field_names = [
+        bd + ' # ' + rst, bd + 'SecurityGroupId' + rst,
+        bd + 'SecurityGroupId' + rst,
+        bd + 'GroupName' + rst,
+        bd + 'VpcId' + rst,
+        bd + 'Description' + rst
+    ]
+    # populate table
+    lookup = {}
+    for index, row in enumerate(sgs):
+        for k,v in row.items():
+
+            lookup[index + 1] = k
+
+            x.add_row(
+                [
+                    userchoice_mapping(index + 1) + '.',
+                    k,
+                    v['SecurityGroupId'],
+                    v['GroupName'],
+                    v['VpcId']
+                    v['Description'],
+                ]
+            )
+
+    # Table showing selections
+    print(f'\n\tSecurityGroups in region {bd + region + rst}\n'.expandtabs(30))
+    display_table(x)
+    try:
+        validate = True
+        while validate:
+            choice = input('\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % lookup[1]) or 'a'
+            index_range = [x for x in lookup]
+
+            if range_test(0, max(index_range), userchoice_mapping(choice)):
+                sg = lookup[userchoice_mapping(choice)]
+                validate = False
+            else:
+                stdout_message(
+                    'You must enter a letter between %s and %s' %
+                    (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1]))
+                )
+        stdout_message('You selected choice {}, {}'.format(choice, subnet))
+    except TypeError as e:
+        logger.exception(f'Typed input caused an exception. Error {e}')
+    return sg
+
+
 def init_cli():
     """
     Initializes commandline script
@@ -258,7 +312,7 @@ def init_cli():
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
             subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
             image = get_imageid(args.profile, args.imagetype, regioncode)
-
+            securitygroup = sg_lookup(args.profile, regioncode)
         return True
     return False
 
