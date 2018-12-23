@@ -237,6 +237,11 @@ def sg_lookup(profile, region):
         bd + 'VpcId' + rst,
         bd + 'Description' + rst
     ]
+
+    # cell alignment
+    x.align = 'c'
+    x.align[bd + 'Description' + rst] = 'l'
+
     # populate table
     lookup = {}
     for index, row in enumerate(sgs):
@@ -271,7 +276,7 @@ def sg_lookup(profile, region):
                     'You must enter a letter between %s and %s' %
                     (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1]))
                 )
-        stdout_message('You selected choice {}, {}'.format(choice, subnet))
+        stdout_message('You selected choice {}, {}'.format(choice, sg))
     except TypeError as e:
         logger.exception(f'Typed input caused an exception. Error {e}')
     return sg
@@ -313,8 +318,8 @@ def init_cli():
 
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
             subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
-            image = get_imageid(args.profile, args.imagetype, regioncode)
-            securitygroup = sg_lookup(args.profile, regioncode)
+            image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
+            securitygroup = sg_lookup(parse_profiles(args.profile), regioncode)
         return True
     return False
 
