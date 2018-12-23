@@ -278,8 +278,18 @@ def sg_lookup(profile, region):
     """
     x = VeryPrettyTable(border=True, header=True, padding_width=2)
     field_max_width = 40
+    max_gn, max_desc = 10, 10         # starting value to find max length of a table field (chars)
 
     sgs = profile_securitygroups(profile, region)
+    for index, row in enumerate(sgs):
+        for k,v in row.items():
+            if len(v['GroupName']) > max_gn:
+                max_gn = len(v['GroupName'])
+            if len(v['Description']) > max_desc:
+                max_desc = len(v['GroupName'])
+
+    tabspaces_gn = int(max_gn / 4)
+    tabspaces_desc = int(max_desc / 4)
 
     x.field_names = [
         bd + ' # ' + rst,
@@ -291,6 +301,7 @@ def sg_lookup(profile, region):
 
     # cell alignment
     x.align = 'c'
+    x.align[bd + 'GroupName' + rst] = 'l'
     x.align[bd + 'Description' + rst] = 'l'
 
     # populate table
