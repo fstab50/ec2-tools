@@ -161,17 +161,26 @@ def get_subnet(account_file, region):
                     v['VpcId']
                 ]
             )
-    print(f'\n\tSubnets in region {region}\n'.expandtabs(20))
-    display_table(x)
-    choice = input('\n\tEnter a letter to select a subnet [%s]: '.expandtabs(8) % lookup[0])
-    while True:
-        if range_test(0, max([x for x in lookup]), lookup[userchoice_mapping(choice)]):
-            subnet = lookup[userchoice_mapping(choice)]
-            break
-        else:
-            stdout_message('You must enter a letter between {} and {}'.format(lookup[0], lookup[-1]))
 
-    stdout_message('You selected subnet {}'.format(subnet))
+    # Table showing selections
+    print(f'\n\tSubnets in region {bd + region + rst}\n'.expandtabs(30))
+    display_table(x)
+
+    validate = True
+    while validate:
+        choice = input('\n\tEnter a letter to select a subnet [%s]: '.expandtabs(8) % lookup[1]) or 'a'
+        index_range = [x for x in lookup]
+
+        if range_test(0, max(index_range), userchoice_mapping(choice)):
+            subnet = lookup[userchoice_mapping(choice)]
+            validate = False
+        else:
+            stdout_message(
+                'You must enter a letter between %s and %s' %
+                (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1]))
+            )
+
+    stdout_message('You selected choice {}, {}'.format(choice, subnet))
     return subnet
 
 
