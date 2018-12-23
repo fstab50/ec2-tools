@@ -151,9 +151,12 @@ def get_subnet(account_file, region):
     # setup table
     x = VeryPrettyTable()
     x.field_names = [
-        bd + 'Choice' + rst, bd + 'SubnetId' + rst,
-        bd + 'AZ' + rst, bd + 'CIDR' + rst,
-        bd + 'Ip Assignment' + rst, bd + 'State'+ rst,
+        bd + '#' + rst,
+        bd + 'SubnetId' + rst,
+        bd + 'AZ' + rst,
+        bd + 'CIDR' + rst,
+        bd + 'Ip Assignment' + rst,
+        bd + 'State'+ rst,
         bd + 'VpcId' + rst
     ]
 
@@ -228,7 +231,7 @@ def sg_lookup(profile, region):
 
     x = VeryPrettyTable()
     x.field_names = [
-        bd + ' # ' + rst, bd + 'SecurityGroupId' + rst,
+        bd + ' # ' + rst,
         bd + 'SecurityGroupId' + rst,
         bd + 'GroupName' + rst,
         bd + 'VpcId' + rst,
@@ -245,9 +248,8 @@ def sg_lookup(profile, region):
                 [
                     userchoice_mapping(index + 1) + '.',
                     k,
-                    v['SecurityGroupId'],
                     v['GroupName'],
-                    v['VpcId']
+                    v['VpcId'],
                     v['Description'],
                 ]
             )
