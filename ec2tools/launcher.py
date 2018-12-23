@@ -225,9 +225,33 @@ def range_test(min, max, value):
     return False
 
 
+def profile_securitygroups(profile, region):
+    """ Profiles securitygroups in an aws account """
+    sgs = {}
+    regions = region or get_regions()
+
+    try:
+        client = boto3_session('ec2', region=region, profile=profile)
+        r = client.describe_security_groups()['SecurityGroups']
+        sgs[region] = [
+                {
+                    x['GroupId']: {
+                        'Description': x['Description'],
+                        'GroupName': x['GroupName'],
+                        'VpcId': x['VpcId']
+                    }
+                } for x in r
+            ]
+    except ClientError as e:
+        logger.warning(
+            '{}: Unable to retrieve securitygroups for region {}'.format(inspect.stack()[0][3], rgn)
+            )
+    return sgs[region]
+
+
 def sg_lookup(profile, region):
     """Returns securitygroup user selection in given region"""
-    sgs = profile_securitygroups(profile)[region]
+    sgs = profile_securitygroups(profile, region)
 
     x = VeryPrettyTable()
     x.field_names = [
