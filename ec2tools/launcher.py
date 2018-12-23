@@ -8,6 +8,7 @@ import inspect
 import boto3
 import pdb
 import subprocess
+from shutil import which
 from botocore.exceptions import ClientError
 from veryprettytable import VeryPrettyTable
 from pyaws.ec2 import default_region
@@ -134,8 +135,14 @@ def get_contents(content):
     return None
 
 
-def get_imageid(region):
-    current_ami.main(region)
+def get_imageid(profile, image, region):
+    if which('machineimage'):
+        cmd = 'machineimage --profile {} --image {} --region {}'.format(profile, image, region)
+        response = json.loads(subprocess.getoutput(cmd))
+    else:
+        stdout_message('machineimage executable could not be located. Exit', prefix='WARN')
+        sys.exit(1)
+    return response[region]
 
 
 def get_subnet(account_file, region):
@@ -250,7 +257,8 @@ def init_cli():
 
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
             subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
-            image = get_imageid(args.profile, args.image, regioncode)
+            image = get_imageid(args.profile, args.imagetype, regioncode)
+
         return True
     return False
 
