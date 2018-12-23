@@ -7,6 +7,7 @@ import argparse
 import inspect
 import boto3
 import pdb
+import subprocess
 from botocore.exceptions import ClientError
 from veryprettytable import VeryPrettyTable
 from pyaws.ec2 import default_region
@@ -14,7 +15,7 @@ from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, 
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
-from ec2tools import logd, __version__
+from ec2tools import current_ami, logd, __version__
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -117,7 +118,10 @@ def options(parser):
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
+    parser.add_argument("-i", "--image", dest='imagetype', type=str, choices=current_ami.VALID_AMI_TYPES, required=False)
+    parser.add_argument("-n", "--number", dest='instance_ct', nargs='?', default='1', required=False)
     parser.add_argument("-r", "--region", dest='regioncode', nargs='?', default=None, required=False)
+    parser.add_argument("-s", "--instance-size", dest='instance_size', nargs='?', default='t3.micro', required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
     return parser.parse_args()
@@ -130,8 +134,12 @@ def get_contents(content):
     return None
 
 
-def get_subnet(account_file, region):
+def get_imageid(region):
+    current_ami.main(region)
 
+
+def get_subnet(account_file, region):
+    """Returns user choice of subnet"""
     # setup table
     x = VeryPrettyTable()
     x.field_names = [
@@ -165,22 +173,23 @@ def get_subnet(account_file, region):
     # Table showing selections
     print(f'\n\tSubnets in region {bd + region + rst}\n'.expandtabs(30))
     display_table(x)
+    try:
+        validate = True
+        while validate:
+            choice = input('\n\tEnter a letter to select a subnet [%s]: '.expandtabs(8) % lookup[1]) or 'a'
+            index_range = [x for x in lookup]
 
-    validate = True
-    while validate:
-        choice = input('\n\tEnter a letter to select a subnet [%s]: '.expandtabs(8) % lookup[1]) or 'a'
-        index_range = [x for x in lookup]
-
-        if range_test(0, max(index_range), userchoice_mapping(choice)):
-            subnet = lookup[userchoice_mapping(choice)]
-            validate = False
-        else:
-            stdout_message(
-                'You must enter a letter between %s and %s' %
-                (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1]))
-            )
-
-    stdout_message('You selected choice {}, {}'.format(choice, subnet))
+            if range_test(0, max(index_range), userchoice_mapping(choice)):
+                subnet = lookup[userchoice_mapping(choice)]
+                validate = False
+            else:
+                stdout_message(
+                    'You must enter a letter between %s and %s' %
+                    (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1]))
+                )
+        stdout_message('You selected choice {}, {}'.format(choice, subnet))
+    except TypeError as e:
+        logger.exception(f'Typed input caused an exception. Error {e}')
     return subnet
 
 
@@ -226,6 +235,13 @@ def init_cli():
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
+    elif args.imagetype is None:
+        stdout_message(f'You must enter an os image type (--image)', prefix='WARN')
+        stdout_message(f'Valid image types are:')
+        for t in current_ami.VALID_AMI_TYPES:
+            print('\t\t' + t)
+        sys.exit(exit_codes['EX_OK']['Code'])
+
     elif args.profile:
 
         regioncode = args.regioncode or default_region(args.profile)
@@ -234,7 +250,7 @@ def init_cli():
 
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
             subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
-
+            image = get_imageid(args.profile, args.image, regioncode)
         return True
     return False
 
