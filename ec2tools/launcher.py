@@ -393,8 +393,10 @@ def init_cli():
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
             subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
-            securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, debug)
+            securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
+            keypairs = profile_keypairs(parse_profiles(args.profile), regioncode)
 
+            print('keypairs: {}'.format(keypairs))
         return True
     return False
 

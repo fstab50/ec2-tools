@@ -132,10 +132,12 @@ def profile_subnets(profile):
     return subnets
 
 
-def profile_securitygroups(profile):
+def profile_securitygroups(profile, region=None):
     """ Profiles securitygroups in an aws account """
     sgs = {}
-    for rgn in get_regions():
+    regions = [region] or get_regions()
+
+    for rgn in regions:
         try:
             client = boto3_session('ec2', region=rgn, profile=profile)
             r = client.describe_security_groups()['SecurityGroups']
@@ -156,9 +158,12 @@ def profile_securitygroups(profile):
     return sgs
 
 
-def profile_keypairs(profile):
+def profile_keypairs(profile, region=None):
     keypairs = {}
-    for rgn in get_regions():
+
+    regions = [region] or get_regions()
+
+    for rgn in regions:
         try:
             client = boto3_session('ec2', region=rgn, profile=profile)
             keypairs[rgn] = [x['KeyName'] for x in client.describe_key_pairs()['KeyPairs']]
