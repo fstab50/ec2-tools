@@ -147,7 +147,20 @@ def get_imageid(profile, image, region):
 
 
 def get_subnet(account_file, region):
-    """Returns user choice of subnet"""
+    """
+    Summary.
+
+        Returns subnet user selection in given region
+
+    Args:
+        :profile (str): profile_name from local awscli configuration
+        :region (str): AWS region code
+
+    Returns:
+        subnet id chosen by user
+
+    """
+    max_len = 30
     # setup table
     x = VeryPrettyTable()
     x.field_names = [
@@ -167,11 +180,11 @@ def get_subnet(account_file, region):
     for index, row in enumerate(subnets):
         for k,v in row.items():
 
-            lookup[index + 1] = k
+            lookup[index] = k
 
             x.add_row(
                 [
-                    userchoice_mapping(index + 1) + '.',
+                    userchoice_mapping(index) + '.',
                     k,
                     v['AvailabilityZone'],
                     v['CidrBlock'],
@@ -187,7 +200,7 @@ def get_subnet(account_file, region):
     try:
         validate = True
         while validate:
-            choice = input('\n\tEnter a letter to select a subnet [%s]: '.expandtabs(8) % lookup[1]) or 'a'
+            choice = input('\n\tEnter a letter to select a subnet [%s]: '.expandtabs(8) % lookup[0]) or 'a'
             index_range = [x for x in lookup]
 
             if range_test(0, max(index_range), userchoice_mapping(choice)):
@@ -250,8 +263,21 @@ def profile_securitygroups(profile, region):
 
 
 def sg_lookup(profile, region):
-    """Returns securitygroup user selection in given region"""
+    """
+    Summary.
+
+        Returns securitygroup user selection in given region
+
+    Args:
+        :profile (str): profile_name from local awscli configuration
+        :region (str): AWS region code
+
+    Returns:
+        securitygroup ID chosen by user
+
+    """
     sgs = profile_securitygroups(profile, region)
+    max_len = 40
 
     x = VeryPrettyTable()
     x.field_names = [
@@ -271,26 +297,27 @@ def sg_lookup(profile, region):
     for index, row in enumerate(sgs):
         for k,v in row.items():
 
-            lookup[index + 1] = k
+            lookup[index] = k
 
             x.add_row(
                 [
-                    userchoice_mapping(index + 1) + '.',
+                    userchoice_mapping(index) + '.',
                     k,
                     v['GroupName'],
                     v['VpcId'],
-                    v['Description'],
+                    v['Description'][:max_len],
                 ]
             )
 
     # Table showing selections
     print(f'\n\tSecurityGroups in region {bd + region + rst}\n'.expandtabs(30))
     display_table(x)
+
     try:
         validate = True
         while validate:
-            choice = input('\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % lookup[1]) or 'a'
-            index_range = [x for x in lookup]
+            choice = input('\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % lookup[0]) or 'a'
+            index_range = [x for x in lookup if x is not None]
 
             if range_test(0, max(index_range), userchoice_mapping(choice)):
                 sg = lookup[userchoice_mapping(choice)]
