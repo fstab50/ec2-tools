@@ -6,9 +6,11 @@ import json
 import argparse
 import inspect
 import boto3
+import pdb
 from botocore.exceptions import ClientError
 from veryprettytable import VeryPrettyTable
-from pyaws.utils import stdout_message, export_json_object, userchoice_mapping
+from pyaws.ec2 import default_region
+from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, range_bind
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
@@ -29,14 +31,6 @@ FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
 CALLER = 'launcher'
 
 
-# set region default
-if os.getenv('AWS_DEFAULT_REGION') is None:
-    default_region = 'us-east-2'
-    os.environ['AWS_DEFAULT_REGION'] = default_region
-else:
-    default_region = os.getenv('AWS_DEFAULT_REGION')
-
-
 def help_menu():
     """ Displays command line parameter options """
     menu = '''
@@ -45,8 +39,7 @@ def help_menu():
 
 ''' + bd + '''DESCRIPTION''' + rst + '''
 
-        Profile AWS Account Environment.  Collects Subnets,
-        SecurityGroups, and ssh Keypairs for all AWS regions.
+        Launch EC2 Instance
 
 ''' + bd + '''OPTIONS''' + rst + '''
 
@@ -123,9 +116,8 @@ def options(parser):
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
-    parser.add_argument("-o", "--outputfile", dest='outputfile', action='store_true', required=False)
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', required=False)
-    parser.add_argument("-s", "--show", dest='show', nargs='?', required=False)
+    parser.add_argument("-r", "--region", dest='regioncode', nargs='?', default=None, required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
     return parser.parse_args()
@@ -138,10 +130,77 @@ def get_contents(content):
     return None
 
 
+def get_subnet(account_file, region):
+
+    # setup table
+    x = VeryPrettyTable()
+    x.field_names = [
+        bd + 'Choice' + rst, bd + 'SubnetId' + rst,
+        bd + 'AZ' + rst, bd + 'CIDR' + rst,
+        bd + 'Ip Assignment' + rst, bd + 'State'+ rst,
+        bd + 'VpcId' + rst
+    ]
+
+    subnets = get_contents(account_file)[region]['Subnets']
+
+    # populate table
+    lookup = {}
+    for index, row in enumerate(subnets):
+        for k,v in row.items():
+
+            lookup[index + 1] = k
+
+            x.add_row(
+                [
+                    userchoice_mapping(index + 1) + '.',
+                    k,
+                    v['AvailabilityZone'],
+                    v['CidrBlock'],
+                    v['IpAddresses'],
+                    v['State'],
+                    v['VpcId']
+                ]
+            )
+    print(f'\n\tSubnets in region {region}\n'.expandtabs(20))
+    display_table(x)
+    choice = input('\n\tEnter a letter to select a subnet [%s]: '.expandtabs(8) % lookup[0])
+    while True:
+        if range_test(0, max([x for x in lookup]), lookup[userchoice_mapping(choice)]):
+            subnet = lookup[userchoice_mapping(choice)]
+            break
+        else:
+            stdout_message('You must enter a letter between {} and {}'.format(lookup[0], lookup[-1]))
+
+    stdout_message('You selected subnet {}'.format(subnet))
+    return subnet
+
+
+def range_test(min, max, value):
+    """
+    Summary.
+
+        Tests value to determine if in range (min, max)
+
+    Args:
+        :min (int):  integer representing minimum acceptable value
+        :max (int):  integer representing maximum acceptable value
+        :value (int): value tested
+
+    Returns:
+        Success | Failure, TYPE: bool
+
+    """
+    if isinstance(value, int):
+        if value in range(min, max + 1):
+            return True
+    return False
+
+
 def init_cli():
     """
     Initializes commandline script
     """
+    #pdb.set_trace()
     parser = argparse.ArgumentParser(add_help=False)
 
     try:
@@ -149,7 +208,6 @@ def init_cli():
     except Exception as e:
         stdout_message(str(e), 'ERROR')
         sys.exit(exit_codes['EX_OK']['Code'])
-
 
     if len(sys.argv) == 1:
         help_menu()
@@ -159,50 +217,14 @@ def init_cli():
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
-    elif ('--show' in sys.argv or '-s' in sys.argv) and args.show is None:
-        stdout_message('You must specify a value when using the --show option. Example: \
-        \n\n\t\t$  %s  --show profiles' % (act + CALLER + rst))
-
     elif args.profile:
+
+        regioncode = args.regioncode or default_region(args.profile)
 
         if authenticated(profile=parse_profiles(args.profile)):
 
             DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
-
-            subnets = get_contents(DEFAULT_OUTPUTFILE)['us-east-2']['Subnets']
-
-            # setup table
-            x = VeryPrettyTable()
-            x.field_names = [
-                bd + 'Choice' + rst, bd + 'SubnetId' + rst,
-                bd + 'AZ' + rst, bd + 'CIDR' + rst,
-                bd + 'Ip Assignment' + rst, bd + 'State'+ rst,
-                bd + 'VpcId' + rst
-            ]
-
-
-            # populate table
-            lookup = {}
-            for index, row in enumerate(subnets):
-                for k,v in row.items():
-
-                    lookup[index] = k
-
-                    x.add_row(
-                        [
-                            str(index + 1),
-                            k,
-                            v['AvailabilityZone'],
-                            v['CidrBlock'],
-                            v['IpAddresses'],
-                            v['State'],
-                            v['VpcId']
-                        ]
-                    )
-
-            display_table(x)
-            choice = input('\n\Select a subnet [%s -- \'a\']: '.expandtabs(8) % lookup[0]) or 'a'
-            subnet = lookup[userchoice_mapping(choice) - 1]
+            subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
 
         return True
     return False
