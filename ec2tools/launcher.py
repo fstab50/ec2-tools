@@ -198,24 +198,7 @@ def get_subnet(account_file, region):
     # Table showing selections
     print(f'\n\tSubnets in region {bd + region + rst}\n'.expandtabs(30))
     display_table(x)
-    try:
-        validate = True
-        while validate:
-            choice = input('\n\tEnter a letter to select a subnet [%s]: '.expandtabs(8) % lookup[0]) or 'a'
-            index_range = [x for x in lookup]
-
-            if range_test(0, max(index_range), userchoice_mapping(choice)):
-                subnet = lookup[userchoice_mapping(choice)]
-                validate = False
-            else:
-                stdout_message(
-                    'You must enter a letter between %s and %s' %
-                    (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1]))
-                )
-        stdout_message('You selected choice {}, {}'.format(choice, subnet))
-    except TypeError as e:
-        logger.exception(f'Typed input caused an exception. Error {e}')
-    return subnet
+    return choose_resource(lookup)
 
 
 def range_test(min, max, value):
@@ -335,25 +318,31 @@ def sg_lookup(profile, region, debug):
     # Table showing selections
     print(f'\n\tSecurityGroups in region {bd + region + rst}\n'.expandtabs(30))
     display_table(x)
+    return choose_resource(lookup)
 
+
+def choose_resource(choice_list):
+    validate = True
     try:
-        validate = True
         while validate:
-            choice = input('\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % lookup[0]) or 'a'
-            index_range = [x for x in lookup if x is not None]
 
-            if range_test(0, max(index_range), userchoice_mapping(choice)):
-                sg = lookup[userchoice_mapping(choice)]
+            choice = input(
+                '\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % choice_list[0]
+            ) or 'a'
+            index_range = [x for x in choice_list if x is not None]
+
+            if range_test(0, max(index_range), choose_resource_mapping(choice)):
+                resourceid = choice_list[userchoice_mapping(choice)]
                 validate = False
             else:
                 stdout_message(
                     'You must enter a letter between %s and %s' %
-                    (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1]))
-                )
-        stdout_message('You selected choice {}, {}'.format(choice, sg))
+                    (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1])))
     except TypeError as e:
         logger.exception(f'Typed input caused an exception. Error {e}')
-    return sg
+        sys.exit(1)
+    stdout_message('You selected choice {}, {}'.format(choice, resourceid))
+    return resourceid
 
 
 def init_cli():
