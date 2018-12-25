@@ -33,6 +33,9 @@ rst = Colors.RESET
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
 CALLER = 'launcher'
 
+image, subnet, securitygroup, keypair = ''
+launch_prereqs = (image, subnet, securitygroup, keypair)
+
 
 def help_menu():
     """ Displays command line parameter options """
@@ -448,7 +451,15 @@ def init_cli():
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
 
-        return True
+            if all(x for x in launch_prereqs):
+                run_ec2_instance(image, subnet, securitygroup, keypair, debug)
+                return True
+            else:
+                stdout_message(
+                    message='One or more launch prerequisities missing. Abort',
+                    prefix='WARN'
+                )
+
     return False
 
 
