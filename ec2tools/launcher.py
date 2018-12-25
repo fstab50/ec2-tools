@@ -33,7 +33,7 @@ rst = Colors.RESET
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
 CALLER = 'launcher'
 
-image, subnet, securitygroup, keypair = ''
+image, subnet, securitygroup, keypair = '', '', '', ''
 launch_prereqs = (image, subnet, securitygroup, keypair)
 
 
@@ -158,8 +158,8 @@ def keypair_lookup(profile, region, debug):
             )
 
     # Table showing selections
-    print(f'\n\tKeypairs in region {bd + region + rst}\n'.expandtabs(30))
-    display_table(x)
+    print(f'\n\tKeypairs in region {bd + region + rst}\n'.expandtabs(26))
+    display_table(x, tabspaces=16)
     return choose_resource(lookup)
 
 
@@ -459,7 +459,6 @@ def init_cli():
                     message='One or more launch prerequisities missing. Abort',
                     prefix='WARN'
                 )
-
     return False
 
 
