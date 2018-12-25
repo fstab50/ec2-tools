@@ -110,6 +110,56 @@ def get_regions():
     return [x['RegionName'] for x in client.describe_regions()['Regions'] if 'cn' not in x['RegionName']]
 
 
+def keypair_lookup(profile, region, debug):
+    """
+    Summary.
+
+        Returns name of keypair user selection in given region
+
+    Args:
+        :profile (str): profile_name from local awscli configuration
+        :region (str): AWS region code
+
+    Returns:
+        keypair name chosen by user
+
+    """
+
+    # setup table
+    x = VeryPrettyTable(border=True, header=True, padding_width=2)
+    field_max_width = 30
+
+    x.field_names = [
+        bd + '#' + rst,
+        bd + 'Keypair' + rst
+    ]
+
+
+    # cell alignment
+    x.align[bd + '#' + rst] = 'c'
+    x.align[bd + 'Keypair' + rst] = 'l'
+
+    keypairs = profile_keypairs(parse_profiles(profile), region)[region]
+
+    # populate table
+    lookup = {}
+    for index, keypair in enumerate(keypairs):
+
+            lookup[index] = keypair
+
+            x.add_row(
+                [
+                    userchoice_mapping(index) + '.',
+                    keypair
+                ]
+            )
+
+    # Table showing selections
+    print(f'\n\tKeypairs in region {bd + region + rst}\n'.expandtabs(30))
+    display_table(x)
+    return choose_resource(lookup)
+
+
 def options(parser):
     """
     Summary:
@@ -287,7 +337,7 @@ def sg_lookup(profile, region, debug):
 
     x.field_names = [
         bd + ' # ' + rst,
-        bd + 'SecurityGroupId' + rst,
+        bd + 'GroupId' + rst,
         tab_gn + bd + 'GroupName' + rst,
         bd + 'VpcId' + rst,
         tab_desc + bd + 'Description' + rst
@@ -316,23 +366,36 @@ def sg_lookup(profile, region, debug):
             )
 
     # Table showing selections
-    print(f'\n\tSecurityGroups in region {bd + region + rst}\n'.expandtabs(30))
+    print(f'\n\tSecurity Groups in region {bd + region + rst}\n'.expandtabs(30))
     display_table(x)
     return choose_resource(lookup)
 
 
-def choose_resource(choice_list):
+def choose_resource(choices):
+    """
+
+    Summary.
+
+        validate user choice of options
+
+    Args:
+        :choices (dict): lookup table by key, for value selected
+            from options displayed via stdout
+
+    Returns:
+        user selected resource identifier
+    """
     validate = True
     try:
         while validate:
 
             choice = input(
-                '\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % choice_list[0]
+                '\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % choices[0]
             ) or 'a'
-            index_range = [x for x in choice_list if x is not None]
+            index_range = [x for x in choices if x is not None]
 
-            if range_test(0, max(index_range), choose_resource_mapping(choice)):
-                resourceid = choice_list[userchoice_mapping(choice)]
+            if range_test(0, max(index_range), userchoice_mapping(choice)):
+                resourceid = choices[userchoice_mapping(choice)]
                 validate = False
             else:
                 stdout_message(
@@ -383,9 +446,8 @@ def init_cli():
             subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
-            keypairs = profile_keypairs(parse_profiles(args.profile), regioncode)
+            keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
 
-            print('keypairs: {}'.format(keypairs))
         return True
     return False
 
