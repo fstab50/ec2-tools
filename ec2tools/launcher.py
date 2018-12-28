@@ -5,10 +5,10 @@ import sys
 import json
 import argparse
 import inspect
-import boto3
 import pdb
 import subprocess
 from shutil import which
+import boto3
 from botocore.exceptions import ClientError
 from veryprettytable import VeryPrettyTable
 from pyaws.ec2 import default_region
@@ -33,7 +33,7 @@ rst = Colors.RESET
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
 CALLER = 'launcher'
 
-image, subnet, securitygroup, keypair = '', '', '', ''
+image, subnet, securitygroup, keypair = None, None, None, None
 launch_prereqs = (image, subnet, securitygroup, keypair)
 
 
@@ -411,6 +411,25 @@ def choose_resource(choices):
     return resourceid
 
 
+def run_ec2_instance(imageid, subid, sgroup, kp, debug):
+    """
+    Summary.
+
+        Creates a new EC2 instance with properties given by supplied parameters
+
+    Args:
+        :imageid (str): Amazon Machine Image Id
+        :subid (str): AWS subnet id (subnet-abcxyz)
+        :sgroup (str): Security group id
+        :kp (str): keypair name matching pre-existing keypair in the targeted AWS account
+        :debug (bool): debug flag to enable verbose logging
+
+    Returns:
+        Success | Failure, TYPE: bool
+    """
+    pass
+
+
 def init_cli():
     """
     Initializes commandline script
@@ -451,14 +470,14 @@ def init_cli():
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
 
-            if all(x for x in launch_prereqs):
-                run_ec2_instance(image, subnet, securitygroup, keypair, debug)
-                return True
-            else:
+            if any(x for x in launch_prereqs) is None:
                 stdout_message(
                     message='One or more launch prerequisities missing. Abort',
                     prefix='WARN'
                 )
+            else:
+                run_ec2_instance(image, subnet, securitygroup, keypair, debug)
+                return True
     return False
 
 
