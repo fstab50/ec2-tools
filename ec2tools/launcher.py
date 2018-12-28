@@ -411,7 +411,7 @@ def choose_resource(choices):
     return resourceid
 
 
-def run_ec2_instance(imageid, subid, sgroup, kp, debug):
+def run_ec2_instance(imageid, subid, sgroup, kp, profile_arn, size='t3.micro', count=1, debug):
     """
     Summary.
 
@@ -425,9 +425,37 @@ def run_ec2_instance(imageid, subid, sgroup, kp, debug):
         :debug (bool): debug flag to enable verbose logging
 
     Returns:
-        Success | Failure, TYPE: bool
+        InstanceId(s), TYPE: list
     """
-    pass
+    profile_name = profile_arn.split('/')[-1]
+
+    response = client.run_instances(
+        ImageId=imageid,
+        InstanceType=size,
+        KeyName=kp,
+        MaxCount=count,
+        MinCount=count,
+        SecurityGroups=[sgroup],
+        SubnetId=subid,
+        UserData='string',
+        IamInstanceProfile={
+            'Arn': profile_arn,
+            'Name': profile_name
+        },
+        InstanceInitiatedShutdownBehavior='stop',
+        TagSpecifications=[
+            {
+                'ResourceType': 'customer-gateway'|'dedicated-host'|'dhcp-options'|'elastic-ip'|'fleet'|'fpga-image'|'image'|'instance'|'internet-gateway'|'launch-template'|'natgateway'|'network-acl'|'network-interface'|'reserved-instances'|'route-table'|'security-group'|'snapshot'|'spot-instances-request'|'subnet'|'transit-gateway'|'transit-gateway-attachment'|'transit-gateway-route-table'|'volume'|'vpc'|'vpc-peering-connection'|'vpn-connection'|'vpn-gateway',
+                'Tags': [
+                    {
+                        'Key': 'string',
+                        'Value': 'string'
+                    },
+                ]
+            }
+        ]
+    )
+    return [x['InstanceId'] for x in response['Instances']]
 
 
 def init_cli():
