@@ -174,7 +174,7 @@ def options(parser):
                               required=False, help="type (default: %(default)s)")
     parser.add_argument("-d", "--debug", dest='debug', action='store_true', default=False, required=False)
     parser.add_argument("-i", "--image", dest='imagetype', type=str, choices=current_ami.VALID_AMI_TYPES, required=False)
-    parser.add_argument("-n", "--number", dest='instance_ct', nargs='?', default='1', required=False)
+    parser.add_argument("-q", "--quantity", dest='quantity', nargs='?', default=1, required=False)
     parser.add_argument("-r", "--region", dest='regioncode', nargs='?', default=None, required=False)
     parser.add_argument("-s", "--instance-size", dest='instance_size', nargs='?', default='t3.micro', required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
@@ -411,7 +411,7 @@ def choose_resource(choices):
     return resourceid
 
 
-def run_ec2_instance(imageid, subid, sgroup, kp, profile_arn, size='t3.micro', count=1, debug):
+def run_ec2_instance(imageid, subid, sgroup, kp, profile_arn, size, count, debug):
     """
     Summary.
 
@@ -427,34 +427,46 @@ def run_ec2_instance(imageid, subid, sgroup, kp, profile_arn, size='t3.micro', c
     Returns:
         InstanceId(s), TYPE: list
     """
-    profile_name = profile_arn.split('/')[-1]
-
-    response = client.run_instances(
-        ImageId=imageid,
-        InstanceType=size,
-        KeyName=kp,
-        MaxCount=count,
-        MinCount=count,
-        SecurityGroups=[sgroup],
-        SubnetId=subid,
-        UserData='string',
-        IamInstanceProfile={
-            'Arn': profile_arn,
-            'Name': profile_name
-        },
-        InstanceInitiatedShutdownBehavior='stop',
-        TagSpecifications=[
-            {
-                'ResourceType': 'customer-gateway'|'dedicated-host'|'dhcp-options'|'elastic-ip'|'fleet'|'fpga-image'|'image'|'instance'|'internet-gateway'|'launch-template'|'natgateway'|'network-acl'|'network-interface'|'reserved-instances'|'route-table'|'security-group'|'snapshot'|'spot-instances-request'|'subnet'|'transit-gateway'|'transit-gateway-attachment'|'transit-gateway-route-table'|'volume'|'vpc'|'vpc-peering-connection'|'vpn-connection'|'vpn-gateway',
-                'Tags': [
-                    {
-                        'Key': 'string',
-                        'Value': 'string'
-                    },
-                ]
-            }
-        ]
-    )
+    if profile_arn is None:
+        response = client.run_instances(
+            ImageId=imageid,
+            InstanceType=size,
+            KeyName=kp,
+            MaxCount=count,
+            MinCount=count,
+            SecurityGroups=[sgroup],
+            SubnetId=subid,
+            UserData='string',
+            InstanceInitiatedShutdownBehavior='stop'
+        )
+    else:
+        profile_name = profile_arn.split('/')[-1]
+        response = client.run_instances(
+            ImageId=imageid,
+            InstanceType=size,
+            KeyName=kp,
+            MaxCount=count,
+            MinCount=count,
+            SecurityGroups=[sgroup],
+            SubnetId=subid,
+            UserData='string',
+            IamInstanceProfile={
+                'Arn': profile_arn,
+                'Name': profile_name
+            },
+            InstanceInitiatedShutdownBehavior='stop',
+            TagSpecifications=[
+                {
+                    'ResourceType': 'customer-gateway'|'dedicated-host'|'dhcp-options'|'elastic-ip'|'fleet'|'fpga-image'|'image'|'instance'|'internet-gateway'|'launch-template'|'natgateway'|'network-acl'|'network-interface'|'reserved-instances'|'route-table'|'security-group'|'snapshot'|'spot-instances-request'|'subnet'|'transit-gateway'|'transit-gateway-attachment'|'transit-gateway-route-table'|'volume'|'vpc'|'vpc-peering-connection'|'vpn-connection'|'vpn-gateway',
+                    'Tags': [
+                        {
+                            'Key': 'string',
+                            'Value': 'string'
+                        },
+                    ]
+                }
+            ]
+        )
     return [x['InstanceId'] for x in response['Instances']]
 
 
@@ -497,6 +509,7 @@ def init_cli():
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
+            instance_profile = None
 
             if any(x for x in launch_prereqs) is None:
                 stdout_message(
@@ -504,7 +517,16 @@ def init_cli():
                     prefix='WARN'
                 )
             else:
-                run_ec2_instance(image, subnet, securitygroup, keypair, debug)
+                run_ec2_instance(
+                    imageid=image,
+                    subid=subnet,
+                    sgroup=securitygroup,
+                    kp=keypair,
+                    profile_arn=instance_profile,
+                    size=args.instance_size,
+                    count=args.quatity,
+                    debug=debug
+                )
                 return True
     return False
 
