@@ -81,6 +81,43 @@ def help_menu():
     return True
 
 
+def choose_resource(choices):
+    """
+
+    Summary.
+
+        validate user choice of options
+
+    Args:
+        :choices (dict): lookup table by key, for value selected
+            from options displayed via stdout
+
+    Returns:
+        user selected resource identifier
+    """
+    validate = True
+    try:
+        while validate:
+
+            choice = input(
+                '\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % choices[0]
+            ) or 'a'
+            index_range = [x for x in choices if x is not None]
+
+            if range_test(0, max(index_range), userchoice_mapping(choice)):
+                resourceid = choices[userchoice_mapping(choice)]
+                validate = False
+            else:
+                stdout_message(
+                    'You must enter a letter between %s and %s' %
+                    (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1])))
+    except TypeError as e:
+        logger.exception(f'Typed input caused an exception. Error {e}')
+        sys.exit(1)
+    stdout_message('You selected choice {}, {}'.format(choice, resourceid))
+    return resourceid
+
+
 def display_table(table, tabspaces=4):
     """Print Table Object offset from left by tabspaces"""
     indent = ('\t').expandtabs(tabspaces)
@@ -376,44 +413,7 @@ def sg_lookup(profile, region, debug):
     return choose_resource(lookup)
 
 
-def choose_resource(choices):
-    """
-
-    Summary.
-
-        validate user choice of options
-
-    Args:
-        :choices (dict): lookup table by key, for value selected
-            from options displayed via stdout
-
-    Returns:
-        user selected resource identifier
-    """
-    validate = True
-    try:
-        while validate:
-
-            choice = input(
-                '\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % choices[0]
-            ) or 'a'
-            index_range = [x for x in choices if x is not None]
-
-            if range_test(0, max(index_range), userchoice_mapping(choice)):
-                resourceid = choices[userchoice_mapping(choice)]
-                validate = False
-            else:
-                stdout_message(
-                    'You must enter a letter between %s and %s' %
-                    (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1])))
-    except TypeError as e:
-        logger.exception(f'Typed input caused an exception. Error {e}')
-        sys.exit(1)
-    stdout_message('You selected choice {}, {}'.format(choice, resourceid))
-    return resourceid
-
-
-def run_ec2_instance(client, imageid, subid, sgroup, kp, profile_arn, size, count, debug):
+def run_ec2_instance(pf, rc, imageid, subid, sgroup, kp, ip_arn, size, count, debug):
     """
     Summary.
 
@@ -430,6 +430,8 @@ def run_ec2_instance(client, imageid, subid, sgroup, kp, profile_arn, size, coun
         InstanceId(s), TYPE: list
     """
     now = datetime.datetime.utcnow()
+    # ec2 client instantiation for launch
+    client = boto3_session('ec2', region=rc, profile=pf)
 
     try:
         if profile_arn is None:
@@ -456,7 +458,7 @@ def run_ec2_instance(client, imageid, subid, sgroup, kp, profile_arn, size, coun
                 ]
             )
         else:
-            profile_name = profile_arn.split('/')[-1]
+            ip_name = ip_arn.split('/')[-1]
 
             response = client.run_instances(
                 ImageId=imageid,
@@ -468,8 +470,8 @@ def run_ec2_instance(client, imageid, subid, sgroup, kp, profile_arn, size, coun
                 SubnetId=subid,
                 UserData='string',
                 IamInstanceProfile={
-                    'Arn': profile_arn,
-                    'Name': profile_name
+                    'Arn': ip_arn,
+                    'Name': ip_name
                 },
                 InstanceInitiatedShutdownBehavior='stop',
                 TagSpecifications=[
@@ -531,7 +533,7 @@ def init_cli():
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
-            instance_profile = None
+            instance_profile = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
 
             if any(x for x in launch_prereqs) is None:
                 stdout_message(
@@ -540,11 +542,9 @@ def init_cli():
                 )
 
             elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, instance_profile):
-                # ec2 client instantiation for launch
-                client_object = boto3_session('ec2', region=regioncode, profile=args.profile)
-
                 r = run_ec2_instance(
-                        client=client_object,
+                        pf=args.profile,
+                        region=regioncode,
                         imageid=image,
                         subid=subnet,
                         sgroup=securitygroup,
