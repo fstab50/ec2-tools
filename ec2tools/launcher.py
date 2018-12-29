@@ -127,6 +127,79 @@ def display_table(table, tabspaces=4):
     return True
 
 
+def find_instanceprofile_roles():
+    """
+    Summary.
+
+        returns instance profile roles in an AWS account
+
+    Returns:
+        iam role information, TYPE:  json
+        Format:
+            {
+                'RoleName': 'SR-S3Ops',
+                'Arn': 'arn:aws:iam::716400000000:role/SR-S3Ops',
+                'CreateDate':
+            }
+    """
+    client = boto3_session(service='iam', profile=profile)
+    r = client.list_roles()['Roles']
+    return [
+            {
+                'RoleName': x['RoleName'],
+                'Arn': x['Arn'],
+                'CreateDate': x['CreateDate'].isoformat()
+            } for x in r
+        ]
+
+
+def ip_lookup(profile, region, debug):
+    """
+    Summary.
+
+        Instance Profile role user selection
+
+    Returns:
+        iam instance profile role ARN (str) or None
+    """
+    # setup table
+    x = VeryPrettyTable(border=True, header=True, padding_width=2)
+    field_max_width = 30
+
+    x.field_names = [
+        bd + '#' + rst,
+        bd + 'Role Name' + rst,
+        bd + 'Role Arn' + rst,
+        bd + 'CreateDate' + rst
+    ]
+
+    # cell alignment
+    x.align[bd + '#' + rst] = 'c'
+    x.align[bd + 'IP Role' + rst] = 'l'
+
+    roles = find_instanceprofile_roles(parse_profiles(profile), region)
+
+    # populate table
+    lookup = {}
+    for index, iprofile in enumerate(roles):
+
+            lookup[index] = iprofile['arn']
+
+            x.add_row(
+                [
+                    userchoice_mapping(index) + '.',
+                    iprofile['RoleName'],
+                    iprofile['Arn'],
+                    iprofile['CreateDate']
+                ]
+            )
+
+    # Table showing selections
+    print(f'\n\tInstance Profile Roles (global directory)\n'.expandtabs(26))
+    display_table(x, tabspaces=16)
+    return choose_resource(lookup)
+
+
 def is_tty():
     """
     Summary:
@@ -166,7 +239,6 @@ def keypair_lookup(profile, region, debug):
         keypair name chosen by user
 
     """
-
     # setup table
     x = VeryPrettyTable(border=True, header=True, padding_width=2)
     field_max_width = 30
@@ -549,7 +621,7 @@ def init_cli():
                         subid=subnet,
                         sgroup=securitygroup,
                         kp=keypair,
-                        profile_arn=instance_profile,
+                        ip_arn=instance_profile,
                         size=args.instance_size,
                         count=args.quatity,
                         debug=debug
