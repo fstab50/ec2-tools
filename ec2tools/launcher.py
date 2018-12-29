@@ -127,7 +127,7 @@ def display_table(table, tabspaces=4):
     return True
 
 
-def find_instanceprofile_roles():
+def find_instanceprofile_roles(profile):
     """
     Summary.
 
@@ -177,7 +177,7 @@ def ip_lookup(profile, region, debug):
     x.align[bd + '#' + rst] = 'c'
     x.align[bd + 'IP Role' + rst] = 'l'
 
-    roles = find_instanceprofile_roles(parse_profiles(profile), region)
+    roles = find_instanceprofile_roles(parse_profiles(profile))
 
     # populate table
     lookup = {}
