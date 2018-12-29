@@ -447,6 +447,11 @@ def profile_securitygroups(profile, region):
     return sgs[0]
 
 
+def read(fname):
+    basedir = os.path.dirname(sys.argv[0])
+    return open(os.path.join(basedir, fname)).read()
+
+
 def sg_lookup(profile, region, debug):
     """
     Summary.
@@ -523,7 +528,7 @@ def sg_lookup(profile, region, debug):
     return choose_resource(lookup)
 
 
-def run_ec2_instance(pf, rc, imageid, subid, sgroup, kp, ip_arn, size, count, debug):
+def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count, debug):
     """
     Summary.
 
@@ -541,7 +546,11 @@ def run_ec2_instance(pf, rc, imageid, subid, sgroup, kp, ip_arn, size, count, de
     """
     now = datetime.datetime.utcnow()
     # ec2 client instantiation for launch
-    client = boto3_session('ec2', region=rc, profile=pf)
+    client = boto3_session('ec2', region=region, profile=pf)
+
+    # userdata | FIXME:  must locate modules (can convert to python script and import it)
+    path, residual = os.path.split(os.path.abspath(module))
+    userdata = read(path + '/userdata.py')
 
     try:
         if profile_arn is None:
@@ -553,7 +562,7 @@ def run_ec2_instance(pf, rc, imageid, subid, sgroup, kp, ip_arn, size, count, de
                 MinCount=1,
                 SecurityGroups=[sgroup],
                 SubnetId=subid,
-                UserData='string',
+                UserData=userdata,
                 DryRun=debug,
                 InstanceInitiatedShutdownBehavior='stop',
                 TagSpecifications=[
@@ -578,7 +587,7 @@ def run_ec2_instance(pf, rc, imageid, subid, sgroup, kp, ip_arn, size, count, de
                 MinCount=1,
                 SecurityGroups=[sgroup],
                 SubnetId=subid,
-                UserData='',
+                UserData=userdata,
                 DryRun=debug,
                 IamInstanceProfile={
                     'Arn': ip_arn,
@@ -663,8 +672,8 @@ def init_cli():
                         kp=keypair,
                         ip_arn=ip_role,
                         size=args.instance_size,
-                        count=args.quatity,
-                        debug=debug
+                        count=args.quantity,
+                        debug=args.debug
                     )
                 export_json_object(r)
                 return True
