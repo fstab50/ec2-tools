@@ -33,7 +33,7 @@ yl = Colors.YELLOW
 bd = Colors.BOLD + Colors.WHITE
 rst = Colors.RESET
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
-CALLER = 'launcher'
+CALLER = 'runmachine'
 
 image, subnet, securitygroup, keypair = None, None, None, None
 launch_prereqs = (image, subnet, securitygroup, keypair)
@@ -42,41 +42,43 @@ launch_prereqs = (image, subnet, securitygroup, keypair)
 def help_menu():
     """ Displays command line parameter options """
     menu = '''
-                      ''' + bd + CALLER + rst + ''' help
-                      ------------------
+                      ''' + bd + CALLER + rst + ''' help contents
+                      ----------------------
 
-''' + bd + '''DESCRIPTION''' + rst + '''
+  ''' + bd + '''DESCRIPTION''' + rst + '''
 
         Launch EC2 Instance
 
-''' + bd + '''OPTIONS''' + rst + '''
+  ''' + bd + '''OPTIONS''' + rst + '''
 
-        $ ''' + act + CALLER + rst + '''  --profile <PROFILE> [--outputfile]
+          $ ''' + act + CALLER + rst + '''  --profile <value>  --region <value>  [<OPTIONS>]
 
-                     -p, --profile  <value>
-                    [-s, --instance-size <value> ]
-                    [-q, --quantity  ]
-                    [-r, --region   <value> ]
-                    [-d, --debug     ]
-                    [-h, --help      ]
+                       -p, --profile  <value>
+                      [-s, --instance-size <value> ]
+                      [-q, --quantity  <value> ]
+                      [-r, --region  <value> ]
+                      [-d, --debug     ]
+                      [-h, --help      ]
 
-    ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + '''  (string):  IAM username or Role corresponding
-        to a profile name from local awscli configuration
+      ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + '''  (string):  IAM username or Role corresponding
+          to a profile name from local awscli configuration
 
-    ''' + bd + '''-o''' + rst + ''', ''' + bd + '''--outputfile''' + rst + ''' (string):  When parameter present, produces
-        a local json file containing metadata gathered about the
-        AWS Account designated by --profile during profiling.
+      ''' + bd + '''-o''' + rst + ''', ''' + bd + '''--outputfile''' + rst + ''' (string):  When parameter present, produces
+          a local json file containing metadata gathered about the
+          AWS Account designated by --profile during profiling.
 
-    ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + '''  (string):   Region code designating a specific
-        AWS region to profile.  If no region specified, profiles
-        all AWS regions in the AWS Account designated by profile
-        name provided with --profile.
+      ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + '''  (string):   Region code designating a specific
+          AWS region to profile.  If no region specified, profiles
+          all AWS regions in the AWS Account designated by profile
+          name provided with --profile.
 
-    ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--show''' + rst + ''' {profiles | ?}:  Display user information
+      ''' + bd + '''-q''' + rst + ''', ''' + bd + '''--quantity''' + rst + ''': Number of identical EC2 instances to create
 
-    ''' + bd + '''-d''' + rst + ''', ''' + bd + '''--debug''' + rst + ''': Debug mode, verbose output.
+      ''' + bd + '''-d''' + rst + ''', ''' + bd + '''--debug''' + rst + ''': Debug mode, verbose output.
 
-    ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this menu
+      ''' + bd + '''-V''' + rst + ''', ''' + bd + '''--version''' + rst + ''': Display program version information
+
+      ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this menu
     '''
     print(menu)
     return True
@@ -97,6 +99,7 @@ def choose_resource(choices):
         user selected resource identifier
     """
     validate = True
+
     try:
         while validate:
 
@@ -551,7 +554,6 @@ def run_ec2_instance(pf, rc, imageid, subid, sgroup, kp, ip_arn, size, count, de
             )
         else:
             ip_name = ip_arn.split('/')[-1]
-
             response = client.run_instances(
                 ImageId=imageid,
                 InstanceType=size,
