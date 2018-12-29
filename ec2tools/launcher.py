@@ -106,13 +106,16 @@ def choose_resource(choices, default='a'):
         while validate:
 
             choice = input(
-                '\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % choices[0]
+                '\n\tEnter a letter to select [%s]: '.expandtabs(8) % choices[0]
             ) or default
 
-            index_range = [x for x in choices if x is not None]
+            index_range = [x for x in choices]
 
             if range_test(0, max(index_range), userchoice_mapping(choice)):
                 resourceid = choices[userchoice_mapping(choice)]
+                validate = False
+            elif choice is None:
+                resourceid = None
                 validate = False
             else:
                 stdout_message(
@@ -203,10 +206,13 @@ def ip_lookup(profile, region, debug):
                 ]
             )
 
+    # add default choice (None)
+    lookup[index + 1] = None
+
     # Table showing selections
     print(f'\n\tInstance Profile Roles (global directory)\n'.expandtabs(26))
     display_table(x, tabspaces=4)
-    return choose_resource(lookup, default=None)
+    return choose_resource(lookup, default=userchoice_mapping(index + 1))
 
 
 def is_tty():
@@ -632,7 +638,7 @@ def init_cli():
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
-            ip = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
+            ip_rolearn = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
             qty = args.quantity
 
             if any(x for x in launch_prereqs) is None:
@@ -649,7 +655,7 @@ def init_cli():
                         subid=subnet,
                         sgroup=securitygroup,
                         kp=keypair,
-                        ip_arn=instance_profile,
+                        ip_arn=ip_rolearn,
                         size=args.instance_size,
                         count=args.quatity,
                         debug=debug
