@@ -47,11 +47,13 @@ def help_menu():
 
   ''' + bd + '''DESCRIPTION''' + rst + '''
 
-        Launch EC2 Instance
+        Launch one or more EC2 virtual server instances utilising the
+        specified parameters.  Automatically finds the latest Amazon
+        Machine Image of the OS type specified.
 
   ''' + bd + '''OPTIONS''' + rst + '''
 
-          $ ''' + act + CALLER + rst + '''  --profile <value>  --region <value>  [<OPTIONS>]
+        $ ''' + act + CALLER + rst + '''  --profile <value>  --region <value>  [OPTIONS]
 
                        -p, --profile  <value>
                       [-s, --instance-size <value> ]
