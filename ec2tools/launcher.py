@@ -86,7 +86,7 @@ def help_menu():
     return True
 
 
-def choose_resource(choices):
+def choose_resource(choices, default='a'):
     """
 
     Summary.
@@ -107,7 +107,8 @@ def choose_resource(choices):
 
             choice = input(
                 '\n\tEnter a letter to select a securitygroup [%s]: '.expandtabs(8) % choices[0]
-            ) or 'a'
+            ) or default
+
             index_range = [x for x in choices if x is not None]
 
             if range_test(0, max(index_range), userchoice_mapping(choice)):
@@ -205,7 +206,7 @@ def ip_lookup(profile, region, debug):
     # Table showing selections
     print(f'\n\tInstance Profile Roles (global directory)\n'.expandtabs(26))
     display_table(x, tabspaces=4)
-    return choose_resource(lookup)
+    return choose_resource(lookup, default=None)
 
 
 def is_tty():
@@ -541,6 +542,7 @@ def run_ec2_instance(pf, rc, imageid, subid, sgroup, kp, ip_arn, size, count, de
                 SecurityGroups=[sgroup],
                 SubnetId=subid,
                 UserData='string',
+                DryRun=debug,
                 InstanceInitiatedShutdownBehavior='stop',
                 TagSpecifications=[
                     {
@@ -564,7 +566,8 @@ def run_ec2_instance(pf, rc, imageid, subid, sgroup, kp, ip_arn, size, count, de
                 MinCount=1,
                 SecurityGroups=[sgroup],
                 SubnetId=subid,
-                UserData='string',
+                UserData='',
+                DryRun=debug,
                 IamInstanceProfile={
                     'Arn': ip_arn,
                     'Name': ip_name
@@ -639,7 +642,6 @@ def init_cli():
                 )
 
             elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, ip, qty):
-                sys.exit(0)
                 r = run_ec2_instance(
                         pf=args.profile,
                         region=regioncode,
