@@ -164,18 +164,20 @@ def ip_lookup(profile, region, debug):
     """
     # setup table
     x = VeryPrettyTable(border=True, header=True, padding_width=2)
-    field_max_width = 30
+    field_max_width = 60
 
     x.field_names = [
         bd + '#' + rst,
-        bd + 'Role Name' + rst,
-        bd + 'Role Arn' + rst,
+        bd + 'RoleName' + rst,
+        bd + 'RoleArn' + rst,
         bd + 'CreateDate' + rst
     ]
 
     # cell alignment
     x.align[bd + '#' + rst] = 'c'
-    x.align[bd + 'IP Role' + rst] = 'l'
+    x.align[bd + 'RoleName' + rst] = 'l'
+    x.align[bd + 'RoleArn' + rst] = 'l'
+    x.align[bd + 'CreateDate' + rst] = 'c'
 
     roles = find_instanceprofile_roles(parse_profiles(profile))
 
@@ -183,20 +185,20 @@ def ip_lookup(profile, region, debug):
     lookup = {}
     for index, iprofile in enumerate(roles):
 
-            lookup[index] = iprofile['arn']
+            lookup[index] = iprofile['Arn']
 
             x.add_row(
                 [
                     userchoice_mapping(index) + '.',
                     iprofile['RoleName'],
-                    iprofile['Arn'],
+                    iprofile['Arn'][:field_max_width],
                     iprofile['CreateDate']
                 ]
             )
 
     # Table showing selections
     print(f'\n\tInstance Profile Roles (global directory)\n'.expandtabs(26))
-    display_table(x, tabspaces=16)
+    display_table(x, tabspaces=4)
     return choose_resource(lookup)
 
 
@@ -363,6 +365,20 @@ def get_subnet(account_file, region):
     print(f'\n\tSubnets in region {bd + region + rst}\n'.expandtabs(30))
     display_table(x)
     return choose_resource(lookup)
+
+
+def parameters_approved(region, subid, imageid, sg, kp, ip):
+    print('  Launch Summary:')
+    print(f'\tEC2 Region: {region}')
+    print(f'\tImage: {imageid}')
+    print(f'\tSubnet Id: {subid}')
+    print(f'\tSecurity GroupId: {sg}')
+    print(f'\tKeypair Name: {kp}')
+    print(f'\tInstance Profile: {ip}')
+    choice = input('\t\tIs this ok? [yes]: ')
+    if choice in ('yes', 'y', True, 'True', 'true'):
+        return True
+    return False
 
 
 def range_test(min, max, value):
@@ -614,6 +630,7 @@ def init_cli():
                 )
 
             elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, instance_profile):
+                sys.exit(0)
                 r = run_ec2_instance(
                         pf=args.profile,
                         region=regioncode,
