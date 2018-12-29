@@ -369,9 +369,9 @@ def get_subnet(account_file, region):
 
 def parameters_approved(region, subid, imageid, sg, kp, ip):
     choice = None
-    print('  Launch Summary:\n')
+    print('\tLaunch Summary:\n')
     print('\t' + bd + 'EC2 Region' + rst + ': \t\t{}'.format(region))
-    print('\t' + bd + 'ImageId' + rst + ': \t\t\t{}'.format(imageid))
+    print('\t' + bd + 'ImageId' + rst + ': \t\t{}'.format(imageid))
     print('\t' + bd + 'Subnet Id' + rst + ': \t\t{}'.format(subid))
     print('\t' + bd + 'Security GroupId' + rst + ': \t{}'.format(sg))
     print('\t' + bd + 'Keypair Name' + rst + ': \t\t{}'.format(kp))
