@@ -106,16 +106,13 @@ def choose_resource(choices, default='a'):
         while validate:
 
             choice = input(
-                '\n\tEnter a letter to select [%s]: '.expandtabs(8) % choices[0]
+                '\n\tEnter a letter to select [%s]: '.expandtabs(8) % choices[userchoice_mapping(default)]
             ) or default
 
             index_range = [x for x in choices]
 
             if range_test(0, max(index_range), userchoice_mapping(choice)):
                 resourceid = choices[userchoice_mapping(choice)]
-                validate = False
-            elif choice is None:
-                resourceid = None
                 validate = False
             else:
                 stdout_message(
@@ -172,6 +169,8 @@ def ip_lookup(profile, region, debug):
     Returns:
         iam instance profile role ARN (str) or None
     """
+    now = datetime.datetime.utcnow()
+
     # setup table
     x = VeryPrettyTable(border=True, header=True, padding_width=2)
     field_max_width = 60
@@ -208,7 +207,14 @@ def ip_lookup(profile, region, debug):
 
     # add default choice (None)
     lookup[index + 1] = None
-
+    x.add_row(
+        [
+            userchoice_mapping(index + 1) + '.',
+            'Default',
+            None,
+            now.strftime('%Y-%m-%dT%H:%M:%S')
+        ]
+    )
     # Table showing selections
     print(f'\n\tInstance Profile Roles (global directory)\n'.expandtabs(26))
     display_table(x, tabspaces=4)
@@ -638,7 +644,7 @@ def init_cli():
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
-            ip_rolearn = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
+            ip_role = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
             qty = args.quantity
 
             if any(x for x in launch_prereqs) is None:
@@ -647,7 +653,7 @@ def init_cli():
                     prefix='WARN'
                 )
 
-            elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, ip, qty):
+            elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, ip_role, qty):
                 r = run_ec2_instance(
                         pf=args.profile,
                         region=regioncode,
@@ -655,7 +661,7 @@ def init_cli():
                         subid=subnet,
                         sgroup=securitygroup,
                         kp=keypair,
-                        ip_arn=ip_rolearn,
+                        ip_arn=ip_role,
                         size=args.instance_size,
                         count=args.quatity,
                         debug=debug
