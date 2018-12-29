@@ -5,6 +5,7 @@ import sys
 import json
 import argparse
 import inspect
+import datetime
 import pdb
 import subprocess
 from shutil import which
@@ -52,7 +53,8 @@ def help_menu():
         $ ''' + act + CALLER + rst + '''  --profile <PROFILE> [--outputfile]
 
                      -p, --profile  <value>
-                    [-o, --outputfile ]
+                    [-s, --instance-size <value> ]
+                    [-q, --quantity  ]
                     [-r, --region   <value> ]
                     [-d, --debug     ]
                     [-h, --help      ]
@@ -411,7 +413,7 @@ def choose_resource(choices):
     return resourceid
 
 
-def run_ec2_instance(imageid, subid, sgroup, kp, profile_arn, size, count, debug):
+def run_ec2_instance(client, imageid, subid, sgroup, kp, profile_arn, size, count, debug):
     """
     Summary.
 
@@ -427,46 +429,66 @@ def run_ec2_instance(imageid, subid, sgroup, kp, profile_arn, size, count, debug
     Returns:
         InstanceId(s), TYPE: list
     """
-    if profile_arn is None:
-        response = client.run_instances(
-            ImageId=imageid,
-            InstanceType=size,
-            KeyName=kp,
-            MaxCount=count,
-            MinCount=count,
-            SecurityGroups=[sgroup],
-            SubnetId=subid,
-            UserData='string',
-            InstanceInitiatedShutdownBehavior='stop'
-        )
-    else:
-        profile_name = profile_arn.split('/')[-1]
-        response = client.run_instances(
-            ImageId=imageid,
-            InstanceType=size,
-            KeyName=kp,
-            MaxCount=count,
-            MinCount=count,
-            SecurityGroups=[sgroup],
-            SubnetId=subid,
-            UserData='string',
-            IamInstanceProfile={
-                'Arn': profile_arn,
-                'Name': profile_name
-            },
-            InstanceInitiatedShutdownBehavior='stop',
-            TagSpecifications=[
-                {
-                    'ResourceType': 'customer-gateway'|'dedicated-host'|'dhcp-options'|'elastic-ip'|'fleet'|'fpga-image'|'image'|'instance'|'internet-gateway'|'launch-template'|'natgateway'|'network-acl'|'network-interface'|'reserved-instances'|'route-table'|'security-group'|'snapshot'|'spot-instances-request'|'subnet'|'transit-gateway'|'transit-gateway-attachment'|'transit-gateway-route-table'|'volume'|'vpc'|'vpc-peering-connection'|'vpn-connection'|'vpn-gateway',
-                    'Tags': [
-                        {
-                            'Key': 'string',
-                            'Value': 'string'
-                        },
-                    ]
-                }
-            ]
-        )
+    now = datetime.datetime.utcnow()
+
+    try:
+        if profile_arn is None:
+            response = client.run_instances(
+                ImageId=imageid,
+                InstanceType=size,
+                KeyName=kp,
+                MaxCount=count,
+                MinCount=1,
+                SecurityGroups=[sgroup],
+                SubnetId=subid,
+                UserData='string',
+                InstanceInitiatedShutdownBehavior='stop',
+                TagSpecifications=[
+                    {
+                        'ResourceType': 'instance',
+                        'Tags': [
+                            {
+                                'Key': 'CreateDateTime',
+                                'Value': now.strftime('%Y-%m-%dT%H:%M:%SZ')
+                            },
+                        ]
+                    }
+                ]
+            )
+        else:
+            profile_name = profile_arn.split('/')[-1]
+
+            response = client.run_instances(
+                ImageId=imageid,
+                InstanceType=size,
+                KeyName=kp,
+                MaxCount=count,
+                MinCount=1,
+                SecurityGroups=[sgroup],
+                SubnetId=subid,
+                UserData='string',
+                IamInstanceProfile={
+                    'Arn': profile_arn,
+                    'Name': profile_name
+                },
+                InstanceInitiatedShutdownBehavior='stop',
+                TagSpecifications=[
+                    {
+                        'ResourceType': 'instance',
+                        'Tags': [
+                            {
+                                'Key': 'CreateDateTime',
+                                'Value': now.strftime('%Y-%m-%dT%H:%M:%SZ')
+                            },
+                        ]
+                    }
+                ]
+            )
+    except ClientError as e:
+        logger.critical(
+            "%s: Unknown problem launching EC2 Instance(s) (Code: %s Message: %s)" %
+            (inspect.stack()[0][3], e.response['Error']['Code'], e.response['Error']['Message']))
+        return []
     return [x['InstanceId'] for x in response['Instances']]
 
 
@@ -516,18 +538,27 @@ def init_cli():
                     message='One or more launch prerequisities missing. Abort',
                     prefix='WARN'
                 )
-            else:
-                run_ec2_instance(
-                    imageid=image,
-                    subid=subnet,
-                    sgroup=securitygroup,
-                    kp=keypair,
-                    profile_arn=instance_profile,
-                    size=args.instance_size,
-                    count=args.quatity,
-                    debug=debug
-                )
+
+            elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, instance_profile):
+                # ec2 client instantiation for launch
+                client_object = boto3_session('ec2', region=regioncode, profile=args.profile)
+
+                r = run_ec2_instance(
+                        client=client_object,
+                        imageid=image,
+                        subid=subnet,
+                        sgroup=securitygroup,
+                        kp=keypair,
+                        profile_arn=instance_profile,
+                        size=args.instance_size,
+                        count=args.quatity,
+                        debug=debug
+                    )
+                export_json_object(r)
                 return True
+
+            else:
+                logger.info('User aborted EC2 launch')
     return False
 
 
