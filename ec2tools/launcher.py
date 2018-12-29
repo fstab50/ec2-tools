@@ -29,6 +29,7 @@ except Exception:
 module = os.path.basename(__file__)
 logger = logd.getLogger(__version__)
 act = Colors.ORANGE
+yl = Colors.YELLOW
 bd = Colors.BOLD + Colors.WHITE
 rst = Colors.RESET
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
@@ -148,7 +149,7 @@ def find_instanceprofile_roles(profile):
             {
                 'RoleName': x['RoleName'],
                 'Arn': x['Arn'],
-                'CreateDate': x['CreateDate'].isoformat()
+                'CreateDate': x['CreateDate'].strftime('%Y-%m-%dT%H:%M:%S')
             } for x in r
         ]
 
@@ -367,17 +368,19 @@ def get_subnet(account_file, region):
     return choose_resource(lookup)
 
 
-def parameters_approved(region, subid, imageid, sg, kp, ip):
-    choice = None
+def parameters_approved(region, subid, imageid, sg, kp, ip, ct):
     print('\tLaunch Summary:\n')
-    print('\t' + bd + 'EC2 Region' + rst + ': \t\t{}'.format(region))
+    print('\t' + bd + 'Number of Instances' + rst + ': \t{}'.format(ct))
+    print('\t' + bd + 'Region' + rst + ': \t\t{}'.format(region))
     print('\t' + bd + 'ImageId' + rst + ': \t\t{}'.format(imageid))
     print('\t' + bd + 'Subnet Id' + rst + ': \t\t{}'.format(subid))
     print('\t' + bd + 'Security GroupId' + rst + ': \t{}'.format(sg))
     print('\t' + bd + 'Keypair Name' + rst + ': \t\t{}'.format(kp))
     print('\t' + bd + 'Instance Profile' + rst + ': \t{}'.format(ip))
-    choice = input('\n\tIs this ok? [yes]: ')
-    if choice in ('yes', 'y', True, 'True', 'true', None):
+
+    choice = input('\n\tOk to create new EC2 instance? [yes]: ')
+
+    if choice in ('yes', 'y', True, 'True', 'true', ''):
         return True
     return False
 
@@ -622,7 +625,8 @@ def init_cli():
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
-            instance_profile = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
+            ip = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
+            qty = args.quantity
 
             if any(x for x in launch_prereqs) is None:
                 stdout_message(
@@ -630,7 +634,7 @@ def init_cli():
                     prefix='WARN'
                 )
 
-            elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, instance_profile):
+            elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, ip, qty):
                 sys.exit(0)
                 r = run_ec2_instance(
                         pf=args.profile,
