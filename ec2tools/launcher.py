@@ -368,15 +368,16 @@ def get_subnet(account_file, region):
 
 
 def parameters_approved(region, subid, imageid, sg, kp, ip):
-    print('  Launch Summary:')
-    print(f'\tEC2 Region: {region}')
-    print(f'\tImage: {imageid}')
-    print(f'\tSubnet Id: {subid}')
-    print(f'\tSecurity GroupId: {sg}')
-    print(f'\tKeypair Name: {kp}')
-    print(f'\tInstance Profile: {ip}')
-    choice = input('\t\tIs this ok? [yes]: ')
-    if choice in ('yes', 'y', True, 'True', 'true'):
+    choice = None
+    print('  Launch Summary:\n')
+    print('\t' + bd + 'EC2 Region' + rst + ': \t\t{}'.format(region))
+    print('\t' + bd + 'ImageId' + rst + ': \t\t\t{}'.format(imageid))
+    print('\t' + bd + 'Subnet Id' + rst + ': \t\t{}'.format(subid))
+    print('\t' + bd + 'Security GroupId' + rst + ': \t{}'.format(sg))
+    print('\t' + bd + 'Keypair Name' + rst + ': \t\t{}'.format(kp))
+    print('\t' + bd + 'Instance Profile' + rst + ': \t{}'.format(ip))
+    choice = input('\n\tIs this ok? [yes]: ')
+    if choice in ('yes', 'y', True, 'True', 'true', None):
         return True
     return False
 
