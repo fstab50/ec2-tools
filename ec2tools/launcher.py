@@ -552,7 +552,7 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
     userdata_str = read(os.path.abspath(userdata.__file__))
 
     try:
-        if profile_arn is None:
+        if ip_arn is None:
             response = client.run_instances(
                 ImageId=imageid,
                 InstanceType=size,
