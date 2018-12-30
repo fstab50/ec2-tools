@@ -396,7 +396,7 @@ def parameters_approved(region, subid, imageid, sg, kp, ip, ct):
     print('\t' + bd + 'Keypair Name' + rst + ': \t\t{}'.format(kp))
     print('\t' + bd + 'Instance Profile' + rst + ': \t{}'.format(ip))
 
-    choice = input('\n\tOk to create new EC2 instance? [yes]: ')
+    choice = input('\n\tCreate new EC2 instance? [yes]: ')
 
     if choice in ('yes', 'y', True, 'True', 'true', ''):
         return True
@@ -559,7 +559,7 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
                 KeyName=kp,
                 MaxCount=count,
                 MinCount=1,
-                SecurityGroups=[sgroup],
+                SecurityGroupIds=[sgroup],
                 SubnetId=subid,
                 UserData=userdata_str,
                 DryRun=debug,
@@ -577,20 +577,19 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
                 ]
             )
         else:
-            ip_name = ip_arn.split('/')[-1]
             response = client.run_instances(
                 ImageId=imageid,
                 InstanceType=size,
                 KeyName=kp,
                 MaxCount=count,
                 MinCount=1,
-                SecurityGroups=[sgroup],
+                SecurityGroupIds=[sgroup],
                 SubnetId=subid,
                 UserData=userdata_str,
                 DryRun=debug,
                 IamInstanceProfile={
                     'Arn': ip_arn,
-                    'Name': ip_name
+                    'Name': ip_arn.split('/')[-1]
                 },
                 InstanceInitiatedShutdownBehavior='stop',
                 TagSpecifications=[
@@ -606,10 +605,18 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
                 ]
             )
     except ClientError as e:
-        logger.critical(
-            "%s: Unknown problem launching EC2 Instance(s) (Code: %s Message: %s)" %
-            (inspect.stack()[0][3], e.response['Error']['Code'], e.response['Error']['Message']))
-        return []
+        if e.response['Error']['Code'] == 'UnauthorizedOperation':
+            stdout_message(
+                message="%s: Your IAM user does not have permissions to launch EC2 instance(s) (Code: %s)" %
+                        (inspect.stack()[0][3], e.response['Error']['Code']),
+                prefix='WARN'
+            )
+            sys.exit(exit_codes['EX_NOPERM']['Code'])
+        else:
+            logger.critical(
+                "%s: Unknown problem launching EC2 Instance(s) (Code: %s Message: %s)" %
+                (inspect.stack()[0][3], e.response['Error']['Code'], e.response['Error']['Message']))
+            return []
     return [x['InstanceId'] for x in response['Instances']]
 
 
@@ -652,7 +659,7 @@ def init_cli():
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
-            ip_role = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
+            role_arn = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
             qty = args.quantity
 
             if any(x for x in launch_prereqs) is None:
@@ -661,7 +668,7 @@ def init_cli():
                     prefix='WARN'
                 )
 
-            elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, ip_role, qty):
+            elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, role_arn, qty):
                 r = run_ec2_instance(
                         pf=args.profile,
                         region=regioncode,
@@ -669,7 +676,7 @@ def init_cli():
                         subid=subnet,
                         sgroup=securitygroup,
                         kp=keypair,
-                        ip_arn=ip_role,
+                        ip_arn=role_arn,
                         size=args.instance_size,
                         count=args.quantity,
                         debug=args.debug
