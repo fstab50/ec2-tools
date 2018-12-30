@@ -620,6 +620,30 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     return [x['InstanceId'] for x in response['Instances']]
 
 
+def terminate_script(id_list, profile):
+    """Creates termination script on local fs"""
+    now = datetime.datetime.utcnow.strftime('%Y-%m-%dT%H:%M:%SZ')
+    fname = 'terminate-script' + now
+    content = """
+        #!/usr/bin/env bash
+
+        if [[ $(which aws) ]]; then
+            aws ec2 terminate-instances --profile """ + profile +  """  \
+                """  + [x for x in id_list][0] +  """
+        fi
+        exit 0
+    """
+    try:
+        with open(os.getcwd() + '/' + fname) as f1:
+            f1.write(content)
+    except OSError as e:
+        logger.exception(
+            '%s: Problem creating terminate script (%s) on local fs' %
+            (inspect.stack()[0][3], fname)
+        return False
+    return True
+
+
 def init_cli():
     """
     Initializes commandline script
@@ -670,7 +694,7 @@ def init_cli():
 
             elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, role_arn, qty):
                 r = run_ec2_instance(
-                        pf=args.profile,
+                        pf=parse_profiles(args.profile),
                         region=regioncode,
                         imageid=image,
                         imagetype=args.imagetype,
@@ -683,6 +707,7 @@ def init_cli():
                         debug=args.debug
                     )
                 export_json_object(r)
+                terminate_script(r, parse_profiles(args.profile))
                 return True
 
             else:
