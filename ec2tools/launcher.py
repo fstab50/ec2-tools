@@ -17,7 +17,7 @@ from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, 
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
-from ec2tools import current_ami, logd, __version__
+from ec2tools import current_ami, logd, userdata, __version__
 from ec2tools.environment import profile_securitygroups, profile_keypairs, profile_subnets
 
 try:
@@ -548,9 +548,8 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
     # ec2 client instantiation for launch
     client = boto3_session('ec2', region=region, profile=pf)
 
-    # userdata | FIXME:  must locate modules (can convert to python script and import it)
-    path, residual = os.path.split(os.path.abspath(module))
-    userdata = read(path + '/userdata.py')
+    # prep default userdata if none specified
+    userdata_str = read(os.path.abspath(userdata.__file__))
 
     try:
         if profile_arn is None:
@@ -562,7 +561,7 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
                 MinCount=1,
                 SecurityGroups=[sgroup],
                 SubnetId=subid,
-                UserData=userdata,
+                UserData=userdata_str,
                 DryRun=debug,
                 InstanceInitiatedShutdownBehavior='stop',
                 TagSpecifications=[
@@ -587,7 +586,7 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
                 MinCount=1,
                 SecurityGroups=[sgroup],
                 SubnetId=subid,
-                UserData=userdata,
+                UserData=userdata_str,
                 DryRun=debug,
                 IamInstanceProfile={
                     'Arn': ip_arn,
