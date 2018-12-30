@@ -386,8 +386,10 @@ def get_subnet(account_file, region):
     return choose_resource(lookup)
 
 
-def nametag(imagetype):
-    default = 'ec2tools-' + imagetype
+def nametag(imagetype, dt):
+
+    default = imagetype + '-' dt.strftime('%Y-%m-%d')
+
     choice = input(
         'Enter Name tag you want displayed in the console [{}]: '.format(default)
     )
@@ -564,7 +566,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     userdata_str = read(os.path.abspath(userdata.__file__))
 
     # name tag content
-    name_tag = nametag(imagetype)
+    name_tag = nametag(imagetype, now)
 
     tags = [
         {
