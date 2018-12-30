@@ -386,6 +386,18 @@ def get_subnet(account_file, region):
     return choose_resource(lookup)
 
 
+def nametag(imagetype):
+    default = 'ec2tools-' + imagetype
+    choice = input(
+        'Enter Name tag you want displayed in the console [{}]: '.format(default)
+    )
+    if not choice:
+        return default
+    elif choice is 'None':
+        return None
+    return choice
+
+
 def parameters_approved(region, subid, imageid, sg, kp, ip, ct):
     print('\tLaunch Summary:\n')
     print('\t' + bd + 'Number of Instances' + rst + ': \t{}'.format(ct))
@@ -551,10 +563,17 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     # prep default userdata if none specified
     userdata_str = read(os.path.abspath(userdata.__file__))
 
+    # name tag content
+    name_tag = nametag(imagetype)
+
     tags = [
         {
             'Key': 'Name',
-            'Value': imagetype + '-' +  now.strptime('%Y-%m-%d')
+            'Value': name_tag
+        },
+        {
+            'Key': 'os',
+            'Value': imagetype
         },
         {
             'Key': 'CreateDateTime',
@@ -713,9 +732,8 @@ def init_cli():
                         count=args.quantity,
                         debug=args.debug
                     )
-                export_json_object(r)
-                terminate_script(r, parse_profiles(args.profile))
-                return True
+                print('\t\t{}'.format(export_json_object(r)))
+                return terminate_script(r, parse_profiles(args.profile))
 
             else:
                 logger.info('User aborted EC2 launch')
