@@ -554,7 +554,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     tags = [
         {
             'Key': 'Name',
-            'Value': imagetype + '-' +  now.strftime('%Y-%m-%d')
+            'Value': imagetype + '-' +  now.strptime('%Y-%m-%d')
         },
         {
             'Key': 'CreateDateTime',
@@ -622,24 +622,30 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
 
 def terminate_script(id_list, profile):
     """Creates termination script on local fs"""
-    now = datetime.datetime.utcnow.strftime('%Y-%m-%dT%H:%M:%SZ')
-    fname = 'terminate-script' + now
+    now = datetime.datetime.utcnow().strftime('%Y-%m-%d')
+    fname = 'terminate-script-' + now + '.sh'
     content = """
         #!/usr/bin/env bash
 
+        pkg=$(basename $0)
+
         if [[ $(which aws) ]]; then
             aws ec2 terminate-instances --profile """ + profile +  """  \
-                """  + [x for x in id_list][0] +  """
+                --instance-ids """  + [x for x in id_list][0] +  """
         fi
+
+        # delete caller
+        rm ./$pkg
         exit 0
     """
     try:
-        with open(os.getcwd() + '/' + fname) as f1:
+        with open(os.getcwd() + '/' + fname, 'w') as f1:
             f1.write(content)
+        stdout_message('Created terminate script: {}'.format(os.getcwd() + '/' + fname))
     except OSError as e:
         logger.exception(
             '%s: Problem creating terminate script (%s) on local fs' %
-            (inspect.stack()[0][3], fname)
+            (inspect.stack()[0][3], fname))
         return False
     return True
 
