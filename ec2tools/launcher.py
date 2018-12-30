@@ -588,7 +588,6 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
                 UserData=userdata_str,
                 DryRun=debug,
                 IamInstanceProfile={
-                    'Arn': ip_arn,
                     'Name': ip_arn.split('/')[-1]
                 },
                 InstanceInitiatedShutdownBehavior='stop',
