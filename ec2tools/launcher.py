@@ -607,8 +607,8 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
     except ClientError as e:
         if e.response['Error']['Code'] == 'UnauthorizedOperation':
             stdout_message(
-                message="%s: Your IAM user does not have permissions to launch EC2 instance(s) (Code: %s)" %
-                        (inspect.stack()[0][3], e.response['Error']['Code']),
+                message="IAM user has inadequate permissions to launch EC2 instance(s) (Code: %s)" %
+                        e.response['Error']['Code'],
                 prefix='WARN'
             )
             sys.exit(exit_codes['EX_NOPERM']['Code'])
