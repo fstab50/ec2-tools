@@ -31,7 +31,7 @@ logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 yl = Colors.YELLOW
 bd = Colors.BOLD + Colors.WHITE
-rst = Colors.RESET
+rst = Colors.rst
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
 CALLER = 'runmachine'
 
@@ -51,7 +51,7 @@ def help_menu():
         specified parameters.  Automatically finds the latest Amazon
         Machine Image of the OS type specified.
 
-  ''' + bd + '''OPTIONS''' + rst + '''
+  ''' + bd + '''SYNOPSYS''' + rst + '''
 
         $ ''' + act + CALLER + rst + '''  --profile <value>  --region <value>  [OPTIONS]
 
@@ -62,12 +62,33 @@ def help_menu():
                       [-d, --debug     ]
                       [-h, --help      ]
 
+  ''' + bd + '''OPTIONS''' + rst + '''
+        -i, --image''' + rst + """  (string):  Amazon  Machine  Image Operating System type
+            Returns the latest AMI of the type specified from the list below
+
+                      """ + bd + """Amazon EC2 Machine Images (AMI)""" + rst + """:
+
+                  - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
+                  - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
+                  - """ + AMI + """centos6""" + rst + """       :  CentOS 6 (RHEL 6+)
+                  - """ + AMI + """centos7""" + rst + """       :  CentOS 7 (RHEL 7+)
+                  - """ + AMI + """redhat""" + rst + """        :  Latest Redhat Enterprise Linux
+                  - """ + AMI + """redhat7.4""" + rst + """     :  Redhat Enterprise Linux 7.4
+                  - """ + AMI + """redhat7.5""" + rst + """     :  Redhat Enterprise Linux 7.5
+                  - """ + AMI + """ubuntu14.04""" + rst + """   :  Ubuntu Linux 14.04
+                  - """ + AMI + """ubuntu16.04""" + rst + """   :  Ubuntu Linux 16.04
+                  - """ + AMI + """ubuntu18.04""" + rst + """   :  Ubuntu Linux 18.04
+                  - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
+                  - """ + AMI + """windows2016""" + rst + '''   :  Microsoft Windows Server 2016
+
       ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + '''  (string):  IAM username or Role corresponding
           to a profile name from local awscli configuration
 
-      ''' + bd + '''-o''' + rst + ''', ''' + bd + '''--outputfile''' + rst + ''' (string):  When parameter present, produces
+      ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--instance-size''' + rst + ''' (string):  When parameter present, produces
           a local json file containing metadata gathered about the
-          AWS Account designated by --profile during profiling.
+
+      ''' + bd + '''-i''' + rst + ''', ''' + bd + '''--image''' + rst + ''' (string):  When parameter present, produces
+          a local json file containing metadata gathered about the
 
       ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + '''  (string):   Region code designating a specific
           AWS region to profile.  If no region specified, profiles
@@ -386,9 +407,9 @@ def get_subnet(account_file, region):
     return choose_resource(lookup)
 
 
-def nametag(imagetype, dt):
+def nametag(imagetype, date):
 
-    default = imagetype + '-' dt.strftime('%Y-%m-%d')
+    default = imagetype + '-' + date
 
     choice = input(
         'Enter Name tag you want displayed in the console [{}]: '.format(default)
@@ -566,7 +587,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     userdata_str = read(os.path.abspath(userdata.__file__))
 
     # name tag content
-    name_tag = nametag(imagetype, now)
+    name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
 
     tags = [
         {
