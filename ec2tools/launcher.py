@@ -528,7 +528,7 @@ def sg_lookup(profile, region, debug):
     return choose_resource(lookup)
 
 
-def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count, debug):
+def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, count, debug):
     """
     Summary.
 
@@ -551,6 +551,17 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
     # prep default userdata if none specified
     userdata_str = read(os.path.abspath(userdata.__file__))
 
+    tags = [
+        {
+            'Key': 'Name',
+            'Value': imagetype + '-' +  now.strftime('%Y-%m-%d')
+        },
+        {
+            'Key': 'CreateDateTime',
+            'Value': now.strftime('%Y-%m-%dT%H:%M:%SZ')
+        }
+    ]
+
     try:
         if ip_arn is None:
             response = client.run_instances(
@@ -567,12 +578,7 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
                 TagSpecifications=[
                     {
                         'ResourceType': 'instance',
-                        'Tags': [
-                            {
-                                'Key': 'CreateDateTime',
-                                'Value': now.strftime('%Y-%m-%dT%H:%M:%SZ')
-                            },
-                        ]
+                        'Tags': tags
                     }
                 ]
             )
@@ -594,12 +600,7 @@ def run_ec2_instance(pf, region, imageid, subid, sgroup, kp, ip_arn, size, count
                 TagSpecifications=[
                     {
                         'ResourceType': 'instance',
-                        'Tags': [
-                            {
-                                'Key': 'CreateDateTime',
-                                'Value': now.strftime('%Y-%m-%dT%H:%M:%SZ')
-                            },
-                        ]
+                        'Tags': tags
                     }
                 ]
             )
@@ -672,6 +673,7 @@ def init_cli():
                         pf=args.profile,
                         region=regioncode,
                         imageid=image,
+                        imagetype=args.imagetype,
                         subid=subnet,
                         sgroup=securitygroup,
                         kp=keypair,
