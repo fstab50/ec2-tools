@@ -630,8 +630,9 @@ def terminate_script(id_list, profile):
         pkg=$(basename $0)
 
         if [[ $(which aws) ]]; then
-            aws ec2 terminate-instances --profile """ + profile +  """  \
-                --instance-ids """  + [x for x in id_list][0] +  """
+            aws ec2 terminate-instances \
+            --profile """ + profile +  """  \
+            --instance-ids """  + [x for x in id_list][0] +  """
         fi
 
         # delete caller
