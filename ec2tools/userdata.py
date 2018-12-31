@@ -1,8 +1,45 @@
 #!/usr/bin/env python
 
+import os
+import inspect
 import platform
+import subprocess
+from pwd import getpwnam as userinfo
+from shutil import which
+import urllib.request
+import urllib.error
 import logging
 import logging.handlers
+
+
+url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bashrc'
+url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bash_aliases'
+
+
+def download(url_list):
+    """
+    Retrieve remote file object
+    """
+    def exists(object):
+        if os.path.exists(os.getcwd() + '/' + filename):
+            return True
+        else:
+            msg = 'File object %s failed to download to %s. Exit' % (filename, os.getcwd())
+            logger.warning(msg)
+            stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
+            return False
+    try:
+        for file_path in url_list:
+            filename = file_path.split('/')[-1]
+            r = urllib.request.urlretrieve(file_path, os.getcwd() + '/' + filename)
+            if not exists(filename):
+                return False
+    except urllib.error.HTTPError as e:
+        logger.exception(
+            '%s: Failed to retrive file object: %s. Exception: %s, data: %s' %
+            (inspect.stack()[0][3], file_path, str(e), e.read()))
+        raise e
+    return True
 
 
 def getLogger(*args, **kwargs):
@@ -56,9 +93,59 @@ def os_type():
         return platform.linux_distribution()[0]
 
 
+def local_profile_setup(distro):
+    """Configures local user profile"""
+    home_dir = None
+
+    if os.path.exists('/home/ec2-user'):
+        userid = userinfo('ec2-user').pw_uid
+        groupid = userinfo('ec2-user').pw_gid
+        home_dir = '/home/ec2-user'
+
+    elif os.path.exists('/home/ubuntu'):
+        userid = userinfo('ubuntu').pw_uid
+        groupid = userinfo('ubuntu').pw_gid
+        home_dir = '/home/ubuntu'
+
+    elif os.path.exists('/home/centos'):
+        userid = userinfo('centos').pw_uid
+        groupid = userinfo('centos').pw_gid
+        home_dir = '/home/centos'
+
+    else:
+        return False
+
+    try:
+        os.chdir(home_dir)
+
+        filename = '.bashrc'
+        if download([url_bashrc]):
+            logger.info('Download of {} successful to {}'.format(filename, home_dir))
+            os.rename(os.path.split(url_bashrc)[1], filename))
+            os.chown(path=filename, gid=groupid , uid=userid)
+            os.chmod(os.path.split(filename, 0o700))
+
+        filename = '.bash_aliases'
+        if download([url_bashrc]):
+            logger.info('Download of {} successful to {}'.format(filename, home_dir))
+            os.rename(os.path.split(url_aliases)[1], '.bash_aliases')
+            os.chown(path=filename, gid=groupid , uid=userid)
+            os.chmod(os.path.split(filename, 0o700))
+    except IOError as e:
+        logger.exception(
+            'Unknown problem downloading or installing local user profile artifacts')
+        return False
+    return True
+
+
 # --- main -----------------------------------------------------------------------------------------
 
 
 # setup logging facility
 logger = getLogger('1.0')
-logger.info('Operating System type identified: {}'.format(os_type()))
+
+if platform.system() == 'Linux':
+    logger.info('Operating System type identified: Linux, {}'.format(os_type()))
+    local_profile_setup(os_type())
+else:
+    logger.info('Operating System type identified: {}'.format(os_type()))
