@@ -132,6 +132,8 @@ def choose_resource(choices, selector='letters', default='a'):
     def safe_choice(sel_index, user_choice):
         if sel_index == 'letters':
             return user_choice
+        elif isinstance(user_choice, int):
+            return user_choice
         elif isinstance(user_choice, str):
             try:
                 return int(user_choice)
