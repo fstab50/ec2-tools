@@ -130,7 +130,9 @@ def choose_resource(choices, selector='letters', default='a'):
         user selected resource identifier
     """
     def safe_choice(sel_index, user_choice):
-        if sel_index == 'numbers' and isinstance(user_choice, str):
+        if sel_index == 'letters':
+            return user_choice
+        elif isinstance(user_choice, str):
             try:
                 return int(user_choice)
             except TypeError:
@@ -146,7 +148,7 @@ def choose_resource(choices, selector='letters', default='a'):
             ) or default
 
             # prevent entering of letters for choice if numbered selector index
-            choice = safe_choice('numbers', choice)
+            choice = safe_choice(selector, choice)
 
             index_range = [x for x in choices]
 
