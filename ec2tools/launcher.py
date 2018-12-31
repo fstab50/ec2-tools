@@ -129,19 +129,29 @@ def choose_resource(choices, selector='letters', default='a'):
     Returns:
         user selected resource identifier
     """
+    def safe_choice(sel_index, user_choice):
+        if sel_index == 'numbers' and isinstance(user_choice, str):
+            try:
+                return int(user_choice)
+            except TypeError:
+                return userchoice_mapping(user_choice)
+
     validate = True
 
     try:
         while validate:
             choice = input(
                 '\n\tEnter a letter to select [%s]: '.expandtabs(8) %
-                (choices[userchoice_mapping(default)] if selector == 'letters' else choices[default])
+                (choices[userchoice_mapping(default)] if selector == 'letters' else choices[int(default)])
             ) or default
+
+            # prevent entering of letters for choice if numbered selector index
+            choice = safe_choice('numbers', choice)
 
             index_range = [x for x in choices]
 
-            if range_test(0, max(index_range), userchoice_mapping(choice) if selector == 'letters' else choice):
-                resourceid = choices[userchoice_mapping(choice)] if selector == 'letters' else choices[choice]
+            if range_test(0, max(index_range), userchoice_mapping(choice) if selector == 'letters' else int(choice)):
+                resourceid = choices[userchoice_mapping(choice)] if selector == 'letters' else choices[int(choice)]
                 validate = False
             else:
                 stdout_message(
