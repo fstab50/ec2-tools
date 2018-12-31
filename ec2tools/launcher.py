@@ -38,7 +38,6 @@ PARAM_ACCENT = Colors.WHITE
 AMI = Colors.DARKCYAN
 
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
-'runmachine'
 
 image, subnet, securitygroup, keypair = None, None, None, None
 launch_prereqs = (image, subnet, securitygroup, keypair)
@@ -46,6 +45,13 @@ launch_prereqs = (image, subnet, securitygroup, keypair)
 
 def help_menu():
     """ Displays command line parameter options """
+    synopsis_cmd = (
+        Colors.RESET + PKG_ACCENT + Colors.BOLD + PACKAGE + rst +
+        PARAM_ACCENT + '  --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + rst + '}' +
+        PARAM_ACCENT + '  --region' + Colors.RESET + ' <value>' +
+        PARAM_ACCENT + '  [ --profile' + Colors.RESET + ' <value> ]'
+        )
+
     menu = """
                         """ + bd + PACKAGE + rst + """ help contents
                         ------------------------
@@ -58,12 +64,13 @@ def help_menu():
 
   """ + bd + """SYNOPSYS""" + rst + """
 
-        $ """ + act + PACKAGE + rst + """  --profile <value>  --region <value>  [OPTIONS]
+          """ + synopsis_cmd + """
 
-                       -p, --profile  <value>
-                       -r, --region  <value>
-                      [-s, --instance-size <value> ]
+                       -i, --image    <value>
+                       -r, --region   <value>
+                      [-p, --profile  <value>  ]
                       [-q, --quantity  <value> ]
+                      [-s, --instance-size <value> ]
                       [-d, --debug     ]
                       [-h, --help      ]
 
@@ -86,16 +93,17 @@ def help_menu():
               - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
               - """ + AMI + """windows2016""" + rst + """   :  Microsoft Windows Server 2016
 
-      """ + bd + """-p""" + rst + """, """ + bd + """--profile""" + rst + """ (string): IAM username or role corresponding to an STS
-          (Secure Token Service) profile from local awscli configuration.
 
       """ + bd + """-s""" + rst + """, """ + bd + """--instance-size""" + rst + """ (string):  Defines the EC2 instance size type at
           launch time. Default: t3.micro unless otherwise specified.
 
-      """ + bd + """-r""" + rst + """, """ + bd + """--region""" + rst + """ (string): AWS region code designating a specific launch
-          region.
+      """ + bd + """-p""" + rst + """, """ + bd + """--profile""" + rst + """ (string): IAM username or role corresponding to an STS
+          (Secure Token Service) profile from local awscli configuration.
 
       """ + bd + """-q""" + rst + """, """ + bd + """--quantity""" + rst + """:  Quantity of identical EC2 servers created at launch
+
+      """ + bd + """-r""" + rst + """, """ + bd + """--region""" + rst + """ (string): AWS region code designating a specific launch
+          region.
 
       """ + bd + """-d""" + rst + """, """ + bd + """--debug""" + rst + """: Debug mode, verbose output.
 
