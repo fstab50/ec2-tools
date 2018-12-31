@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import platform
 import logging
@@ -61,4 +61,4 @@ def os_type():
 
 # setup logging facility
 logger = getLogger('1.0')
-logger.info('Operating System identified:  type {}'.format(os_type()))
+logger.info('Operating System type identified: {}'.format(os_type()))

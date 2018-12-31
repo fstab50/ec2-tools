@@ -31,9 +31,14 @@ logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 yl = Colors.YELLOW
 bd = Colors.BOLD + Colors.WHITE
-rst = Colors.rst
+rst = Colors.RESET
+PACKAGE = 'runmachine'
+PKG_ACCENT = Colors.ORANGE
+PARAM_ACCENT = Colors.WHITE
+AMI = Colors.DARKCYAN
+
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
-CALLER = 'runmachine'
+'runmachine'
 
 image, subnet, securitygroup, keypair = None, None, None, None
 launch_prereqs = (image, subnet, securitygroup, keypair)
@@ -41,19 +46,19 @@ launch_prereqs = (image, subnet, securitygroup, keypair)
 
 def help_menu():
     """ Displays command line parameter options """
-    menu = '''
-                      ''' + bd + CALLER + rst + ''' help contents
-                      ----------------------
+    menu = """
+                      """ + bd + PACKAGE + rst + """ help contents
+                      ------------------------
 
-  ''' + bd + '''DESCRIPTION''' + rst + '''
+  """ + bd + """DESCRIPTION""" + rst + """
 
         Launch one or more EC2 virtual server instances utilising the
         specified parameters.  Automatically finds the latest Amazon
         Machine Image of the OS type specified.
 
-  ''' + bd + '''SYNOPSYS''' + rst + '''
+  """ + bd + """SYNOPSYS""" + rst + """
 
-        $ ''' + act + CALLER + rst + '''  --profile <value>  --region <value>  [OPTIONS]
+        $ """ + act + PACKAGE + rst + """  --profile <value>  --region <value>  [OPTIONS]
 
                        -p, --profile  <value>
                       [-s, --instance-size <value> ]
@@ -62,47 +67,43 @@ def help_menu():
                       [-d, --debug     ]
                       [-h, --help      ]
 
-  ''' + bd + '''OPTIONS''' + rst + '''
-        -i, --image''' + rst + """  (string):  Amazon  Machine  Image Operating System type
-            Returns the latest AMI of the type specified from the list below
+  """ + bd + """OPTIONS
+      -i, --image""" + rst + """  (string):  Amazon  Machine  Image Operating System type
+          Returns the latest AMI of the type specified from the list below
 
-                      """ + bd + """Amazon EC2 Machine Images (AMI)""" + rst + """:
+                  """ + bd + """Amazon EC2 Machine Images (AMI)""" + rst + """:
 
-                  - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
-                  - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
-                  - """ + AMI + """centos6""" + rst + """       :  CentOS 6 (RHEL 6+)
-                  - """ + AMI + """centos7""" + rst + """       :  CentOS 7 (RHEL 7+)
-                  - """ + AMI + """redhat""" + rst + """        :  Latest Redhat Enterprise Linux
-                  - """ + AMI + """redhat7.4""" + rst + """     :  Redhat Enterprise Linux 7.4
-                  - """ + AMI + """redhat7.5""" + rst + """     :  Redhat Enterprise Linux 7.5
-                  - """ + AMI + """ubuntu14.04""" + rst + """   :  Ubuntu Linux 14.04
-                  - """ + AMI + """ubuntu16.04""" + rst + """   :  Ubuntu Linux 16.04
-                  - """ + AMI + """ubuntu18.04""" + rst + """   :  Ubuntu Linux 18.04
-                  - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
-                  - """ + AMI + """windows2016""" + rst + '''   :  Microsoft Windows Server 2016
+              - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
+              - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
+              - """ + AMI + """centos6""" + rst + """       :  CentOS 6 (RHEL 6+)
+              - """ + AMI + """centos7""" + rst + """       :  CentOS 7 (RHEL 7+)
+              - """ + AMI + """redhat""" + rst + """        :  Latest Redhat Enterprise Linux
+              - """ + AMI + """redhat7.4""" + rst + """     :  Redhat Enterprise Linux 7.4
+              - """ + AMI + """redhat7.5""" + rst + """     :  Redhat Enterprise Linux 7.5
+              - """ + AMI + """ubuntu14.04""" + rst + """   :  Ubuntu Linux 14.04
+              - """ + AMI + """ubuntu16.04""" + rst + """   :  Ubuntu Linux 16.04
+              - """ + AMI + """ubuntu18.04""" + rst + """   :  Ubuntu Linux 18.04
+              - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
+              - """ + AMI + """windows2016""" + rst + """   :  Microsoft Windows Server 2016
 
-      ''' + bd + '''-p''' + rst + ''', ''' + bd + '''--profile''' + rst + '''  (string):  IAM username or Role corresponding
-          to a profile name from local awscli configuration
+      """ + bd + """-p""" + rst + """, """ + bd + """--profile""" + rst + """  (string):  IAM username or Role corresponding to an
+          sts profile name from local awscli configuration
 
-      ''' + bd + '''-s''' + rst + ''', ''' + bd + '''--instance-size''' + rst + ''' (string):  When parameter present, produces
-          a local json file containing metadata gathered about the
+      """ + bd + """-s""" + rst + """, """ + bd + """--instance-size""" + rst + """ (string):  Defines the EC2 instance size type
+          at launch time. Default: t3.micro unless otherwise specified.
 
-      ''' + bd + '''-i''' + rst + ''', ''' + bd + '''--image''' + rst + ''' (string):  When parameter present, produces
-          a local json file containing metadata gathered about the
+      """ + bd + """-r""" + rst + """, """ + bd + """--region""" + rst + """  (string):   Region code designating a specific AWS
+          launch region. If no region specified, profiles all AWS regions
+          in the AWS Account designated by profile name provided with --profile.
 
-      ''' + bd + '''-r''' + rst + ''', ''' + bd + '''--region''' + rst + '''  (string):   Region code designating a specific
-          AWS region to profile.  If no region specified, profiles
-          all AWS regions in the AWS Account designated by profile
-          name provided with --profile.
+      """ + bd + """-q""" + rst + """, """ + bd + """--quantity""" + rst + """: Number of identical EC2 instances to create
 
-      ''' + bd + '''-q''' + rst + ''', ''' + bd + '''--quantity''' + rst + ''': Number of identical EC2 instances to create
+      """ + bd + """-d""" + rst + """, """ + bd + """--debug""" + rst + """: Debug mode, verbose output.
 
-      ''' + bd + '''-d''' + rst + ''', ''' + bd + '''--debug''' + rst + ''': Debug mode, verbose output.
+      """ + bd + """-V""" + rst + """, """ + bd + """--version""" + rst + """: Display program version information
 
-      ''' + bd + '''-V''' + rst + ''', ''' + bd + '''--version''' + rst + ''': Display program version information
-
-      ''' + bd + '''-h''' + rst + ''', ''' + bd + '''--help''' + rst + ''': Print this menu
-    '''
+      """ + bd + """-h""" + rst + """, """ + bd + """--help""" + rst + """: Print this menu
+    """
     print(menu)
     return True
 
