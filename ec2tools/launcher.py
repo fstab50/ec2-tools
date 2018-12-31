@@ -128,7 +128,8 @@ def choose_resource(choices, default='a'):
         while validate:
 
             choice = input(
-                '\n\tEnter a letter to select [%s]: '.expandtabs(8) % choices[userchoice_mapping(default)]
+                '\n\tEnter a letter to select [%s]: '.expandtabs(8) %
+                None if default is None else choices[userchoice_mapping(default)]
             ) or default
 
             index_range = [x for x in choices]
@@ -140,6 +141,9 @@ def choose_resource(choices, default='a'):
                 stdout_message(
                     'You must enter a letter between %s and %s' %
                     (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1])))
+    except KeyError:
+        resourceid = None
+        choice = [k for k, v in choices.items() if v is None]
     except TypeError as e:
         logger.exception(f'Typed input caused an exception. Error {e}')
         sys.exit(1)
@@ -220,7 +224,7 @@ def ip_lookup(profile, region, debug):
 
             x.add_row(
                 [
-                    userchoice_mapping(index) + '.',
+                    str(index) + '.',
                     iprofile['RoleName'],
                     iprofile['Arn'][:field_max_width],
                     iprofile['CreateDate']
@@ -231,7 +235,7 @@ def ip_lookup(profile, region, debug):
     lookup[index + 1] = None
     x.add_row(
         [
-            userchoice_mapping(index + 1) + '.',
+            str(index + 1) + '.',
             'Default',
             None,
             now.strftime('%Y-%m-%dT%H:%M:%S')
@@ -240,7 +244,7 @@ def ip_lookup(profile, region, debug):
     # Table showing selections
     print(f'\n\tInstance Profile Roles (global directory)\n'.expandtabs(26))
     display_table(x, tabspaces=4)
-    return choose_resource(lookup, default=userchoice_mapping(index + 1))
+    return choose_resource(lookup, default=str(index + 1))
 
 
 def is_tty():
