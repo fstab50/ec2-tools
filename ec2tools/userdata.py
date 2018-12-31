@@ -121,15 +121,15 @@ def local_profile_setup(distro):
         filename = '.bashrc'
         if download([url_bashrc]):
             logger.info('Download of {} successful to {}'.format(filename, home_dir))
-            os.rename(os.path.split(url_bashrc)[1], filename))
-            os.chown(path=filename, gid=groupid , uid=userid)
+            os.rename(os.path.split(url_bashrc)[1], filename)
+            os.chown(path=filename, gid=groupid, uid=userid)
             os.chmod(os.path.split(filename, 0o700))
 
         filename = '.bash_aliases'
         if download([url_bashrc]):
             logger.info('Download of {} successful to {}'.format(filename, home_dir))
             os.rename(os.path.split(url_aliases)[1], '.bash_aliases')
-            os.chown(path=filename, gid=groupid , uid=userid)
+            os.chown(path=filename, gid=groupid, uid=userid)
             os.chmod(os.path.split(filename, 0o700))
     except IOError as e:
         logger.exception(
