@@ -5,9 +5,7 @@ import inspect
 import platform
 import subprocess
 from pwd import getpwnam as userinfo
-from shutil import which
-import urllib.request
-import urllib.error
+import urllib
 import logging
 import logging.handlers
 
@@ -136,6 +134,21 @@ def local_profile_setup(distro):
             'Unknown problem downloading or installing local user profile artifacts')
         return False
     return True
+
+
+def which(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
 
 
 # --- main -----------------------------------------------------------------------------------------
