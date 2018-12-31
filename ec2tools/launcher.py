@@ -47,23 +47,23 @@ launch_prereqs = (image, subnet, securitygroup, keypair)
 def help_menu():
     """ Displays command line parameter options """
     menu = """
-                      """ + bd + PACKAGE + rst + """ help contents
-                      ------------------------
+                        """ + bd + PACKAGE + rst + """ help contents
+                        ------------------------
 
   """ + bd + """DESCRIPTION""" + rst + """
 
-        Launch one or more EC2 virtual server instances utilising the
-        specified parameters.  Automatically finds the latest Amazon
-        Machine Image of the OS type specified.
+        Launch one or more EC2 virtual server instances in a specified AWS
+        region. Automatically finds the latest Amazon Machine Image of the
+        operation system type specified (Windows & Linux).
 
   """ + bd + """SYNOPSYS""" + rst + """
 
         $ """ + act + PACKAGE + rst + """  --profile <value>  --region <value>  [OPTIONS]
 
                        -p, --profile  <value>
+                       -r, --region  <value>
                       [-s, --instance-size <value> ]
                       [-q, --quantity  <value> ]
-                      [-r, --region  <value> ]
                       [-d, --debug     ]
                       [-h, --help      ]
 
@@ -71,7 +71,7 @@ def help_menu():
       -i, --image""" + rst + """  (string):  Amazon  Machine  Image Operating System type
           Returns the latest AMI of the type specified from the list below
 
-                  """ + bd + """Amazon EC2 Machine Images (AMI)""" + rst + """:
+                  """ + bd + """Amazon EC2 Machine Image types""" + rst + """:
 
               - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
               - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
@@ -86,17 +86,16 @@ def help_menu():
               - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
               - """ + AMI + """windows2016""" + rst + """   :  Microsoft Windows Server 2016
 
-      """ + bd + """-p""" + rst + """, """ + bd + """--profile""" + rst + """  (string):  IAM username or Role corresponding to an
-          sts profile name from local awscli configuration
+      """ + bd + """-p""" + rst + """, """ + bd + """--profile""" + rst + """ (string): IAM username or role corresponding to an STS
+          (Secure Token Service) profile from local awscli configuration.
 
-      """ + bd + """-s""" + rst + """, """ + bd + """--instance-size""" + rst + """ (string):  Defines the EC2 instance size type
-          at launch time. Default: t3.micro unless otherwise specified.
+      """ + bd + """-s""" + rst + """, """ + bd + """--instance-size""" + rst + """ (string):  Defines the EC2 instance size type at
+          launch time. Default: t3.micro unless otherwise specified.
 
-      """ + bd + """-r""" + rst + """, """ + bd + """--region""" + rst + """  (string):   Region code designating a specific AWS
-          launch region. If no region specified, profiles all AWS regions
-          in the AWS Account designated by profile name provided with --profile.
+      """ + bd + """-r""" + rst + """, """ + bd + """--region""" + rst + """ (string): AWS region code designating a specific launch
+          region.
 
-      """ + bd + """-q""" + rst + """, """ + bd + """--quantity""" + rst + """: Number of identical EC2 instances to create
+      """ + bd + """-q""" + rst + """, """ + bd + """--quantity""" + rst + """:  Quantity of identical EC2 servers created at launch
 
       """ + bd + """-d""" + rst + """, """ + bd + """--debug""" + rst + """: Debug mode, verbose output.
 
