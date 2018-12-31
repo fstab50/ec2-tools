@@ -115,7 +115,7 @@ def help_menu():
     return True
 
 
-def choose_resource(choices, default='a'):
+def choose_resource(choices, selector='letters', default='a'):
     """
 
     Summary.
@@ -133,21 +133,25 @@ def choose_resource(choices, default='a'):
 
     try:
         while validate:
-
             choice = input(
                 '\n\tEnter a letter to select [%s]: '.expandtabs(8) %
-                None if default is None else choices[userchoice_mapping(default)]
+                (choices[userchoice_mapping(default)] if selector == 'letters' else choices[default])
             ) or default
 
             index_range = [x for x in choices]
 
-            if range_test(0, max(index_range), userchoice_mapping(choice)):
-                resourceid = choices[userchoice_mapping(choice)]
+            if range_test(0, max(index_range), userchoice_mapping(choice) if selector == 'letters' else choice):
+                resourceid = choices[userchoice_mapping(choice)] if selector == 'letters' else choices[choice]
                 validate = False
             else:
                 stdout_message(
-                    'You must enter a letter between %s and %s' %
-                    (userchoice_mapping(index_range[0]), userchoice_mapping(index_range[-1])))
+                    'You must enter a %s between %s and %s' %
+                    (
+                        'letter' if selector == 'letters' else 'number',
+                        userchoice_mapping(index_range[0]) if selector == 'letters' else index_range[0],
+                        userchoice_mapping(index_range[-1]) if selector == 'letters' else index_range[-1]
+                    )
+                )
     except KeyError:
         resourceid = None
         choice = [k for k, v in choices.items() if v is None]
@@ -251,7 +255,7 @@ def ip_lookup(profile, region, debug):
     # Table showing selections
     print(f'\n\tInstance Profile Roles (global directory)\n'.expandtabs(26))
     display_table(x, tabspaces=4)
-    return choose_resource(lookup, default=str(index + 1))
+    return choose_resource(lookup, selector='numbers', default=(index + 1))
 
 
 def is_tty():
@@ -465,7 +469,7 @@ def range_test(min, max, value):
         Success | Failure, TYPE: bool
 
     """
-    if isinstance(value, int):
+    if isinstance(int(value), int):
         if value in range(min, max + 1):
             return True
     return False
