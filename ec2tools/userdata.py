@@ -13,7 +13,7 @@ import distutils.spawn
 
 url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bashrc'
 url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bash_aliases'
-
+url_colors = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/colors.sh'
 
 def download(url_list):
     """
@@ -132,6 +132,17 @@ def local_profile_setup(distro):
         if download([url_aliases]):
             logger.info('Download of {} successful to {}'.format(filename, home_dir))
             os.rename(os.path.split(url_aliases)[1], '.bash_aliases')
+            os.chown(filename, groupid, userid)
+            os.chmod(filename, 0o700)
+
+        filename = 'colors.sh'
+        destination = home_dir + '/.config/bash'
+        if download([url_colors]):
+            logger.info('Download of {} successful to {}'.format(filename, home_dir))
+
+            if not os.path.exists(destination):
+                os.makedirs(destination)
+            os.rename(filename, destination + '/' + filename)
             os.chown(filename, groupid, userid)
             os.chmod(filename, 0o700)
     except OSError as e:
