@@ -17,7 +17,7 @@ from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, 
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
-from ec2tools import current_ami, logd, userdata, __version__
+from ec2tools import current_ami, logd, __version__
 from ec2tools.environment import profile_securitygroups, profile_keypairs, profile_subnets
 
 try:
@@ -596,6 +596,20 @@ def sg_lookup(profile, region, debug):
     return choose_resource(lookup)
 
 
+def parse_userdata(ostype):
+    """
+    Summary.
+
+        Parses userdata appropriate for operation system deployed
+
+    Returns:
+        userdata (str)
+    """
+    if ostype.split('.')[0] in PYTHON3_OS_IMAGES:
+        from userdata import content
+    return (str(content))
+
+
 def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size):
     """Writes launch config to disk for reuse"""
     fname = alias + '_' + region + '.json'
@@ -624,6 +638,7 @@ def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, k
         return False
     return True
 
+
 def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, count, debug):
     """
     Summary.
@@ -645,7 +660,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     client = boto3_session('ec2', region=region, profile=pf)
 
     # prep default userdata if none specified
-    userdata_str = read(os.path.abspath(userdata.__file__))
+    userdata_str = parse_userdata(imagetype)
 
     # name tag content
     name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
