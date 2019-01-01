@@ -666,10 +666,10 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
         from ec2tools import python3_userdata as userdata
         userdata_str = read(os.path.abspath(userdata.__file__))
     else:
-        #from ec2tools import python2-userdata as userdata
-        from ec2tools import userdata
-        userdata_str = userdata.content
-
+        #from ec2tools import userdata
+        #userdata_str = userdata.content
+        from ec2tools import python2_userdata as userdata
+        userdata_str = read(os.path.abspath(userdata.__file__))
 
     # name tag content
     name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
@@ -855,7 +855,8 @@ def init_cli():
                         count=args.quantity,
                         debug=args.debug
                     )
-                print('\tLaunching instances: \n\t\t{}'.format(x + ', ' for x in r if len(r) > 0))
+                print('\tLaunching instances:')
+                list(filter(lambda x: print('\t' + x), r))
                 return terminate_script(r, parse_profiles(args.profile))
 
             else:
