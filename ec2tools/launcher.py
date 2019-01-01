@@ -229,17 +229,17 @@ def ip_lookup(profile, region, debug):
     field_max_width = 60
 
     x.field_names = [
-        bd + '#' + rst,
-        bd + 'RoleName' + rst,
-        bd + 'RoleArn' + rst,
-        bd + 'CreateDate' + rst
+        bd + '#' + frame,
+        bd + 'RoleName' + frame,
+        bd + 'RoleArn' + frame,
+        bd + 'CreateDate' + frame
     ]
 
     # cell alignment
-    x.align[bd + '#' + rst] = 'c'
-    x.align[bd + 'RoleName' + rst] = 'l'
-    x.align[bd + 'RoleArn' + rst] = 'l'
-    x.align[bd + 'CreateDate' + rst] = 'c'
+    x.align[bd + '#' + frame] = 'c'
+    x.align[bd + 'RoleName' + frame] = 'l'
+    x.align[bd + 'RoleArn' + frame] = 'l'
+    x.align[bd + 'CreateDate' + frame] = 'c'
 
     roles = find_instanceprofile_roles(parse_profiles(profile))
 
