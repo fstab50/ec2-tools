@@ -817,7 +817,7 @@ def init_cli():
                         ip_arn=role_arn,
                         size=args.instance_size,
                     )
-                return 0
+
                 r = run_ec2_instance(
                         pf=parse_profiles(args.profile),
                         region=regioncode,
