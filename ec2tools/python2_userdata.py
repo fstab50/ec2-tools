@@ -43,7 +43,7 @@ def download(url_list):
                 return False
     except Exception as e:
         logger.info(
-            'Error downloading file: {}, Code: {}, URL: {}'.format(os.path.basename(url), e.code, url)
+            'Error downloading file: {}, URL: {}'.format(os.path.basename(url), url)
         )
         return False
     return True
