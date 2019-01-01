@@ -75,7 +75,7 @@ def getLogger(*args, **kwargs):
             sys_handler.setFormatter(sys_formatter)
             logger.addHandler(sys_handler)
             logger.setLevel(logging.DEBUG)
-    except IOError as e:
+    except OSError as e:
         raise e
     return logger
 
@@ -129,12 +129,12 @@ def local_profile_setup(distro):
             os.chmod(filename, 0o700)
 
         filename = '.bash_aliases'
-        if download([url_bashrc]):
+        if download([url_aliases]):
             logger.info('Download of {} successful to {}'.format(filename, home_dir))
             os.rename(os.path.split(url_aliases)[1], '.bash_aliases')
             os.chown(filename, groupid, userid)
             os.chmod(filename, 0o700)
-    except IOError as e:
+    except OSError as e:
         logger.exception(
             'Unknown problem downloading or installing local user profile artifacts')
         return False
