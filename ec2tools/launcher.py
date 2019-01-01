@@ -360,6 +360,7 @@ def options(parser):
     parser.add_argument("-q", "--quantity", dest='quantity', nargs='?', default=1, required=False)
     parser.add_argument("-r", "--region", dest='regioncode', nargs='?', default=None, required=False)
     parser.add_argument("-s", "--instance-size", dest='instance_size', nargs='?', default='t3.micro', required=False)
+    parser.add_argument("-t", "--tags", dest='tags', action='store_true', default=False, required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
     return parser.parse_args()
@@ -451,9 +452,11 @@ def nametag(imagetype, date):
     return choice
 
 
-def parameters_approved(region, subid, imageid, sg, kp, ip, ct):
-    print('\tLaunch Summary:\n')
-    print('\t' + bd + 'Number of Instances' + rst + ': \t{}'.format(ct))
+def parameters_approved(alias, region, subid, imageid, sg, kp, ip, size, ct):
+    print('\tEC2 Instance Launch Summary:\n')
+    print('\t' + bd + 'AWS Account' + rst + ': \t\t{}'.format(alias))
+    print('\t' + bd + 'Instance Count' + rst + ': \t{}'.format(ct))
+    print('\t' + bd + 'Size Type' + rst + ': \t\t{}'.format(size))
     print('\t' + bd + 'Region' + rst + ': \t\t{}'.format(region))
     print('\t' + bd + 'ImageId' + rst + ': \t\t{}'.format(imageid))
     print('\t' + bd + 'Subnet Id' + rst + ': \t\t{}'.format(subid))
@@ -461,7 +464,7 @@ def parameters_approved(region, subid, imageid, sg, kp, ip, ct):
     print('\t' + bd + 'Keypair Name' + rst + ': \t\t{}'.format(kp))
     print('\t' + bd + 'Instance Profile' + rst + ': \t{}'.format(ip))
 
-    choice = input('\n\tCreate new EC2 instance? [yes]: ')
+    choice = input('\n\tCreate EC2 instance? [yes]: ')
 
     if choice in ('yes', 'y', True, 'True', 'true', ''):
         return True
@@ -592,6 +595,10 @@ def sg_lookup(profile, region, debug):
     display_table(x)
     return choose_resource(lookup)
 
+
+def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, count):
+    """Writes launch config to disk for reuse"""
+    with open
 
 def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, count, debug):
     """
@@ -757,7 +764,8 @@ def init_cli():
 
         if authenticated(profile=parse_profiles(args.profile)):
 
-            DEFAULT_OUTPUTFILE = get_account_identifier(parse_profiles(args.profile or 'default')) + '.profile'
+            account_alias = get_account_identifier(parse_profiles(args.profile or 'default'))
+            DEFAULT_OUTPUTFILE = account_alias + '.profile'
             subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
@@ -771,7 +779,22 @@ def init_cli():
                     prefix='WARN'
                 )
 
-            elif parameters_approved(regioncode, subnet, image, securitygroup, keypair, role_arn, qty):
+            elif parameters_approved(account_alias, regioncode, subnet, image, securitygroup,
+                                                keypair, role_arn, args.instance_size, qty):
+                persist_launchconfig(
+                        alias=account_alias,
+                        pf=parse_profiles(args.profile),
+                        region=regioncode,
+                        imageid=image,
+                        imagetype=args.imagetype,
+                        subid=subnet,
+                        sgroup=securitygroup,
+                        kp=keypair,
+                        ip_arn=role_arn,
+                        size=args.instance_size,
+                        count=args.quantity
+                    )
+
                 r = run_ec2_instance(
                         pf=parse_profiles(args.profile),
                         region=regioncode,
