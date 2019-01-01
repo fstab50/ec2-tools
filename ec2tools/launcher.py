@@ -596,9 +596,34 @@ def sg_lookup(profile, region, debug):
     return choose_resource(lookup)
 
 
-def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, count):
+def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size):
     """Writes launch config to disk for reuse"""
-    with open
+    fname = alias + '.json'
+    content = {
+        'account': alias,
+        'region': region,
+        'profile': pf,
+        'imageId': imageid,
+        'imagetype': imagetype,
+        'subnetId': subid,
+        'SecurityGroups': ['GroupId': sgroup],
+        'Keypairs': ['KeyName': kp],
+        'InstanceProfileArn': ip_arn,
+        'InstanceType': size
+    }
+    try:
+        if not os.path.exists(FILE_PATH + '/' + 'launchconfigs'):
+            os.makedirs(FILE_PATH + '/' + 'launchconfigs')
+
+        with open(FILE_PATH + '/launchconfigs/' + fname, 'w') as f1:
+            f1.write(content)
+        stdout_message('Created terminate script: {}'.format(os.getcwd() + '/' + fname))
+    except OSError as e:
+        logger.exception(
+            '%s: Problem creating terminate script (%s) on local fs' %
+            (inspect.stack()[0][3], fname))
+        return False
+    return True
 
 def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, count, debug):
     """
@@ -792,7 +817,6 @@ def init_cli():
                         kp=keypair,
                         ip_arn=role_arn,
                         size=args.instance_size,
-                        count=args.quantity
                     )
 
                 r = run_ec2_instance(
