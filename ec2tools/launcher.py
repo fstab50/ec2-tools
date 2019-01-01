@@ -318,14 +318,14 @@ def keypair_lookup(profile, region, debug):
     field_max_width = 30
 
     x.field_names = [
-        bd + '#' + rst,
-        bd + 'Keypair' + rst
+        bd + '#' + frame,
+        bd + 'Keypair' + frame
     ]
 
 
     # cell alignment
-    x.align[bd + '#' + rst] = 'c'
-    x.align[bd + 'Keypair' + rst] = 'l'
+    x.align[bd + '#' + frame] = 'c'
+    x.align[bd + 'Keypair' + frame] = 'l'
 
     keypairs = profile_keypairs(parse_profiles(profile), region)[region]
 
@@ -337,8 +337,8 @@ def keypair_lookup(profile, region, debug):
 
             x.add_row(
                 [
-                    userchoice_mapping(index) + '.',
-                    keypair
+                    rst + userchoice_mapping(index) + '.' + frame,
+                    rst + keypair + frame
                 ]
             )
 
@@ -404,13 +404,13 @@ def get_subnet(account_file, region):
     field_max_width = 30
 
     x.field_names = [
-        bd + '#' + rst,
-        bd + 'SubnetId' + rst,
-        bd + 'AZ' + rst,
-        bd + 'CIDR' + rst,
-        bd + 'Ip Assign' + rst,
-        bd + 'State'+ rst,
-        bd + 'VpcId' + rst
+        bd + '#' + frame,
+        bd + 'SubnetId' + frame,
+        bd + 'AZ' + frame,
+        bd + 'CIDR' + frame,
+        bd + 'Ip Assign' + frame,
+        bd + 'State' + frame,
+        bd + 'VpcId' + frame
     ]
 
     subnets = get_contents(account_file)[region]['Subnets']
@@ -424,13 +424,13 @@ def get_subnet(account_file, region):
 
             x.add_row(
                 [
-                    userchoice_mapping(index) + '.',
-                    k,
-                    v['AvailabilityZone'],
-                    v['CidrBlock'],
-                    v['IpAddresses'],
-                    v['State'],
-                    v['VpcId']
+                    rst + userchoice_mapping(index) + '.' + frame,
+                    rst + k + frame,
+                    rst + v['AvailabilityZone'] + frame,
+                    rst + v['CidrBlock'] + frame,
+                    rst + v['IpAddresses'] + frame,
+                    rst + v['State'] + frame,
+                    rst + v['VpcId'] + frame
                 ]
             )
 
@@ -563,17 +563,17 @@ def sg_lookup(profile, region, debug):
     tab_desc = '\t'.expandtabs(tabspaces_desc)
 
     x.field_names = [
-        bd + ' # ' + rst,
-        bd + 'GroupId' + rst,
-        tab_gn + bd + 'GroupName' + rst,
-        bd + 'VpcId' + rst,
-        tab_desc + bd + 'Description' + rst
+        bd + ' # ' + frame,
+        bd + 'GroupId' + frame,
+        tab_gn + bd + 'GroupName' + frame,
+        bd + 'VpcId' + frame,
+        tab_desc + bd + 'Description' + frame
     ]
 
     # cell alignment
     x.align = 'c'
-    x.align[tab_gn + bd + 'GroupName' + rst] = 'l'
-    x.align[tab_desc + bd + 'Description' + rst] = 'l'
+    x.align[tab_gn + bd + 'GroupName' + frame] = 'l'
+    x.align[tab_desc + bd + 'Description' + frame] = 'l'
 
     # populate table
     lookup = {}
@@ -584,11 +584,11 @@ def sg_lookup(profile, region, debug):
 
             x.add_row(
                 [
-                    userchoice_mapping(index) + '.',
-                    k,
-                    v['GroupName'][:field_max_width],
-                    v['VpcId'],
-                    v['Description'][:field_max_width],
+                    rst + userchoice_mapping(index) + '.' + frame,
+                    rst + k + frame,
+                    rst + v['GroupName'][:field_max_width] + frame,
+                    rst + v['VpcId'] + frame,
+                    rst + v['Description'][:field_max_width] + frame
                 ]
             )
 
