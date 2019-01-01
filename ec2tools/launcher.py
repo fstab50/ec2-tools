@@ -598,17 +598,16 @@ def sg_lookup(profile, region, debug):
 
 def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size):
     """Writes launch config to disk for reuse"""
-    fname = alias + '.json'
+    fname = alias + '_' + region + '.json'
     content = {
         'account': alias,
         'region': region,
         'profile': pf,
         'imageId': imageid,
-        'imagetype': imagetype,
         'subnetId': subid,
-        'SecurityGroups': ['GroupId': sgroup],
-        'Keypairs': ['KeyName': kp],
-        'InstanceProfileArn': ip_arn,
+        'SecurityGroupIds': [ sgroup ],
+        'KeypairNames': [ kp ],
+        'InstanceProfileArn': 'None' if ip_arn is None else ip_arn,
         'InstanceType': size
     }
     try:
@@ -616,7 +615,7 @@ def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, k
             os.makedirs(FILE_PATH + '/' + 'launchconfigs')
 
         with open(FILE_PATH + '/launchconfigs/' + fname, 'w') as f1:
-            f1.write(content)
+            f1.write(json.dumps(content, indent=4))
         stdout_message('Created terminate script: {}'.format(os.getcwd() + '/' + fname))
     except OSError as e:
         logger.exception(
@@ -818,7 +817,7 @@ def init_cli():
                         ip_arn=role_arn,
                         size=args.instance_size,
                     )
-
+                return 0
                 r = run_ec2_instance(
                         pf=parse_profiles(args.profile),
                         region=regioncode,
