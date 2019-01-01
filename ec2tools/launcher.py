@@ -831,7 +831,7 @@ def init_cli():
                         count=args.quantity,
                         debug=args.debug
                     )
-                print('\t\t{}'.format(export_json_object(r)))
+                print('\tLaunching instances: \n\t\t{}'.format(x + ', ' for x in r if len(r) > 0))
                 return terminate_script(r, parse_profiles(args.profile))
 
             else:

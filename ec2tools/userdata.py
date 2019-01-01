@@ -41,11 +41,10 @@ def download(url_list):
             else:
                 logger.info('Failed to download {} no url binary found'.format(os.path.basename(url)))
                 return False
-    except HTTPError as e:
-        logger.info('HTTP Error: Code: {}, URL: {}'.format(e.code, url))
-        return False
-    except URLError as e:
-        logger.info('URL Error: Code: {}, URL: {}, Reason: {}'.format(e.code, url, e.reason))
+    except Exception as e:
+        logger.info(
+            'Error downloading file: {}, Code: {}, URL: {}'.format(os.path.basename(url), e.code, url)
+        )
         return False
     return True
 
