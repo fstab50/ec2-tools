@@ -660,7 +660,14 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     client = boto3_session('ec2', region=region, profile=pf)
 
     # prep default userdata if none specified
-    userdata_str = parse_userdata(imagetype)
+    if imagetype.split('.')[0] in ('ubuntu18'):
+        from ec2tools import python3-userdata as userdata
+        userdata_str = read(os.path.abspath(userdata.__file__))
+    else:
+        #from ec2tools import python2-userdata as userdata
+        from ec2tools import userdata
+        userdata_str = userdata.content
+
 
     # name tag content
     name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
