@@ -5,9 +5,10 @@ import inspect
 import platform
 import subprocess
 from pwd import getpwnam as userinfo
-import urllib
+from urllib2 import urlopen, HTTPError, URLError
 import logging
 import logging.handlers
+import distutils.spawn
 
 
 url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bashrc'
@@ -27,16 +28,20 @@ def download(url_list):
             stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
             return False
     try:
-        for file_path in url_list:
-            filename = file_path.split('/')[-1]
-            r = urllib.request.urlretrieve(file_path, os.getcwd() + '/' + filename)
-            if not exists(filename):
-                return False
-    except urllib.error.HTTPError as e:
-        logger.exception(
-            '%s: Failed to retrive file object: %s. Exception: %s, data: %s' %
-            (inspect.stack()[0][3], file_path, str(e), e.read()))
-        raise e
+        for url in url_list:
+            f = urlopen(url)
+            logger.info("downloading " + url)
+
+            # Open our local file for writing
+            with open(os.path.basename(url), "wb") as local_file:
+                local_file.write(f.read())
+
+    except HTTPError, e:
+        logger.info('HTTP Error: Code: {}, URL: {}'.format(e.code, url))
+        return False
+    except URLError, e:
+        logger.info('URL Error: Code: {}, URL: {}, Reason: {}'.format(e.code, url, e.reason))
+        return False
     return True
 
 
@@ -70,7 +75,7 @@ def getLogger(*args, **kwargs):
             sys_handler.setFormatter(sys_formatter)
             logger.addHandler(sys_handler)
             logger.setLevel(logging.DEBUG)
-    except OSError as e:
+    except IOError as e:
         raise e
     return logger
 
@@ -120,15 +125,15 @@ def local_profile_setup(distro):
         if download([url_bashrc]):
             logger.info('Download of {} successful to {}'.format(filename, home_dir))
             os.rename(os.path.split(url_bashrc)[1], filename)
-            os.chown(path=filename, gid=groupid, uid=userid)
-            os.chmod(os.path.split(filename, 0o700))
+            os.chown(filename, groupid, userid)
+            os.chmod(filename, 0o700)
 
         filename = '.bash_aliases'
         if download([url_bashrc]):
             logger.info('Download of {} successful to {}'.format(filename, home_dir))
             os.rename(os.path.split(url_aliases)[1], '.bash_aliases')
-            os.chown(path=filename, gid=groupid, uid=userid)
-            os.chmod(os.path.split(filename, 0o700))
+            os.chown(filename, groupid, userid)
+            os.chmod(filename, 0o700)
     except IOError as e:
         logger.exception(
             'Unknown problem downloading or installing local user profile artifacts')
