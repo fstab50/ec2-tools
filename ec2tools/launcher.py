@@ -31,6 +31,7 @@ logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 yl = Colors.YELLOW
 bd = Colors.BOLD + Colors.WHITE
+frame = Colors.BOLD + Colors.BRIGHTGREEN
 rst = Colors.RESET
 PACKAGE = 'runmachine'
 PKG_ACCENT = Colors.ORANGE
@@ -181,7 +182,8 @@ def display_table(table, tabspaces=4):
     indent = ('\t').expandtabs(tabspaces)
     table_str = table.get_string()
     for e in table_str.split('\n'):
-        print(indent + e)
+        print(indent + frame + e)
+    sys.stdout.write(Colors.RESET)
     return True
 
 
@@ -249,10 +251,10 @@ def ip_lookup(profile, region, debug):
 
             x.add_row(
                 [
-                    str(index) + '.',
-                    iprofile['RoleName'],
-                    iprofile['Arn'][:field_max_width],
-                    iprofile['CreateDate']
+                    rst + str(index) + '.' + frame,
+                    rst + iprofile['RoleName'] + frame,
+                    rst + iprofile['Arn'][:field_max_width] + frame,
+                    rst + iprofile['CreateDate'] + frame
                 ]
             )
 
@@ -260,10 +262,10 @@ def ip_lookup(profile, region, debug):
     lookup[index + 1] = None
     x.add_row(
         [
-            str(index + 1) + '.',
-            'Default',
+            rst + str(index + 1) + '.' + frame,
+            rst + 'Default' + frame,
             None,
-            now.strftime('%Y-%m-%dT%H:%M:%S')
+            rst + now.strftime('%Y-%m-%dT%H:%M:%S') + frame
         ]
     )
     # Table showing selections
@@ -661,7 +663,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
 
     # prep default userdata if none specified
     if imagetype.split('.')[0] in ('ubuntu18'):
-        from ec2tools import python3-userdata as userdata
+        from ec2tools import python3_userdata as userdata
         userdata_str = read(os.path.abspath(userdata.__file__))
     else:
         #from ec2tools import python2-userdata as userdata
