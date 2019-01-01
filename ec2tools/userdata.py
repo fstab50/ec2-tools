@@ -5,7 +5,6 @@ import inspect
 import platform
 import subprocess
 from pwd import getpwnam as userinfo
-from urllib2 import urlopen, HTTPError, URLError
 import logging
 import logging.handlers
 import distutils.spawn
@@ -29,17 +28,23 @@ def download(url_list):
             return False
     try:
         for url in url_list:
-            f = urlopen(url)
-            logger.info("downloading " + url)
+            if which('curl'):
+                cmd = 'curl -o ' + os.path.basename(url) + ' ' + url
+                subprocess.getoutput(cmd)
+                logger.info("downloading " + url)
 
-            # Open our local file for writing
-            with open(os.path.basename(url), "wb") as local_file:
-                local_file.write(f.read())
+            elif which('wget'):
+                cmd = 'wget ' + url
+                subprocess.getoutput(cmd)
+                logger.info("downloading " + url)
 
-    except HTTPError, e:
+            else:
+                logger.info('Failed to download {} no url binary found'.format(os.path.basename(url)))
+                return False
+    except HTTPError as e:
         logger.info('HTTP Error: Code: {}, URL: {}'.format(e.code, url))
         return False
-    except URLError, e:
+    except URLError as e:
         logger.info('URL Error: Code: {}, URL: {}, Reason: {}'.format(e.code, url, e.reason))
         return False
     return True
