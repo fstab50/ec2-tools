@@ -34,13 +34,13 @@ def download(url_list):
             if which('wget'):
                 cmd = 'wget ' + url
                 p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-                r = p.communicate()
+                r = p.communicate()[0]
                 logger.info('Downloading... \n{}'.format(r))
 
             elif which('curl'):
                 cmd = 'curl -o ' + os.path.basename(url) + ' ' + url
                 p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-                r = p.communicate()
+                r = p.communicate()[0]
                 logger.info('Downloading... \n{}'.format(r))
 
             else:
@@ -166,7 +166,7 @@ def package_check(binary, pkg):
     """Checks if pip package installed"""
     cmd = binary + ' list | grep ' + pkg
     p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-    r = p.communicate()
+    r = p.communicate()[0]
 
     if r:
         logger.info('python package installed, output: {}'.format(r))
@@ -187,7 +187,7 @@ def prerun(packages):
     for pkg in packages:
         cmd = bin + ' install ' + pkg + ' --user'
         p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-        r = p.communicate()
+        r = p.communicate()[0]
         logger.info(r)
         package_check(bin, pkg)
     return True
