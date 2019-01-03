@@ -48,14 +48,13 @@ def help_menu():
     """ Displays command line parameter options """
     synopsis_cmd = (
         Colors.RESET + PKG_ACCENT + Colors.BOLD + PACKAGE + rst +
-        PARAM_ACCENT + '  --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + rst + '}' +
+        PARAM_ACCENT + '  --image ' + Colors.RESET + '{' + AMI + 'OS' + rst + '}' +
         PARAM_ACCENT + '  --region' + Colors.RESET + ' <value>' +
         PARAM_ACCENT + '  [ --profile' + Colors.RESET + ' <value> ]'
         )
 
     menu = """
                         """ + bd + PACKAGE + rst + """ help contents
-                        ------------------------
 
   """ + bd + """DESCRIPTION""" + rst + """
 
@@ -65,7 +64,7 @@ def help_menu():
 
   """ + bd + """SYNOPSYS""" + rst + """
 
-          """ + synopsis_cmd + """
+        """ + synopsis_cmd + """
 
                        -i, --image    <value>
                        -r, --region   <value>
