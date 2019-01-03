@@ -103,7 +103,7 @@ def os_type():
     if platform.system() == 'Windows':
         return 'Windows'
     elif platform.system() == 'Linux':
-        return distro.linux_distribution()[0]
+        return distribution.linux_distribution()[0]
 
 
 def local_profile_setup():
@@ -189,7 +189,8 @@ def prerun(packages):
         p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
         r = p.communicate()[0]
         logger.info(r)
-        package_check(bin, pkg)
+        if package_check(bin, pkg) and pkg == 'distro':
+            distribution = __import__(pkg)
     return True
 
 
