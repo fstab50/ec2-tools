@@ -185,7 +185,7 @@ def display_table(table, tabspaces=4):
     return True
 
 
-def find_instanceprofile_roles(profile):
+def source_instanceprofiles(profile):
     """
     Summary.
 
@@ -201,10 +201,10 @@ def find_instanceprofile_roles(profile):
             }
     """
     client = boto3_session(service='iam', profile=profile)
-    r = client.list_roles()['Roles']
+    r = client.list_instance_profiles()['InstanceProfiles']
     return [
             {
-                'RoleName': x['RoleName'],
+                'InstanceProfileName': x['InstanceProfileName'],
                 'Arn': x['Arn'],
                 'CreateDate': x['CreateDate'].strftime('%Y-%m-%dT%H:%M:%S')
             } for x in r
@@ -235,11 +235,11 @@ def ip_lookup(profile, region, debug):
 
     # cell alignment
     x.align[bd + '#' + frame] = 'c'
-    x.align[bd + 'RoleName' + frame] = 'l'
+    x.align[bd + 'InstanceProfileName' + frame] = 'l'
     x.align[bd + 'RoleArn' + frame] = 'l'
     x.align[bd + 'CreateDate' + frame] = 'c'
 
-    roles = find_instanceprofile_roles(parse_profiles(profile))
+    roles = source_instanceprofiles(parse_profiles(profile))
 
     # populate table
     lookup = {}
@@ -250,7 +250,7 @@ def ip_lookup(profile, region, debug):
             x.add_row(
                 [
                     rst + str(index) + '.' + frame,
-                    rst + iprofile['RoleName'] + frame,
+                    rst + iprofile['InstanceProfileName'] + frame,
                     rst + iprofile['Arn'][:field_max_width] + frame,
                     rst + iprofile['CreateDate'] + frame
                 ]
