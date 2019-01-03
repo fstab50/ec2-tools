@@ -449,16 +449,14 @@ def nametag(imagetype, date, default=True):
     """
     choice = None
     if default:
-        default = imagetype + '-' + date
+        default_tag = imagetype + '-' + date
     else:
         # user provided default Name tag
         choice = input(
             '\tEnter Name tag you want displayed in the console [{}]: '.format(default)
         )
-
-    if choice is not 'None':
         return choice
-    return default
+    return default_tag
 
 
 def parameters_approved(alias, region, subid, imageid, sg, kp, ip, size, ct):
@@ -683,7 +681,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
 
     # name tag content
     name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
-
+    
     tags = [
         {
             'Key': 'Name',
@@ -865,8 +863,8 @@ def init_cli():
                         count=args.quantity,
                         debug=args.debug
                     )
-                print('\tLaunching instances:')
-                list(filter(lambda x: print('\to  ' + bd + x + rst), r))
+                print('\tLaunching Summary:\n')
+                list(filter(lambda x: print('\t\to  ' + bd + x + rst), r))
                 return terminate_script(r, parse_profiles(args.profile))
 
             else:
