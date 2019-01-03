@@ -224,11 +224,11 @@ def ip_lookup(profile, region, debug):
 
     # setup table
     x = VeryPrettyTable(border=True, header=True, padding_width=2)
-    field_max_width = 60
+    field_max_width = 70
 
     x.field_names = [
         bd + '#' + frame,
-        bd + 'RoleName' + frame,
+        bd + 'InstanceProfileName' + frame,
         bd + 'RoleArn' + frame,
         bd + 'CreateDate' + frame
     ]
@@ -438,13 +438,16 @@ def get_subnet(account_file, region):
     return choose_resource(lookup)
 
 
-def nametag(imagetype, date):
+def nametag(imagetype, date, default=True):
 
-    default = imagetype + '-' + date
+    if default:
+        default = imagetype + '-' + date
+    else:
+        # user provided default Name tag
+        choice = input(
+            '\tEnter Name tag you want displayed in the console [{}]: '.format(default)
+        )
 
-    choice = input(
-        'Enter Name tag you want displayed in the console [{}]: '.format(default)
-    )
     if not choice:
         return default
     elif choice is 'None':
@@ -854,7 +857,7 @@ def init_cli():
                         debug=args.debug
                     )
                 print('\tLaunching instances:')
-                list(filter(lambda x: print('\t' + x), r))
+                list(filter(lambda x: print('\to  ' + bd + x + rst), r))
                 return terminate_script(r, parse_profiles(args.profile))
 
             else:
