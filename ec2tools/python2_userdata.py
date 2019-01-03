@@ -190,6 +190,7 @@ def prerun(packages):
         r = p.communicate()[0]
         logger.info(r)
         if package_check(bin, pkg) and pkg == 'distro':
+            global distribution
             distribution = __import__(pkg)
     return True
 
