@@ -439,7 +439,15 @@ def get_subnet(account_file, region):
 
 
 def nametag(imagetype, date, default=True):
+    """
+    Summary.
 
+        Apply Name tag to EC2 instances
+
+    Returns:
+
+    """
+    choice = None
     if default:
         default = imagetype + '-' + date
     else:
@@ -448,11 +456,9 @@ def nametag(imagetype, date, default=True):
             '\tEnter Name tag you want displayed in the console [{}]: '.format(default)
         )
 
-    if not choice:
-        return default
-    elif choice is 'None':
-        return None
-    return choice
+    if choice is not 'None':
+        return choice
+    return default
 
 
 def parameters_approved(alias, region, subid, imageid, sg, kp, ip, size, ct):
@@ -671,6 +677,9 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
         #userdata_str = userdata.content
         from ec2tools import python2_userdata as userdata
         userdata_str = read(os.path.abspath(userdata.__file__))
+
+    if debug:
+        print('USERDATA CONTENT: \n{}'.format(userdata_str))
 
     # name tag content
     name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
