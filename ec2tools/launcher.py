@@ -66,33 +66,32 @@ def help_menu():
 
         """ + synopsis_cmd + """
 
-                       -i, --image    <value>
-                       -r, --region   <value>
-                      [-p, --profile  <value>  ]
-                      [-q, --quantity  <value> ]
-                      [-s, --instance-size <value> ]
-                      [-d, --debug     ]
-                      [-h, --help      ]
+                         -i, --image    <value>
+                         -r, --region   <value>
+                        [-p, --profile  <value>  ]
+                        [-q, --quantity  <value> ]
+                        [-s, --instance-size <value> ]
+                        [-d, --debug     ]
+                        [-h, --help      ]
 
   """ + bd + """OPTIONS
       -i, --image""" + rst + """  (string):  Amazon  Machine  Image Operating System type
           Returns the latest AMI of the type specified from the list below
 
-                  """ + bd + """Amazon EC2 Machine Image types""" + rst + """:
+                    """ + bd + """Amazon EC2 Machine Image types""" + rst + """:
 
-              - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
-              - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
-              - """ + AMI + """centos6""" + rst + """       :  CentOS 6 (RHEL 6+)
-              - """ + AMI + """centos7""" + rst + """       :  CentOS 7 (RHEL 7+)
-              - """ + AMI + """redhat""" + rst + """        :  Latest Redhat Enterprise Linux
-              - """ + AMI + """redhat7.4""" + rst + """     :  Redhat Enterprise Linux 7.4
-              - """ + AMI + """redhat7.5""" + rst + """     :  Redhat Enterprise Linux 7.5
-              - """ + AMI + """ubuntu14.04""" + rst + """   :  Ubuntu Linux 14.04
-              - """ + AMI + """ubuntu16.04""" + rst + """   :  Ubuntu Linux 16.04
-              - """ + AMI + """ubuntu18.04""" + rst + """   :  Ubuntu Linux 18.04
-              - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
-              - """ + AMI + """windows2016""" + rst + """   :  Microsoft Windows Server 2016
-
+                - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
+                - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
+                - """ + AMI + """centos6""" + rst + """       :  CentOS 6 (RHEL 6+)
+                - """ + AMI + """centos7""" + rst + """       :  CentOS 7 (RHEL 7+)
+                - """ + AMI + """redhat""" + rst + """        :  Latest Redhat Enterprise Linux
+                - """ + AMI + """redhat7.4""" + rst + """     :  Redhat Enterprise Linux 7.4
+                - """ + AMI + """redhat7.5""" + rst + """     :  Redhat Enterprise Linux 7.5
+                - """ + AMI + """ubuntu14.04""" + rst + """   :  Ubuntu Linux 14.04
+                - """ + AMI + """ubuntu16.04""" + rst + """   :  Ubuntu Linux 16.04
+                - """ + AMI + """ubuntu18.04""" + rst + """   :  Ubuntu Linux 18.04
+                - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
+                - """ + AMI + """windows2016""" + rst + """   :  Microsoft Windows Server 2016
 
       """ + bd + """-s""" + rst + """, """ + bd + """--instance-size""" + rst + """ (string):  Defines the EC2 instance size type at
           launch time. Default: t3.micro unless otherwise specified.
