@@ -13,6 +13,9 @@ url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bashrc'
 url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bash_aliases'
 url_colors = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/colors.sh'
 
+package_list = ['distro']
+
+
 def download(url_list):
     """
     Retrieve remote file object
@@ -23,23 +26,27 @@ def download(url_list):
         else:
             msg = 'File object %s failed to download to %s. Exit' % (filename, os.getcwd())
             logger.warning(msg)
-            stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
             return False
     try:
-        for url in url_list:
-            if which('curl'):
-                cmd = 'curl -o ' + os.path.basename(url) + ' ' + url
-                subprocess.getoutput(cmd)
-                logger.info("downloading " + url)
 
-            elif which('wget'):
+        for url in url_list:
+
+            if which('wget'):
                 cmd = 'wget ' + url
-                subprocess.getoutput(cmd)
-                logger.info("downloading " + url)
+                p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+                r = p.communicate()
+                logger.info('Downloading... \n{}'.format(r))
+
+            elif which('curl'):
+                cmd = 'curl -o ' + os.path.basename(url) + ' ' + url
+                p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+                r = p.communicate()
+                logger.info('Downloading... \n{}'.format(r))
 
             else:
                 logger.info('Failed to download {} no url binary found'.format(os.path.basename(url)))
                 return False
+
     except Exception as e:
         logger.info(
             'Error downloading file: {}, URL: {}'.format(os.path.basename(url), url)
@@ -96,10 +103,10 @@ def os_type():
     if platform.system() == 'Windows':
         return 'Windows'
     elif platform.system() == 'Linux':
-        return platform.linux_distribution()[0]
+        return distro.linux_distribution()[0]
 
 
-def local_profile_setup(distro):
+def local_profile_setup():
     """Configures local user profile"""
     home_dir = None
 
@@ -155,6 +162,37 @@ def local_profile_setup(distro):
     return True
 
 
+def package_check(binary, pkg):
+    """Checks if pip package installed"""
+    cmd = binary + ' list | grep ' + pkg
+    p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    r = p.communicate()
+
+    if r:
+        logger.info('python package installed, output: {}'.format(r))
+        return True
+    logger.warning('python package ({}) not installed'.format(pkg))
+    return False
+
+
+def prerun(packages):
+    """Installs dependent packages"""
+    if which('pip'):
+        bin = 'pip'
+    elif which('pip2.7'):
+        bin = 'pip2.7'
+    else:
+        logger.warning('Failed to find pip binary when installing dep python packages')
+        return False
+    for pkg in packages:
+        cmd = bin + ' install ' + pkg + ' --user'
+        p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+        r = p.communicate()
+        logger.info(r)
+        package_check(bin, pkg)
+    return True
+
+
 def which(program):
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -176,8 +214,10 @@ def which(program):
 # setup logging facility
 logger = getLogger('1.0')
 
+prerun(package_list)
+
 if platform.system() == 'Linux':
     logger.info('Operating System type identified: Linux, {}'.format(os_type()))
-    local_profile_setup(os_type())
+    local_profile_setup()
 else:
     logger.info('Operating System type identified: {}'.format(os_type()))
