@@ -30,7 +30,8 @@ requires = [
     'boto3>=1.7.1',
     'botocore>=1.10.1',
     'pyaws>=0.2.24',
-    'Pygments>=2.2.0'
+    'Pygments>=2.2.0',
+    'VeryPrettyTable'
 ]
 
 
@@ -53,6 +54,7 @@ setup(
         'Topic :: Utilities',
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows'
@@ -64,7 +66,8 @@ setup(
     entry_points={
         'console_scripts': [
             'machineimage=ec2tools.current_ami:init_cli',
-            'profileaccount=ec2tools.environment:init_cli'
+            'profileaccount=ec2tools.environment:init_cli',
+            'runmachine=ec2tools.launcher:init_cli',
         ]
     },
     zip_safe=False
