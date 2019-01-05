@@ -12,10 +12,26 @@ PYTHON2_SCRIPT='python2-userdata.py'
 PYTHON3_SCRIPT='python3-userdata.py'
 CALLER=$(basename $0)
 SOURCE_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files'
+EPEL_URL='https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
 
 # log tags
 info="[INFO]: $CALLER"
 warn="[WARN]: $CALLER"
+
+packages=(
+    "distro"
+)
+
+# --- declarations  ------------------------------------------------------------------
+
+
+function packagemanager_type(){
+    if [[ $(which rpm 2>/dev/null) ]]; then
+        echo "redhat"
+    elif [[ $(which apt 2>/dev/null) ]]; then
+        echo "debian"
+    fi
+}
 
 function os_type(){
     if [[ $(which rpm 2>/dev/null) ]]; then
@@ -60,6 +76,13 @@ function download(){
 }
 
 
+function enable_epel_repo(){
+    ## installs epel repo on redhat-distro systems
+    wget -O epel.rpm –nv $EPEL_URL
+    yum install -y ./epel.rpm
+}
+
+
 function install_package_deps(){
     ## pypi package dep install
     pip=$(pip_binary)
@@ -79,7 +102,7 @@ function install_python3(){
     logger --tag $info "installing python3"
 
     if [ "$os" = "redhat" ]; then
-        yum install -y python36*
+        yum install -y python3*
     elif [ "$os" = "debian" ]; then
         apt install -y python3.6*
     fi
@@ -112,7 +135,7 @@ function pip_binary(){
 
 
 # log os type
-os=$(os_type)
+os=$(packagemanager_type)
 
 logger --tag $info "Package manager type: $os"
 
@@ -122,6 +145,9 @@ if [[ "$os" = "redhat" ]]; then
 
     # install wget if available
     yum install -y wget
+
+    # install epel
+    enable_epel_repo
 
 elif [[ "$os" = "debian" ]]; then
     # update os
