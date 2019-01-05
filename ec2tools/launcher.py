@@ -672,9 +672,9 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
         from ec2tools import python3_userdata as userdata
         userdata_str = read(os.path.abspath(userdata.__file__))
     else:
-        #userdata_str = read(os.path.abspath(GENERIC_USERDATA))
-        from ec2tools import userdata
-        userdata_str = userdata.content
+        #from ec2tools import userdata
+        #userdata_str = userdata.content
+        userdata_str = read(os.path.abspath(GENERIC_USERDATA))
 
     if debug:
         print('USERDATA CONTENT: \n{}'.format(userdata_str))
