@@ -22,6 +22,24 @@ function os_type(){
     fi
 }
 
+
+function binary_installed_boolean(){
+    ##
+    ## return boolean value if binary dependencies installed ##
+    ##
+    local check_list=( "$@" )
+    #
+    for prog in "${check_list[@]}"; do
+        if ! type "$prog" > /dev/null 2>&1; then
+            return 1
+        fi
+    done
+    return 0
+    #
+    # <<-- end function binary_installed_boolean -->>
+}
+
+
 function download(){
     local fname="$1"
     if [[ $(which wget) ]]; then
@@ -39,6 +57,19 @@ function download(){
 }
 
 
+install_python3(){
+    os="$1"
+    if [ "$os" = "redhat" ]; then
+        yum install -y python36*
+    elif [ "$os" = "debian" ]; then
+        apt install -y python3.6*
+    fi
+}
+
+
+# --- main ----------------------------------------------------------------------------------------
+
+
 # log os type
 if [[ $(which logger) ]]; then
     logger "Package manager type: $(os_type)"
@@ -54,6 +85,10 @@ else
     apt install -y wget
 fi
 
+# install python3
+if ! binary_installed_boolean "python3"; then
+    install_python3 "$(os_type)"
+fi
 
 # download and execute python userdata script
 if [[ $(which python3) ]]; then
