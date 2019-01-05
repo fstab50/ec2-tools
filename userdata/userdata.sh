@@ -116,9 +116,11 @@ function binary_installed_boolean(){
 
 
 function download(){
-    local fname="$1"
+    local url="$1"
+    local fname
 
-    wget "$SOURCE_URL/$fname"
+    fname=$(echo $url | awk -F '/' '{print $NF}')
+    wget "$url"
 
     if [[ -f $fname ]]; then
         logger --tag $info "$fname downloaded successfully"
@@ -141,6 +143,7 @@ function install_package_deps(){
     ## pypi package dep install
     local pip_bin
     pip_bin=$(pip_binary)
+
     if [[ $pip_bin ]]; then
         for pkg in "${packages[@]}"; do
             $pip_bin install $pkg
@@ -275,13 +278,14 @@ fi
 # download and execute python userdata script
 PYTHON3=$(python3_binary)
 
+logger --tag $info "python3 binary identified as:  $PYTHON3"
+
 if [[ "$PYTHON3" ]]; then
 
-    logger --tag $info "python3 binary identified ($python3), executing $PYTHON3_SCRIPT userdata"
+    logger --tag $info "Executing $PYTHON3_SCRIPT userdata"
 
-    if download "$PYTHON3_SCRIPT"; then
-        $PYTHON3 "$PYTHON3_SCRIPT"
-    fi
+    download 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
+    $PYTHON3 $PWD/$PYTHON3_SCRIPT
 
 elif download "$PYTHON2_SCRIPT"; then
     logger --tag $info "Only python2 binary identified, executing $PYTHON2_SCRIPT userdata"

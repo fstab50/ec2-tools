@@ -98,7 +98,7 @@ def os_type():
     if platform.system() == 'Windows':
         return 'Windows'
     elif platform.system() == 'Linux':
-        return platform.linux_distribution()[0]
+        return 'Linux'
 
 
 def local_profile_setup(distro):
