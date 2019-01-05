@@ -114,7 +114,7 @@ function pip_binary(){
 
 # log os type
 if [[ $(which logger) ]]; then
-    logger "Package manager type: $(os_type)"
+    logger --tag $info "Package manager type: $(os_type)"
 else
     echo "Package manager type: $(os_type)" > /root/userdata.msg
 fi
