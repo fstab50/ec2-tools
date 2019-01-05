@@ -184,7 +184,7 @@ setup(
     data_files=[
         (
             user_home() + '/' + '.config/' + _package + '/userdata',
-            ['userdata/python2_generic.py', 'userdata/python3_generic.py']
+            ['userdata/python2_generic.py', 'userdata/userdata.sh']
         )
     ],
     entry_points={
