@@ -18,10 +18,9 @@ warn='[WARN]'
 
 
 function os_type(){
-    local bin
-    if [[ $(which rpm) ]]; then
+    if [[ $(which rpm 2>/dev/null) ]]; then
         echo "redhat"
-    elif [[ $(which apt) ]]; then
+    elif [[ $(which apt 2>/dev/null) ]]; then
         echo "debian"
     fi
 }
