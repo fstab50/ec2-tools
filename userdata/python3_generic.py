@@ -7,6 +7,7 @@ import subprocess
 from pwd import getpwnam as userinfo
 import logging
 import logging.handlers
+import distro
 
 
 url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bashrc'
