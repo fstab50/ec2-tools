@@ -16,6 +16,7 @@ MAKE = $(shell which make)
 MODULE_PATH := $(CUR_DIR)/$(PROJECT)
 SCRIPTS := $(CUR_DIR)/scripts
 DOC_PATH := $(CUR_DIR)/docs
+CONFIG_PATH = $(HOME)/.config/$(PROJECT)
 REQUIREMENT = $(CUR_DIR)/requirements.txt
 VERSION_FILE = $(CUR_DIR)/$(PROJECT)/_version.py
 
@@ -109,7 +110,8 @@ source-install:  setup-venv  ## Install (source: local source). Build artifacts 
 update-source-install:     ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
 	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; else \
- 	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi
+ 	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
+	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/
 
 
 .PHONY: help
