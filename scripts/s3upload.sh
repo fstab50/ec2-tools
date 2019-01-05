@@ -38,12 +38,11 @@ artifacts=(
 cd "$git_root/userdata" || echo "ERROR: unable to cd to userdata directory"
 
 
-if [[ $debug ]]; then
-    echo -e "\tArtifacts for upload are:"
-    for f in "${artifacts[@]}"; do
-        echo -e "\t\t$f"
-    done
-fi
+
+echo -e "\tArtifacts for upload to Amazon S3:\n"
+for f in "${artifacts[@]}"; do
+    echo -e "\t\t$f"
+done
 
 
 for f in "${artifacts[@]}"; do
