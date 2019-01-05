@@ -28,13 +28,14 @@ def download(url_list):
             return False
     try:
         for url in url_list:
-            if which('curl'):
-                cmd = 'curl -o ' + os.path.basename(url) + ' ' + url
+
+            if which('wget'):
+                cmd = 'wget ' + url
                 subprocess.getoutput(cmd)
                 logger.info("downloading " + url)
 
-            elif which('wget'):
-                cmd = 'wget ' + url
+            elif which('curl'):
+                cmd = 'curl -o ' + os.path.basename(url) + ' ' + url
                 subprocess.getoutput(cmd)
                 logger.info("downloading " + url)
 
@@ -43,7 +44,7 @@ def download(url_list):
                 return False
     except Exception as e:
         logger.info(
-            'Error downloading file: {}, Code: {}, URL: {}'.format(os.path.basename(url), e.code, url)
+            'Error downloading file: {}, URL: {}, Error: {}'.format(os.path.basename(url), url, e)
         )
         return False
     return True
@@ -62,7 +63,7 @@ def getLogger(*args, **kwargs):
         logger object | TYPE: logging
     """
     syslog_facility = 'local7'
-    syslog_format = '- %(pathname)s - %(name)s - [%(levelname)s]: %(message)s'
+    syslog_format = '[INFO] - %(pathname)s - %(name)s - [%(levelname)s]: %(message)s'
 
     # all formats
     asctime_format = "%Y-%m-%d %H:%M:%S"
