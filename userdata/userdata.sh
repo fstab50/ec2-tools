@@ -22,6 +22,7 @@ packages=(
     "distro"
 )
 
+
 # --- declarations  ------------------------------------------------------------------
 
 
@@ -38,14 +39,15 @@ function amazonlinux_release_version(){
 	local cwd=$PWD
 	local tmp='/tmp'
 	#
-	cd $tmp
+	cd $tmp || return 1
 	curl -O 'http://169.254.169.254/latest/dynamic/instance-identity/document'
 	image_id="$(jq -r .imageId $tmp/document)"
 	region="$(jq -r .region $tmp/document)"
 	aws ec2 describe-images --image-ids $image_id --region $region > $tmp/images.json
 	printf -- "%s\n" "$(jq -r .Images[0].Name $tmp/images.json | awk -F '-' '{print $1}')"
 	rm $tmp/document $tmp/images.json
-	cd $cwd
+	cd $cwd || return 1
+    return 0
 }
 
 
