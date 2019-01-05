@@ -77,8 +77,8 @@ function os_type(){
 
     if [[ $(grep -i amazon /etc/os-release 2>/dev/null) ]]; then
         case $(amazonlinux_version_number) in
-            '1') os='amazon1' ;;
-            '2') os='amazon2' ;;
+            '1') os='amzn1' ;;
+            '2') os='amzn2' ;;
         esac
 
     elif [[ $(grep -i redhat /etc/os-release 2>/dev/null) ]]; then
@@ -157,10 +157,10 @@ function install_python3(){
 
     logger --tag $info "installing python3"
 
-    if [ "$os" = "amazon1" ]; then
+    if [ "$os" = "amzn1" ]; then
         yum install -y python3*
 
-    elif [ "$os" = "amazon2" ]; then
+    elif [ "$os" = "amzn2" ]; then
         yum install -y python3*
 
     elif [ "$os" = "redhat" ] || [ "$os" = "centos" ]; then
@@ -233,7 +233,7 @@ logger --tag $info "Operating System Type identified:  $os"
 logger --tag $info "Package manager type: $(packagemanager_type)"
 
 case $os in
-    'amazon1' | 'amazon2')
+    'amzn1' | 'amzn2')
         # update os
         yum update -y
         # install binaries if available
