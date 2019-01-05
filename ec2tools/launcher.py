@@ -39,6 +39,7 @@ PARAM_ACCENT = Colors.WHITE
 AMI = Colors.DARKCYAN
 
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
+GENERIC_USERDATA =  local_config['CONFIG']['USERDATA_DIR'] + '/userdata.sh'
 
 image, subnet, securitygroup, keypair = None, None, None, None
 launch_prereqs = (image, subnet, securitygroup, keypair)
@@ -671,17 +672,16 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
         from ec2tools import python3_userdata as userdata
         userdata_str = read(os.path.abspath(userdata.__file__))
     else:
-        #from ec2tools import userdata
-        #userdata_str = userdata.content
-        from ec2tools import python2_userdata as userdata
-        userdata_str = read(os.path.abspath(userdata.__file__))
+        #userdata_str = read(os.path.abspath(GENERIC_USERDATA))
+        from ec2tools import userdata
+        userdata_str = userdata.content
 
     if debug:
         print('USERDATA CONTENT: \n{}'.format(userdata_str))
 
     # name tag content
     name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
-    
+
     tags = [
         {
             'Key': 'Name',
