@@ -57,9 +57,8 @@ function amazonlinux_version_number(){
     ##  release version 1 or 2
     ##
     local var version
-    local etc_file='/etc/os-release'
-    var=$(grep VERSION $etc_file | head -n1)
-    version=$(echo ${var#*=} | cut -c 2-20 | rev | cut -c 2-20 | rev)
+    var=$(grep VERSION /etc/os-release | head -n1)
+    version=$(echo ${var#*=} | cut -c 2-20 | rev | cut -c 2-20 | rev | awk '{print $1}')
     echo $version
 }
 
