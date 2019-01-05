@@ -25,6 +25,43 @@ packages=(
 # --- declarations  ------------------------------------------------------------------
 
 
+function amazonlinux_release_version(){
+	#
+	#  determines release version internally from  within an
+	#  amazonlinux host os environment.
+	#
+	#  Requires identification of AmazonLinux OS Family as a
+	#  prerequisite
+	#
+	local image_id
+	local region
+	local cwd=$PWD
+	local tmp='/tmp'
+	#
+	cd $tmp
+	curl -O 'http://169.254.169.254/latest/dynamic/instance-identity/document'
+	image_id="$(jq -r .imageId $tmp/document)"
+	region="$(jq -r .region $tmp/document)"
+	aws ec2 describe-images --image-ids $image_id --region $region > $tmp/images.json
+	printf -- "%s\n" "$(jq -r .Images[0].Name $tmp/images.json | awk -F '-' '{print $1}')"
+	rm $tmp/document $tmp/images.json
+	cd $cwd
+}
+
+
+function amazonlinux_version_number(){
+    ##
+    ##  short function to determine either amazon linux
+    ##  release version 1 or 2
+    ##
+    local var version
+    local etc_file='/etc/os-release'
+    var=$(grep VERSION $etc_file | head -n1)
+    version=$(echo ${var#*=} | cut -c 2-20 | rev | cut -c 2-20 | rev)
+    echo $version
+}
+
+
 function packagemanager_type(){
     if [[ $(which rpm 2>/dev/null) ]]; then
         echo "redhat"
@@ -35,14 +72,22 @@ function packagemanager_type(){
 
 function os_type(){
     local os
+
     if [[ $(grep -i amazon /etc/os-release 2>/dev/null) ]]; then
-        os='amazon'
+        case $(amazonlinux_version_number) in
+            '1') os='amazon1' ;;
+            '2') os='amazon2' ;;
+        esac
+
     elif [[ $(grep -i redhat /etc/os-release 2>/dev/null) ]]; then
         os='redhat'
+
     elif [[ $(grep -i centos /etc/os-release 2>/dev/null) ]]; then
         os='centos'
+
     elif [[ $(grep -i ubuntu /etc/os-release 2>/dev/null) ]]; then
         os='ubuntu'
+
     elif [[ $(grep -i debian /etc/os-release 2>/dev/null) ]]; then
         os='debian'
     fi
@@ -146,28 +191,36 @@ function pip_binary(){
 
 
 # log os type
-os=$(packagemanager_type)
+os=$(os_type)
 
-logger --tag $info "Package manager type: $os"
+logger --tag $info "Operating System Type identified:  $os"
+logger --tag $info "Package manager type: $(packagemanager_type)"
 
-if [[ "$os" = "redhat" ]]; then
-    # update os
-    yum update -y
+case $os in
+    'amazon1' | 'amazon2')
+        # update os
+        yum update -y
+        # install binaries if available
+        yum install -y wget jq
+        ;;
 
-    # install wget if available
-    yum install -y wget
+    'redhat' | 'centos')
+        # update os
+        yum update -y
+        # install binaries if available
+        yum install -y wget jq
+        # install epel
+        enable_epel_repo
+        ;;
 
-    # install epel
-    enable_epel_repo
-
-elif [[ "$os" = "debian" ]]; then
-    # update os
-    apt update -y
-    apt upgrade -y
-
-    # install wget if available
-    apt install -y wget
-fi
+    'ubuntu' | 'debian')
+        # update os
+        apt update -y
+        apt upgrade -y
+        # install binaries if available
+        apt install -y wget jq
+        ;;
+esac
 
 
 # install python3
@@ -185,12 +238,13 @@ fi
 
 
 # download and execute python userdata script
-if [[ $(which python3) ]]; then
+python3=$(python3_binary)
+if [[ $python3 ]]; then
 
-    logger --tag $info "python3 binary identified, executing $PYTHON3_SCRIPT userdata"
+    logger --tag $info "python3 binary identified ($python3), executing $PYTHON3_SCRIPT userdata"
 
     if download "$PYTHON3_SCRIPT"; then
-        python3 "$PYTHON3_SCRIPT"
+        $python3 "$PYTHON3_SCRIPT"
     fi
 
 elif download "$PYTHON2_SCRIPT"; then
