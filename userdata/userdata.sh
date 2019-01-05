@@ -115,7 +115,7 @@ function binary_installed_boolean(){
 
 function download(){
     local fname="$1"
-    if [[ $(which wget) ]]; then
+    if [[ $(which wget 2>/dev/null) ]]; then
         wget "$SOURCE_URL/$fname"
     else
         curl -o $fname  "$SOURCE_URL/$fname"
@@ -155,10 +155,15 @@ function install_python3(){
 
     logger --tag $info "installing python3"
 
-    if [ "$os" = "amazon" ]; then
+    if [ "$os" = "amazon1" ]; then
         yum install -y python3*
-    if [ "$os" = "redhat" ] || [ "$os" = "centos" ]; then
+
+    elif [ "$os" = "amazon2" ]; then
+        yum install -y python3*
+
+    elif [ "$os" = "redhat" ] || [ "$os" = "centos" ]; then
         yum install -y python36*
+
     elif [ "$os" = "debian" ] || [ "$os" = "ubuntu" ]; then
         apt install -y python3.6*
     fi
@@ -167,7 +172,9 @@ function install_python3(){
 
 function pip_binary(){
     ## id current pip binary
-    local pip_bin=$(which pip3 2>/dev/null)
+    local pip_bin
+
+    pip_bin=$(which pip3 2>/dev/null)
 
     if [[ ! $pip_bin ]]; then
         for binary in pip3.7 pip-3.7 pip3.6 pip-3.6; do
@@ -184,6 +191,33 @@ function pip_binary(){
         logger --tag $warn "Unable to identify pip binary"
         return 1
     fi
+}
+
+
+function python3_binary(){
+    ##
+    ##  returns correct call to python3 binary
+    ##
+    local binary
+
+    if [[ $(which python3) ]]; then
+        binary='python3'
+
+    elif [[ $(which python37) ]]; then
+        binary='python37'
+
+    elif [[ $(which python36) ]]; then
+        binary='python36'
+
+    elif [[ $(which python3.7) ]]; then
+        binary='python3.7'
+
+    elif [[ $(which python3.6) ]]; then
+        binary='python3.7'
+    fi
+
+    if [[ $binary ]]; then echo $binary; return 0; fi
+    return 1
 }
 
 
@@ -239,7 +273,7 @@ fi
 
 # download and execute python userdata script
 python3=$(python3_binary)
-if [[ $python3 ]]; then
+if [[ "$python3" ]]; then
 
     logger --tag $info "python3 binary identified ($python3), executing $PYTHON3_SCRIPT userdata"
 
