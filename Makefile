@@ -15,6 +15,7 @@ ACTIVATE = $(shell . $(VENV_DIR)/bin/activate)
 MAKE = $(shell which make)
 MODULE_PATH := $(CUR_DIR)/$(PROJECT)
 SCRIPTS := $(CUR_DIR)/scripts
+S3UPLOAD_SCRIPT = s3upload.sh
 DOC_PATH := $(CUR_DIR)/docs
 CONFIG_PATH = $(HOME)/.config/$(PROJECT)
 REQUIREMENT = $(CUR_DIR)/requirements.txt
@@ -104,6 +105,7 @@ test-install:  setup-venv ## Install (source: testpypi). Build artifacts exist
 source-install:  setup-venv  ## Install (source: local source). Build artifacts exist
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
 	$(PIP_CALL) install .
+	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
 .PHONY: update-source-install
@@ -111,7 +113,8 @@ update-source-install:     ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
 	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; else \
  	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
-	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/
+	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
+	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
 .PHONY: help
