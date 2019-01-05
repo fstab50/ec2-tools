@@ -20,13 +20,19 @@ declare -a artifacts
 #    'python3_generic.py'
 #)
 
-cd "$git_root/userdata" || exit 1
+cd "$git_root/userdata" || echo "ERROR: unable to cd to userdata directory"
 
 artifacts=(  "$(ls .)" )
+echo "${artifacts[@]}"
+
 
 for f in "${artifacts[@]}"; do
     echo "$pkg:  uploading artifact $f to Amazon S3..."
     aws s3 cp $f s3://$bucketname/files/$f --profile $profilename
+done
+
+for f in "${artifacts[@]}"; do
+    echo "$pkg:  setting acl on artifact $f..."
     aws s3api put-object-acl --key files/$f --acl $acltype --bucket $bucketname --profile $profilename
 done
 
