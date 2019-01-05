@@ -21,8 +21,14 @@ contained in the program LICENSE file.
 
 import os
 import sys
+import platform
+import subprocess
 from setuptools import setup, find_packages
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 from codecs import open
+from shutil import copy2 as copyfile
+from shutil import rmtree
 import ec2tools
 
 
