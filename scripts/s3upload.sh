@@ -27,6 +27,8 @@ bd=$(echo -e $bold)
 rst=$(echo -e $resetansi)
 
 declare -a artifacts
+# artifacts=(  "$(ls .)" )    # DOES NOT WORK FOR SOME STRANGE REASON
+
 artifacts=(
     'python2_generic.py'
     'python3_generic.py'
@@ -35,7 +37,7 @@ artifacts=(
 
 cd "$git_root/userdata" || echo "ERROR: unable to cd to userdata directory"
 
-artifacts=(  "$(ls .)" )
+
 
 if [[ $debug ]]; then
     echo -e "\tArtifacts for upload are:"
