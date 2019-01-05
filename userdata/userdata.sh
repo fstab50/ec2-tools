@@ -34,11 +34,20 @@ function packagemanager_type(){
 }
 
 function os_type(){
-    if [[ $(which rpm 2>/dev/null) ]]; then
-        echo "redhat"
-    elif [[ $(which apt 2>/dev/null) ]]; then
-        echo "debian"
+    local os
+    if [[ $(grep -i amazon /etc/os-release 2>/dev/null) ]]; then
+        os='amazon'
+    elif [[ $(grep -i redhat /etc/os-release 2>/dev/null) ]]; then
+        os='redhat'
+    elif [[ $(grep -i centos /etc/os-release 2>/dev/null) ]]; then
+        os='centos'
+    elif [[ $(grep -i ubuntu /etc/os-release 2>/dev/null) ]]; then
+        os='ubuntu'
+    elif [[ $(grep -i debian /etc/os-release 2>/dev/null) ]]; then
+        os='debian'
     fi
+    echo $os
+    return 0
 }
 
 
@@ -101,9 +110,11 @@ function install_python3(){
 
     logger --tag $info "installing python3"
 
-    if [ "$os" = "redhat" ]; then
+    if [ "$os" = "amazon" ]; then
         yum install -y python3*
-    elif [ "$os" = "debian" ]; then
+    if [ "$os" = "redhat" ] || [ "$os" = "centos" ]; then
+        yum install -y python36*
+    elif [ "$os" = "debian" ] || [ "$os" = "ubuntu" ]; then
         apt install -y python3.6*
     fi
 }
