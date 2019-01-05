@@ -12,13 +12,13 @@ bucketname='awscloud.center'
 profilename='gcreds-da-atos'
 acltype='public-read'
 git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+scripts_dir="$git_root/scripts"
 pwd=$PWD
-config_dir="$HOME/.config/bash"
 errors='/dev/null'
 debug="$1"
 
-if [[ -f $config_dir/colors.sh ]]; then
-    source "$config_dir/colors.sh"
+if [[ -f $scripts_dir/colors.sh ]]; then
+    source "$scripts_dir/colors.sh"
 fi
 
 # colors
@@ -36,7 +36,6 @@ artifacts=(
 )
 
 cd "$git_root/userdata" || echo "ERROR: unable to cd to userdata directory"
-
 
 
 if [[ $debug ]]; then
