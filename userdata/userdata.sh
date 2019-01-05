@@ -64,7 +64,7 @@ function install_package_deps(){
     ## pypi package dep install
     pip=$(pip_binary)
     if [[ $pip ]]; then
-        for pkg in ${packages[@]}; do
+        for pkg in "${packages[@]}"; do
             $pip install $pkg
         done
         return 0
@@ -113,24 +113,32 @@ function pip_binary(){
 
 
 # log os type
-if [[ $(which logger) ]]; then
-    logger --tag $info "Package manager type: $(os_type)"
-else
-    echo "Package manager type: $(os_type)" > /root/userdata.msg
-fi
+os=$(os_type)
 
+logger --tag $info "Package manager type: $os"
 
-# install wget if available
-if [[ "$(os_type)" = "redhat" ]]; then
+if [[ "$os" = "redhat" ]]; then
+    # update os
+    yum update -y
+
+    # install wget if available
     yum install -y wget
-else
+
+elif [[ "$os" = "debian" ]]; then
+    # update os
+    apt update -y
+    apt upgrade -y
+
+    # install wget if available
     apt install -y wget
 fi
+
 
 # install python3
 if ! binary_installed_boolean "python3"; then
     install_python3 "$(os_type)"
 fi
+
 
 # install pypi packages
 if install_package_deps; then
