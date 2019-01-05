@@ -12,6 +12,7 @@ PYTHON2_SCRIPT='python2-generic.py'
 PYTHON3_SCRIPT='python3-generic.py'
 CALLER=$(basename $0)
 SOURCE_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files'
+SOURCE_URL="https://s3.us-east-2.amazonaws.com/awscloud.center/files"
 EPEL_URL='https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
 
 # log tags
@@ -116,11 +117,9 @@ function binary_installed_boolean(){
 
 function download(){
     local fname="$1"
-    if [[ $(which wget 2>/dev/null) ]]; then
-        wget "$SOURCE_URL/$fname"
-    else
-        curl -o $fname  "$SOURCE_URL/$fname"
-    fi
+
+    wget "$SOURCE_URL/$fname"
+
     if [[ -f $fname ]]; then
         logger --tag $info "$fname downloaded successfully"
         return 0
@@ -140,10 +139,11 @@ function enable_epel_repo(){
 
 function install_package_deps(){
     ## pypi package dep install
-    pip=$(pip_binary)
-    if [[ $pip ]]; then
+    local pip_bin
+    pip_bin=$(pip_binary)
+    if [[ $pip_bin ]]; then
         for pkg in "${packages[@]}"; do
-            $pip install $pkg
+            $pip_bin install $pkg
         done
         return 0
     fi
@@ -273,13 +273,14 @@ fi
 
 
 # download and execute python userdata script
-python3=$(python3_binary)
-if [[ "$python3" ]]; then
+PYTHON3=$(python3_binary)
+
+if [[ "$PYTHON3" ]]; then
 
     logger --tag $info "python3 binary identified ($python3), executing $PYTHON3_SCRIPT userdata"
 
     if download "$PYTHON3_SCRIPT"; then
-        $python3 "$PYTHON3_SCRIPT"
+        $PYTHON3 "$PYTHON3_SCRIPT"
     fi
 
 elif download "$PYTHON2_SCRIPT"; then
