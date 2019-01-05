@@ -10,12 +10,12 @@
 
 PYTHON2_SCRIPT='python2-userdata.py'
 PYTHON3_SCRIPT='python3-userdata.py'
+CALLER=$(basename $0)
 SOURCE_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files'
 
 # log tags
-info='[INFO]'
-warn='[WARN]'
-
+info="[INFO]: $CALLER"
+warn="[WARN]: $CALLER"
 
 function os_type(){
     if [[ $(which rpm 2>/dev/null) ]]; then
@@ -51,7 +51,7 @@ function download(){
         curl -o $fname  "$SOURCE_URL/$fname"
     fi
     if [[ -f $fname ]]; then
-        logger "$fname downloaded successfully"
+        logger --tag $info "$fname downloaded successfully"
         return 0
     else
         logger "ERROR:  Problem downloading $fname"
@@ -88,15 +88,14 @@ function install_python3(){
 
 function pip_binary(){
     ## id current pip binary
-    local pip_bin
-    if [ "$(which pip3)" ]; then
-        pip_bin=$(which pip3)
-    elif [ "$(which pip-3.6)" ]; then
-        pip_bin=$(which pip3)
-    elif [ "$(which pip3.6)" ]; then
-        pip_bin=$(which pip3.6)
-    elif [ "$(which pip)" ]; then
-        pip_bin=$(which pip3)
+    local pip_bin=$(which pip3 2>/dev/null)
+
+    if [[ ! $pip_bin ]]; then
+        for binary in pip3.7 pip-3.7 pip3.6 pip-3.6; do
+            if [[ $(which $binary 2>/dev/null) ]]; then
+                pip_bin=$(which binary 2>/dev/null)
+            fi
+        done
     fi
     if $pip_bin; then
         logger --tag $info "pip binary identified as: $pip_bin"
