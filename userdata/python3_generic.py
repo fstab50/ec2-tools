@@ -123,6 +123,7 @@ def local_profile_setup(distro):
         return False
 
     try:
+
         os.chdir(home_dir)
 
         filename = '.bashrc'
@@ -149,6 +150,7 @@ def local_profile_setup(distro):
             os.rename(filename, destination + '/' + filename)
             os.chown(filename, groupid, userid)
             os.chmod(filename, 0o700)
+
     except OSError as e:
         logger.exception(
             'Unknown problem downloading or installing local user profile artifacts')
