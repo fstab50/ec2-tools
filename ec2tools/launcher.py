@@ -362,6 +362,7 @@ def options(parser):
     parser.add_argument("-r", "--region", dest='regioncode', nargs='?', default=None, required=False)
     parser.add_argument("-s", "--instance-size", dest='instance_size', nargs='?', default='t3.micro', required=False)
     parser.add_argument("-t", "--tags", dest='tags', action='store_true', default=False, required=False)
+    parser.add_argument("-u", "--userdata", dest='userdata', nargs='?', default=None, required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
     return parser.parse_args()
@@ -647,7 +648,8 @@ def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, k
     return True
 
 
-def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, count, debug):
+def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
+                            kp, ip_arn, size, count, userdata, debug):
     """
     Summary.
 
@@ -658,6 +660,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
         :subid (str): AWS subnet id (subnet-abcxyz)
         :sgroup (str): Security group id
         :kp (str): keypair name matching pre-existing keypair in the targeted AWS account
+        :ud (str): Path to userdata file; otherwise, None
         :debug (bool): debug flag to enable verbose logging
 
     Returns:
@@ -667,14 +670,17 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     # ec2 client instantiation for launch
     client = boto3_session('ec2', region=region, profile=pf)
 
-    # prep default userdata if none specified
-    if imagetype.split('.')[0] in ('ubuntu18'):
-        from ec2tools import python3_userdata as userdata
-        userdata_str = read(os.path.abspath(userdata.__file__))
-    else:
-        #from ec2tools import userdata
-        #userdata_str = userdata.content
-        userdata_str = read(os.path.abspath(GENERIC_USERDATA))
+    if ud is None:
+        userdata_str = '#!/usr/bin/env bash\n'
+    elif ud == 'default':
+        # prep default userdata if none specified
+        if imagetype.split('.')[0] in ('ubuntu18'):
+            from ec2tools import python3_userdata as userdata
+            userdata_str = read(os.path.abspath(userdata.__file__))
+        else:
+            #from ec2tools import userdata
+            #userdata_str = userdata.content
+            userdata_str = read(os.path.abspath(GENERIC_USERDATA))
 
     if debug:
         print('USERDATA CONTENT: \n{}'.format(userdata_str))
@@ -861,6 +867,7 @@ def init_cli():
                         ip_arn=role_arn,
                         size=args.instance_size,
                         count=args.quantity,
+                        userdata=args.userdata,
                         debug=args.debug
                     )
                 print('\tLaunching Summary:\n')
