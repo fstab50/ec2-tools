@@ -41,7 +41,7 @@ artifacts=(
 
 
 if [[ ! $(gcreds -s | grep $profilename) ]] || [[ $(gcreds -s | grep expired) ]]; then
-    std_message "No active temporary credentials found for profile name $profilename" "WARN"
+    std_warn "No active temporary credentials found for profile name $profilename"
     exit 1
 fi
 
