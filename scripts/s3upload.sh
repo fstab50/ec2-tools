@@ -26,22 +26,36 @@ accent=$pv_orange
 bd=$(echo -e $bold)
 rst=$(echo -e $resetansi)
 
+
 declare -a artifacts
 # artifacts=(  "$(ls .)" )    # DOES NOT WORK FOR SOME STRANGE REASON
-
 artifacts=(
     'python2_generic.py'
     'python3_generic.py'
     'userdata.sh'
 )
 
+
+# ---  declarations  -------------------------------------------------------------------------------
+
+
+
+
+# --- main -----------------------------------------------------------------------------------------
+
+
+if [[ ! $(gcreds -s | grep $profilename) ]] || [[ $(gcreds -s | grep expired) ]]; then
+    echo -e "\n\tNo active temporary credentials found for profile name $profilename\n"
+    exit 1
+fi
+
 cd "$git_root/userdata" || echo "ERROR: unable to cd to userdata directory"
 
 
 
-echo -e "\tArtifacts for upload to Amazon S3:\n"
+echo -e "\n\t\tArtifacts for upload to Amazon S3:\n"
 for f in "${artifacts[@]}"; do
-    echo -e "\t\t$f"
+    echo -e "\t\t\t$f"
 done
 
 
