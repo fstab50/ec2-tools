@@ -109,7 +109,9 @@ def help_menu():
 
       """ + bd + """-u""" + rst + """, """ + bd + """--userdata""" + rst + """: Path to userdata file on local filesystem. Example:
 
-                    $  runmachine  --image redhat  --region us-east-1  --userdata /home/bob/userdata.sh
+                $  runmachine  --image redhat  \\
+                               --region us-east-1  \\
+                               --userdata "/home/bob/userdata.sh"
 
       """ + bd + """-V""" + rst + """, """ + bd + """--version""" + rst + """: Display program version information
 
