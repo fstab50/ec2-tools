@@ -107,6 +107,10 @@ def help_menu():
 
       """ + bd + """-d""" + rst + """, """ + bd + """--debug""" + rst + """: Debug mode, verbose output.
 
+      """ + bd + """-u""" + rst + """, """ + bd + """--userdata""" + rst + """: Path to userdata file on local filesystem. Example:
+
+                    $  runmachine  --image redhat  --region us-east-1  --userdata /home/bob/userdata.sh
+
       """ + bd + """-V""" + rst + """, """ + bd + """--version""" + rst + """: Display program version information
 
       """ + bd + """-h""" + rst + """, """ + bd + """--help""" + rst + """: Print this menu
