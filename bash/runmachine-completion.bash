@@ -95,6 +95,24 @@ function _complete_username_subcommands(){
 }
 
 
+function _complete_region_subcommands(){
+    local cmds="$1"
+    local split='7'       # times to split screen width
+    local ct="0"
+    local IFS=$' \t\n'
+    local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
+
+    for i in "${!formatted_cmds[@]}"; do
+        formatted_cmds[$i]="$(printf '%*s' "-$(($COLUMNS/$split))"  "${formatted_cmds[$i]}")"
+    done
+
+    COMPREPLY=( "${formatted_cmds[@]}")
+    return 0
+    #
+    # <-- end function _complete_region_subcommands -->
+}
+
+
 function _return_profiles(){
     ##
     ##  Returns a list of all awscli profiles
@@ -256,6 +274,22 @@ function _runmachine_completions(){
             ;;
 
         '--debug' | '--version' | '--help')
+            return 0
+            ;;
+
+        '--region')
+            ##  NOTE: Need to filter users by account number assoc with --profile
+            ## use python3 config parser
+            python3=$(which python3)
+            regions=$($python3 "$config_dir/regions.py")
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+
+                _complete_region_subcommands "${regions}"
+
+            else
+                COMPREPLY=( $(compgen -W "${regions}" -- ${cur}) )
+            fi
             return 0
             ;;
 
