@@ -23,91 +23,30 @@
 # SOFTWARE.
 
 
-function current_branch(){
+function _list_iam_users(){
     ##
-    ##  returns current working branch
+    ##  Returns array of iam users
     ##
-    echo "$(git branch 2>/dev/null | grep '\*' | awk '{print $2}')"
-}
+    local profile_name="$1"
+    declare -a profiles
 
-
-function _code_subcommands(){
-    ##
-    ##  returns list of all files changed; relative paths
-    ##
-    local branch1="master"
-    local branch2=$(current_branch)
-    local root=$(_git_root)
-
-    declare -a changed
-    changed=$(git diff --name-only $branch1..$branch2 | xargs -I '{}' realpath --relative-to=. $root/'{}')
-    echo "${changed[@]}"
-}
-
-
-function _git_root(){
-    ##
-    ##  determines full path to current git project root
-    ##
-    echo "$(git rev-parse --show-toplevel 2>/dev/null)"
-}
-
-
-function _local_branches(){
-    ##
-    ##  returns an array of git branches listed by the
-    ##  local git repository
-    ##
-    declare -a local_branches
-
-    local_branches=(  $(git branch 2>/dev/null |  grep -v remotes | cut -c 3-50)  )
-    echo "${local_branches[@]}"
-    #
-    # <--- end function _clean_subcommands --->
-}
-
-
-function _remote_branchnames(){
-    ##
-    ##  returns an array of git branches listed by the
-    ##  remote repository
-    ##
-    declare -a remotes
-
-    remotes=(  $(git branch -a 2>/dev/null |  grep remotes | tail -n +2 | awk -F '/' '{print $NF}')  )
-    echo "${remotes[@]}"
-    #
-    # <--- end function _clean_subcommands --->
-}
-
-
-function _complete_alternatebranch_commands(){
-    ##
-    ##  Prints all local or remote branches
-    ##
-    local cmds="$1"
-    local split='4'       # times to split screen width
-    local ct="0"
-    local IFS=$' \t\n'
-    local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
-
-    for i in "${!formatted_cmds[@]}"; do
-        formatted_cmds[$i]="$(printf '%*s' "-$(($COLUMNS/$split))"  "${formatted_cmds[$i]}")"
+    if [ ! $profile_name ]; then
+        profile_name="default"
+    fi
+    for user in $(aws iam list-users  --profile $profile_name --output json | jq .Users[].UserName); do
+        profiles=(  "${profiles[@]}" "$user"  )
     done
-
-    COMPREPLY=( "${formatted_cmds[@]}")
+    echo "${profiles[@]}"
     return 0
-    #
-    # <-- end function _complete_branchdiff_commands -->
 }
 
 
-function _complete_branchdiff_commands(){
+function _complete_runmachine_commands(){
     local cmds="$1"
     local split='5'       # times to split screen width
     local ct="0"
     local IFS=$' \t\n'
-    local formatted_cmds=( $(compgen -W "${cmds}" -- "${COMP_WORDS[1]}") )
+    local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
 
     for i in "${!formatted_cmds[@]}"; do
         formatted_cmds[$i]="$(printf '%*s' "-$(($COLUMNS/$split))"  "${formatted_cmds[$i]}")"
@@ -116,13 +55,14 @@ function _complete_branchdiff_commands(){
     COMPREPLY=( "${formatted_cmds[@]}")
     return 0
     #
-    # <-- end function _complete_branchdiff_commands -->
+    # <-- end function _complete_runmachine_commands -->
 }
 
 
-function _complete_code_subcommands(){
+function _complete_profile_subcommands(){
     local cmds="$1"
-    local split='3'       # times to split screen width
+    local split='7'       # times to split screen width
+    local ct="0"
     local IFS=$' \t\n'
     local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
 
@@ -133,13 +73,14 @@ function _complete_code_subcommands(){
     COMPREPLY=( "${formatted_cmds[@]}")
     return 0
     #
-    # <-- end function _complete_code_subcommands -->
+    # <-- end function _complete_profile_subcommands -->
 }
 
 
-function _complete_commitlog_subcommands(){
+function _complete_username_subcommands(){
     local cmds="$1"
-    local split='3'       # times to split screen width
+    local split='7'       # times to split screen width
+    local ct="0"
     local IFS=$' \t\n'
     local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
 
@@ -150,20 +91,37 @@ function _complete_commitlog_subcommands(){
     COMPREPLY=( "${formatted_cmds[@]}")
     return 0
     #
-    # <-- end function _complete_commitlog_subcommands -->
+    # <-- end function _complete_username_subcommands -->
 }
 
 
-function _branchdiff_completions(){
+function _return_profiles(){
     ##
-    ##  Completion structures for branchdiff exectuable
+    ##  Returns a list of all awscli profiles
     ##
-    local numargs numoptions cur prev prevcmd
+    if [ -f "$HOME/.aws/credentials" ]; then
+        echo "$(grep '\[*\]' ~/.aws/credentials | cut -c 2-80 | rev | cut -c 2-80 | rev)"
 
+    elif [ -f "$HOME/.aws/config" ]; then
+        echo "$(grep 'profile' ~/.aws/config | awk '{print $2}' | rev | cut -c 2-80 | rev)"
+
+    fi
+    return 0
+}
+
+function _runmachine_completions(){
+    ##
+    ##  Completion structures for runmachine exectuable
+    ##
+    local numargs numoptions cur prev initcmd
+    local completion_dir
+
+    completion_dir="$HOME/.bash_completion.d"
+    config_dir="$HOME/.config/runmachine"
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     initcmd="${COMP_WORDS[COMP_CWORD-2]}"
-    #echxo "cur: $cur, prev: $prev"
+    #echo "cur: $cur, prev: $prev"
 
     # initialize vars
     COMPREPLY=()
@@ -171,132 +129,162 @@ function _branchdiff_completions(){
     numoptions=0
 
     # option strings
-    commands='--branch --code --commit-log --debug --help --repository-url --version'
-    commitlog_subcommands='detail help history summary'
-    operations='--branch --code'
-    norepo_commands='--help --version'
+    commands='--auto --configure --debug --help --operation --profile --user-name --version'
+    operations='list up'
 
 
     case "${initcmd}" in
 
-        '--branch')
-            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-code')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-debug')" ]; then
+        '--user-name')
+            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-operation')" ]; then
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-code')" ]; then
-                COMPREPLY=( $(compgen -W "--debug" -- ${cur}) )
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
+                COMPREPLY=( $(compgen -W "--operation --debug" -- ${cur}) )
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-debug')" ]; then
-                COMPREPLY=( $(compgen -W "--code" -- ${cur}) )
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-operation')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --debug" -- ${cur}) )
                 return 0
 
             else
-                COMPREPLY=( $(compgen -W "--code --debug" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--profile --operation --debug" -- ${cur}) )
                 return 0
             fi
             ;;
 
-        '--code')
-            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-branch')" ]; then
+        '--profile')
+            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-operation')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
                 return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-operation')" ]; then
+                COMPREPLY=( $(compgen -W "--user-name" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
+                COMPREPLY=( $(compgen -W "--operation" -- ${cur}) )
+                return 0
+
             else
-                COMPREPLY=( $(compgen -W "--branch" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--operation --user-name" -- ${cur}) )
                 return 0
             fi
             ;;
 
-        '--commit-log')
-           return 0
-           ;;
+        '--operation')
+            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
+                COMPREPLY=( $(compgen -W "--user-name" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
+                COMPREPLY=( $(compgen -W "--profile" -- ${cur}) )
+                return 0
+
+            else
+                COMPREPLY=( $(compgen -W "--profile --user-name" -- ${cur}) )
+                return 0
+            fi
+            ;;
     esac
     case "${cur}" in
+        'runmachine' | 'keyu')
+            COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
+            ;;
 
-        '--version')
+        '--operation' | '--operations')
+            COMPREPLY=( $(compgen -W "${operations}" -- ${cur}) )
             return 0
             ;;
 
-        'branchdiff')
-            _complete_branchdiff_commands "${commands}"
+        '--version' | '--help')
             return 0
             ;;
 
-        '--commit-log')
-             _complete_commitlog_subcommands "${commitlog_subcommands}"
-            #COMPREPLY=( $(compgen -W "${commitlog_subcommands}" -- ${cur}) )
-            return 0
-            ;;
     esac
     case "${prev}" in
 
-        '--branch')
-            remote_branches=$(_remote_branchnames)
-            #_complete_alternatebranch_commands "${local_branchnames}"
-            COMPREPLY=( $(compgen -W "${remote_branches}" -- ${cur}) )
-            return 0
-            ;;
-
-        '--code')
+        '--profile')
+            python3=$(which python3)
+            iam_users=$($python3 "$config_dir/iam_users.py")
 
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
                 # display full completion subcommands
-                _complete_code_subcommands "$(_code_subcommands)"
+                _complete_profile_subcommands "${iam_users}"
             else
-                changed_files=$(_code_subcommands)
-                COMPREPLY=( $(compgen -W "${changed_files}" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "${iam_users}" -- ${cur}) )
             fi
             return 0
             ;;
 
-        '--debug')
-            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-branch')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-code')" ]; then
+        '--operation' | '--operations')
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] || [ "$cur" = "l" ] || [ "$cur" = "u" ]; then
+                COMPREPLY=( $(compgen -W "${operations}" -- ${cur}) )
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-branch')" ]; then
-                COMPREPLY=( $(compgen -W "--code" -- ${cur}) )
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-code')" ]; then
-                COMPREPLY=( $(compgen -W "--branch" -- ${cur}) )
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
+                COMPREPLY=( $(compgen -W "--user-name" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
+                COMPREPLY=( $(compgen -W "--profile" -- ${cur}) )
+                return 0
+
+            else
+                COMPREPLY=( $(compgen -W "${operations}" -- ${cur}) )
                 return 0
             fi
             ;;
 
-        '--commit-log')
+        'list' | 'up')
+            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
+                COMPREPLY=( $(compgen -W "--user-name" -- ${cur}) )
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
+                COMPREPLY=( $(compgen -W "--profile" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+        '--debug' | '--version' | '--help')
+            return 0
+            ;;
+
+        '--instance-size')
+            ##  NOTE: Need to filter users by account number assoc with --profile
+            ## use python3 config parser
+            python3=$(which python3)
+            iam_users=$($python3 "$config_dir/iam_users.py" default)
+
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
-                # display full completion subcommands
-                _complete_commitlog_subcommands "${commitlog_subcommands}"
+
+                _complete_username_subcommands "${iam_users}"
+
             else
-                COMPREPLY=( $(compgen -W "${commitlog_subcommands}" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "${iam_users}" -- ${cur}) )
             fi
             return 0
             ;;
 
-        '--version' | '--help' | '--repository-url')
-            return 0
-            ;;
+        'runmachine')
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
-        'detail' | 'history' | 'summary')
-            # --commit-log subcommands completed; stop
-            return 0
-            ;;
+                _complete_runmachine_commands "${commands}"
+                return 0
 
-        "branchdiff")
-            if [ "$(_git_root)" ]; then
-                if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
-
-                    _complete_branchdiff_commands "${commands}"
-
-                else
-                    COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
-                fi
-            else
-                COMPREPLY=( $(compgen -W "${norepo_commands}" -- ${cur}) )
             fi
-            return 0
             ;;
     esac
 
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
 
-} && complete -F _branchdiff_completions branchdiff
+} && complete -F _runmachine_completions runmachine
