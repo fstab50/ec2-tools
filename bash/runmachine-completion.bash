@@ -97,7 +97,7 @@ function _complete_username_subcommands(){
 
 function _complete_region_subcommands(){
     local cmds="$1"
-    local split='7'       # times to split screen width
+    local split='6'       # times to split screen width
     local ct="0"
     local IFS=$' \t\n'
     local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
@@ -135,7 +135,7 @@ function _runmachine_completions(){
     local completion_dir
 
     completion_dir="$HOME/.bash_completion.d"
-    config_dir="$HOME/.config/runmachine"
+    config_dir="$HOME/.config/ec2tools"
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     initcmd="${COMP_WORDS[COMP_CWORD-2]}"
