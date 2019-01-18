@@ -493,10 +493,6 @@ function _runmachine_completions(){
                     COMPREPLY=( $(compgen -W "--profile --image --instance-size --region" -- ${cur}) )
                     return 0
                 fi
-                ;;
-
-            else
-                COMPREPLY=( $(compgen -W "$(seq 10)" -- ${cur}) )
             fi
             return 0
             ;;
