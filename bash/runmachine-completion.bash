@@ -113,6 +113,23 @@ function _complete_region_subcommands(){
 }
 
 
+function _quantity_subcommands(){
+    ##
+    ##  Valid number of parallel processes for make binary
+    ##
+    local maxct='20'
+
+    for count in $(seq $maxct); do
+        if [ "${#count}" = "1" ]; then
+            arr_subcmds=( "${arr_subcmds[@]}" "0$count"  )
+        else
+            arr_subcmds=( "${arr_subcmds[@]}" "$count"  )
+        fi
+    done
+    printf -- '%s\n' "${arr_subcmds[@]}"
+}
+
+
 function _return_profiles(){
     ##
     ##  Returns a list of all awscli profiles
@@ -358,21 +375,6 @@ function _runmachine_completions(){
             return 0
             ;;
 
-        '--region')
-            ##  complete AWS region codes
-            python3=$(which python3)
-            regions=$($python3 "$config_dir/regions.py")
-
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
-
-                _complete_region_subcommands "${regions}"
-
-            else
-                COMPREPLY=( $(compgen -W "${regions}" -- ${cur}) )
-            fi
-            return 0
-            ;;
-
         '--instance-size')
             ## EC@ instances size types
             declare -a sizes
@@ -384,6 +386,33 @@ function _runmachine_completions(){
 
             else
                 COMPREPLY=( $(compgen -W "${sizes[@]}" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+        '--quantity')
+            ## EC@ instances size types
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+
+                _complete_username_subcommands "$(_quantity_subcommands)"
+
+            else
+                COMPREPLY=( $(compgen -W "$(seq 10)" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+        '--region')
+            ##  complete AWS region codes
+            python3=$(which python3)
+            regions=$($python3 "$config_dir/regions.py")
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+
+                _complete_region_subcommands "${regions}"
+
+            else
+                COMPREPLY=( $(compgen -W "${regions}" -- ${cur}) )
             fi
             return 0
             ;;
