@@ -252,19 +252,74 @@ function _runmachine_completions(){
             ;;
 
         '--profile')
-            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-operation')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
+            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-operation')" ]; then
-                COMPREPLY=( $(compgen -W "--user-name" -- ${cur}) )
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
+                COMPREPLY=( $(compgen -W "--region" -- ${cur}) )
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
-                COMPREPLY=( $(compgen -W "--operation" -- ${cur}) )
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\region')" ]; then
+                COMPREPLY=( $(compgen -W "--quantity" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
+                COMPREPLY=( $(compgen -W "--instance-size" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
+                COMPREPLY=( $(compgen -W "--image" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
+                COMPREPLY=( $(compgen -W "--quantity --instance-size" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
+                COMPREPLY=( $(compgen -W "--quantity --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
+                COMPREPLY=( $(compgen -W "--region --image" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
+                COMPREPLY=( $(compgen -W "--quantity --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
+                COMPREPLY=( $(compgen -W "--image --quanitity --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --quanitity --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
+                COMPREPLY=( $(compgen -W "--instance-size --image --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
+                COMPREPLY=( $(compgen -W "--image --quantity --image" -- ${cur}) )
                 return 0
 
             else
-                COMPREPLY=( $(compgen -W "--operation --user-name" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--profile --image --quanitity --region" -- ${cur}) )
                 return 0
             fi
             ;;
@@ -403,7 +458,7 @@ function _runmachine_completions(){
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
                 _complete_quantity_subcommands "$(_quantity_subcommands)"
-                
+
             fi
             return 0
             ;;
