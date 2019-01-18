@@ -169,7 +169,10 @@ function _runmachine_completions(){
 
     # option strings
     commands='--debug --image --instance-size --help --quantity --profile --region --version'
+    commands_image='--instance-size --profile --region --quantity '
     commands_quantity='--image --instance-size --profile --region'
+    commands_size='--image --quantity --profile --region'
+    commands_region='--image --instance-size --profile --quantity'
     image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
                 ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
 
