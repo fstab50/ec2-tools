@@ -272,8 +272,7 @@ function _runmachine_completions(){
             ;;
 
         '--region')
-            ##  NOTE: Need to filter users by account number assoc with --profile
-            ## use python3 config parser
+            ##  complete AWS region codes
             python3=$(which python3)
             regions=$($python3 "$config_dir/regions.py")
 
