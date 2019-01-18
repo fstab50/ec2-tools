@@ -77,7 +77,7 @@ function _complete_profile_subcommands(){
 }
 
 
-function _complete_username_subcommands(){
+function _complete_sizes_subcommands(){
     local cmds="$1"
     local split='7'       # times to split screen width
     local ct="0"
@@ -91,7 +91,7 @@ function _complete_username_subcommands(){
     COMPREPLY=( "${formatted_cmds[@]}")
     return 0
     #
-    # <-- end function _complete_username_subcommands -->
+    # <-- end function _complete_sizes_subcommands -->
 }
 
 
@@ -130,20 +130,6 @@ function _quantity_subcommands(){
 }
 
 
-function _return_profiles(){
-    ##
-    ##  Returns a list of all awscli profiles
-    ##
-    if [ -f "$HOME/.aws/credentials" ]; then
-        echo "$(grep '\[*\]' ~/.aws/credentials | cut -c 2-80 | rev | cut -c 2-80 | rev)"
-
-    elif [ -f "$HOME/.aws/config" ]; then
-        echo "$(grep 'profile' ~/.aws/config | awk '{print $2}' | rev | cut -c 2-80 | rev)"
-
-    fi
-    return 0
-}
-
 function _runmachine_completions(){
     ##
     ##  Completion structures for runmachine exectuable
@@ -165,6 +151,7 @@ function _runmachine_completions(){
 
     # option strings
     commands='--debug --image --instance-size --help --quantity --profile --region --version'
+    commands_quantity='--image --instance-size --profile --region'
     image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
                 ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
 
@@ -382,7 +369,7 @@ function _runmachine_completions(){
 
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
-                _complete_username_subcommands "${sizes[@]}"
+                _complete_sizes_subcommands "${sizes[@]}"
 
             else
                 COMPREPLY=( $(compgen -W "${sizes[@]}" -- ${cur}) )
@@ -391,13 +378,10 @@ function _runmachine_completions(){
             ;;
 
         '--quantity')
-            ## EC@ instances size types
+            ## EC2 instances count
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
-                _complete_username_subcommands "$(_quantity_subcommands)"
-
-            else
-                COMPREPLY=( $(compgen -W "$(seq 10)" -- ${cur}) )
+                _complete_quantity_subcommands "$(_quantity_subcommands)"
             fi
             return 0
             ;;
@@ -413,6 +397,18 @@ function _runmachine_completions(){
 
             else
                 COMPREPLY=( $(compgen -W "${regions}" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+        [0-9][0-9])
+            ## EC2 instances size types
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+
+                _complete_quantity_subcommands "$(_quantity_subcommands)"
+
+            else
+                COMPREPLY=( $(compgen -W "$(seq 10)" -- ${cur}) )
             fi
             return 0
             ;;
