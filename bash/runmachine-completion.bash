@@ -258,22 +258,11 @@ function _runmachine_completions(){
 
         '--image' | '--images')
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] || [ "$cur" = "l" ] || [ "$cur" = "u" ]; then
-                COMPREPLY=( $(compgen -W "${unage_subcommands}" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
-                COMPREPLY=( $(compgen -W "--user-name" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
-                COMPREPLY=( $(compgen -W "--profile" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "${image_subcommands}" -- ${cur}) )
                 return 0
 
             else
-                COMPREPLY=( $(compgen -W "${operations}" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "${image_subcommands}" -- ${cur}) )
                 return 0
             fi
             ;;
