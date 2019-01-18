@@ -373,7 +373,7 @@ function _runmachine_completions(){
             return 0
             ;;
 
-        '--image')
+        '--instance-size')
             ## EC@ instances size types
             declare -a sizes
             sizes=$(cat "$config_dir/sizes.txt")
