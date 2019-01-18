@@ -189,6 +189,37 @@ function _runmachine_completions(){
                 COMPREPLY=( $(compgen -W "--quantity --instance-size" -- ${cur}) )
                 return 0
 
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
+                COMPREPLY=( $(compgen -W "--region --instance-size" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
+                COMPREPLY=( $(compgen -W "--quantity --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
+                COMPREPLY=( $(compgen -W "--instance-size --quanitity --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --quanitity --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --instance-size --region" -- ${cur}) )
+                return 0
+
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --quantity --instance-size" -- ${cur}) )
+                return 0
+
             else
                 COMPREPLY=( $(compgen -W "--profile --instance-size --quanitity --region" -- ${cur}) )
                 return 0
