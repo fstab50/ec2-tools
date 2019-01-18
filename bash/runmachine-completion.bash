@@ -41,6 +41,24 @@ function _list_iam_users(){
 }
 
 
+function _complete_4_horsemen_subcommands(){
+    local cmds="$1"
+    local split='3'       # times to split screen width
+    local ct="0"
+    local IFS=$' \t\n'
+    local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
+
+    for i in "${!formatted_cmds[@]}"; do
+        formatted_cmds[$i]="$(printf '%*s' "-$(($COLUMNS/$split))"  "${formatted_cmds[$i]}")"
+    done
+
+    COMPREPLY=( "${formatted_cmds[@]}")
+    return 0
+    #
+    # <-- end function _complete_region_subcommands -->
+}
+
+
 function _complete_runmachine_commands(){
     local cmds="$1"
     local split='5'       # times to split screen width
@@ -246,7 +264,7 @@ function _runmachine_completions(){
                 return 0
 
             else
-                COMPREPLY=( $(compgen -W "--profile --instance-size --quanitity --region" -- ${cur}) )
+                _complete_4_horsemen_subcommands  "--profile --instance-size --quanitity --region"
                 return 0
             fi
             ;;
@@ -319,7 +337,7 @@ function _runmachine_completions(){
                 return 0
 
             else
-                COMPREPLY=( $(compgen -W "--profile --image --quanitity --region" -- ${cur}) )
+                _complete_4_horsemen_subcommands "--profile --image --quanitity --region"
                 return 0
             fi
             ;;
@@ -392,7 +410,7 @@ function _runmachine_completions(){
                 return 0
 
             else
-                COMPREPLY=( $(compgen -W "--profile --image --quanitity --region" -- ${cur}) )
+                _complete_4_horsemen_subcommands "--profile --image --quanitity --region"
                 return 0
             fi
             ;;
@@ -459,10 +477,12 @@ function _runmachine_completions(){
 
                 _complete_quantity_subcommands "$(_quantity_subcommands)"
 
+            else
+                COMPREPLY=( $(compgen -W "${_quantity_subcommands}" -- ${cur}) )
             fi
             return 0
             ;;
-
+            
         '--region')
             ##  complete AWS region codes
             python3=$(which python3)
@@ -554,7 +574,7 @@ function _runmachine_completions(){
                     return 0
 
                 else
-                    COMPREPLY=( $(compgen -W "--profile --image --instance-size --region" -- ${cur}) )
+                    _complete_4_horsemen_subcommands "--profile --image --instance-size --region"
                     return 0
                 fi
             fi
