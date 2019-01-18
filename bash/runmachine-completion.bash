@@ -148,38 +148,38 @@ function _runmachine_completions(){
 
     # option strings
     commands='--debug --image --instance-size --help --quantity --profile --region --version'
-    image_subcmds='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
+    image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
                 ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
 
     case "${initcmd}" in
 
         '--image')
             if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; && \
-               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; && \
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
                 COMPREPLY=( $(compgen -W "--instance-size" -- ${cur}) )
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; && \
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\instance-size')" ]; then
                 COMPREPLY=( $(compgen -W "--quantity" -- ${cur}) )
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; && \
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\instance-size')" ]; then
                 COMPREPLY=( $(compgen -W "--region" -- ${cur}) )
                 return 0
 
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; && \
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\instance-size')" ]; then
                 COMPREPLY=( $(compgen -W "--profile" -- ${cur}) )
                 return 0
@@ -258,7 +258,7 @@ function _runmachine_completions(){
 
         '--image' | '--images')
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] || [ "$cur" = "l" ] || [ "$cur" = "u" ]; then
-                COMPREPLY=( $(compgen -W "${imagetypes}" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "${unage_subcommands}" -- ${cur}) )
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-user-name')" ]; then
