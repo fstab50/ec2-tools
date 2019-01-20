@@ -41,8 +41,9 @@ artifacts=(
 
 
 if [[ ! $(gcreds -s | grep $profilename) ]] || [[ $(gcreds -s | grep expired) ]]; then
-    std_warn "No active temporary credentials found for profile name $profilename"
-    exit 1
+    std_warn "No active temporary credentials found for profile name ${bd}$profilename${rst}"
+    std_message "Skipping upload of Amazon S3 artifacts" "INFO"
+    exit 0
 fi
 
 cd "$git_root/userdata" || echo "ERROR: unable to cd to userdata directory"
