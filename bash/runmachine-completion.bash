@@ -109,7 +109,7 @@ function _complete_quantity_subcommands(){
     COMPREPLY=( "${formatted_cmds[@]}")
     return 0
     #
-    # <-- end function _complete_profile_subcommands -->
+    # <-- end function _complete_quantity_subcommands -->
 }
 
 
@@ -461,7 +461,7 @@ function _runmachine_completions(){
             declare -a sizes
             sizes=$(cat "$config_dir/sizes.txt")
 
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+            if [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
                 _complete_sizes_subcommands "${sizes[@]}"
 
@@ -473,22 +473,24 @@ function _runmachine_completions(){
 
         '--quantity')
             ## EC2 instances count
+            subcommands="$(_quantity_subcommands)"
+
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
-                _complete_quantity_subcommands "$(_quantity_subcommands)"
+                _complete_quantity_subcommands "${subcommands}"
 
             else
-                COMPREPLY=( $(compgen -W "${_quantity_subcommands}" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "$(_quantity_subcommands)" -- ${cur}) )
             fi
             return 0
             ;;
-            
+
         '--region')
             ##  complete AWS region codes
             python3=$(which python3)
             regions=$($python3 "$config_dir/regions.py")
 
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+            if [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
                 _complete_region_subcommands "${regions}"
 
