@@ -97,7 +97,7 @@ function _complete_profile_subcommands(){
 
 function _complete_quantity_subcommands(){
     local cmds="$1"
-    local split='7'       # times to split screen width
+    local split='3'       # times to split screen width
     local ct="0"
     local IFS=$' \t\n'
     local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
@@ -153,11 +153,11 @@ function _quantity_subcommands(){
     ##
     ##  Valid number of parallel processes for make binary
     ##
-    local maxct='20'
+    local maxct='9'
 
     for count in $(seq $maxct); do
-        if [ "${#count}" = "1" ]; then
-            arr_subcmds=( "${arr_subcmds[@]}" "0$count"  )
+        if [ "$count" = "1" ]; then
+            arr_subcmds=( "${arr_subcmds[@]}" "1"  )
         else
             arr_subcmds=( "${arr_subcmds[@]}" "$count"  )
         fi
@@ -442,8 +442,8 @@ function _runmachine_completions(){
             ;;
 
         '--image' | '--images')
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] || [ "$cur" = "l" ] || [ "$cur" = "u" ]; then
-                COMPREPLY=( $(compgen -W "${image_subcommands}" -- ${cur}) )
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+                _complete_sizes_subcommands "${image_subcommands}"
                 return 0
 
             else
