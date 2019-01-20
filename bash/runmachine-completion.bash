@@ -456,12 +456,12 @@ function _runmachine_completions(){
             return 0
             ;;
 
-        '--instance-size')
+        '--instance-size' | "--inst*")
             ## EC@ instances size types
             declare -a sizes
             sizes=$(cat "$config_dir/sizes.txt")
 
-            if [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
                 _complete_sizes_subcommands "${sizes[@]}"
 
@@ -485,12 +485,12 @@ function _runmachine_completions(){
             return 0
             ;;
 
-        '--region')
+        '--region' | "--re*")
             ##  complete AWS region codes
             python3=$(which python3)
             regions=$($python3 "$config_dir/regions.py")
 
-            if [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
                 _complete_region_subcommands "${regions}"
 
@@ -596,3 +596,4 @@ function _runmachine_completions(){
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
 
 } && complete -F _runmachine_completions runmachine
+df
