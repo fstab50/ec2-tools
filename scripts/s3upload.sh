@@ -40,7 +40,7 @@ artifacts=(
 # --- main -----------------------------------------------------------------------------------------
 
 
-if [[ ! $(which greds) ]]; then
+if [[ ! $(which gcreds) ]]; then
     std_warn "gcreds binary not found; skipping upload of Amazon S3 artifacts" "INFO"
     exit 0
 
