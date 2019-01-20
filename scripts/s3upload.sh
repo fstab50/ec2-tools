@@ -40,6 +40,10 @@ artifacts=(
 # --- main -----------------------------------------------------------------------------------------
 
 
+if [[ ! $(which greds) ]]; then
+    std_warn "gcreds binary not found; skipping upload of Amazon S3 artifacts" "INFO"
+    exit 0
+
 if [[ ! $(gcreds -s | grep $profilename) ]] || [[ $(gcreds -s | grep expired) ]]; then
     std_warn "No active temporary credentials found for profile name ${bd}$profilename${rst}"
     std_message "Skipping upload of Amazon S3 artifacts" "INFO"
