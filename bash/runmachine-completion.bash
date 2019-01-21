@@ -596,4 +596,3 @@ function _runmachine_completions(){
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
 
 } && complete -F _runmachine_completions runmachine
-df
