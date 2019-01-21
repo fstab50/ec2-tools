@@ -500,7 +500,7 @@ function _runmachine_completions(){
             return 0
             ;;
 
-        [0-9][0-9])
+        [0-9] | [0-9][0-9])
             ## EC2 instances size types
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
@@ -576,7 +576,7 @@ function _runmachine_completions(){
                     return 0
 
                 else
-                    _complete_4_horsemen_subcommands "--profile --image --instance-size --region"
+                    _complete_4_horsemen_subcommands '--profile --image --instance-size --region'
                     return 0
                 fi
             fi
