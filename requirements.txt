@@ -3,5 +3,6 @@ botocore
 distro
 pyaws
 Pygments
+requests
 twine
 veryprettytable
