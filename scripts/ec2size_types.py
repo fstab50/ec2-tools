@@ -12,15 +12,31 @@ import sys
 import json
 import subprocess
 import inspect
+import urllib.request
+import urllib.error
 import requests
-from pyaws import logd
+from pyaws import logd, Colors
 from pyaws.utils import stdout_message
+
+
+try:
+
+    from pyaws.core.oscodes_unix import exit_codes
+    splitchar = '/'     # character for splitting paths (linux)
+
+except Exception as e:
+    msg = 'Import Error: %s. Exit' % str(e)
+    stdout_message(msg, 'WARN')
+    sys.exit(exit_codes['E_DEPENDENCY']['Code'])
 
 
 index_url = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/index.json'
 tmpdir = '/tmp'
 pricee_url = None
 output_filename = 'sizes.txt'
+bdwt = Colors.BOLD + Colors.BRIGHTWHITE
+yl = Colors.GOLD3
+rst = Colors.RESET
 
 
 def download_fileobject(url):
@@ -106,7 +122,7 @@ def write_sizetypes(path, types_list):
             for sizetype in types_list:
                 out1.write(sizetype + '\n')
     except OSError as e:
-        print(f'OS Error writing size types to output file {output_filename}')
+        print(f'OS Error writing size types to output file {yl + output_filename + rst}')
         return False
     return True
 
