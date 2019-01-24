@@ -133,24 +133,24 @@ output_path = git_root() + '/scripts/' + output_filename
 # download, process index file
 index_path = download_fileobject(index_url)
 if price_url:
-    stdout_message(message='index file {index_url} downloaded successfully')
+    stdout_message(message=f'index file {index_url} downloaded successfully')
 
 # download, process  price file
 price_url = current_priceurl(index_path)
 if download_fileobject(pricefile_url):
-    stdout_message(message='Price file {pricefile} downloaded successfully')
+    stdout_message(message=f'Price file {pricefile} downloaded successfully')
 
 # generate new size type list; dedup list
 current_sizetypes = eliminate_duplicates(sizetype(tmpdir + '/' + 'index.json'))
 
 if write_sizetypes(output_path, current_sizetypes):
-    stdout_message(message='New EC2 sizetype file ({output_path}) created successfully')
+    stdout_message(message=f'New EC2 sizetype file ({output_path}) created successfully')
     stdout_message(message='File contains {len(current_sizetypes)} size types')
     sys.exit(0)
 
 else:
     stdout_message(
-            message='Uknown problem creating new EC2 sizetype file ({output_path})',
+            message=f'Uknown problem creating new EC2 sizetype file ({output_path})',
             prefix='WARN'
         )
     sys.exist(1)
