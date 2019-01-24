@@ -76,6 +76,37 @@ def eliminate_duplicates(d_list):
     return uniques
 
 
+def get_service_url(service, url=INDEXURL):
+    """
+    Summary.
+
+        Retrieve Amazon API Global Offer File (Service API Index) File
+
+    Args:
+        :url (str): universal resource locator for Amazon API Index file.
+            index file details the current url locations for retrieving the
+            most up to date API data files
+    Returns:
+        Current URL of EC2 Price file (str), Publication date (str)
+
+    """
+    url_prefix = 'https://pricing.us-east-1.amazonaws.com'
+    converted_name = name_lookup(service)
+
+    if not converted_name:
+        logger.critical(
+            f'{inspect.stack()[0][3]}: The boto3 service name provided could \
+            not be found in the index file')
+        return None
+
+    r = requests.get(url)
+    f1 = json.loads(r.content)
+    index_url = url_prefix + f1['offers'][converted_name]['currentRegionIndexUrl']
+    data = json.loads(requests.get(index_url).content)
+    url_suffix = data['regions']['us-east-1']['currentVersionUrl']
+    return url_prefix + url_suffix
+
+
 def git_root():
     """
     Summary.
@@ -85,6 +116,42 @@ def git_root():
     """
     cmd = 'git rev-parse --show-toplevel 2>/dev/null'
     return subprocess.getoutput(cmd).strip()
+
+
+def retrieve_raw_data(service_url):
+    """
+    Summary.
+
+        Retrieve url of current ec2 price file
+
+    Args:
+        :service_url (str): universal resource locator for Amazon API Index file.
+            index file details the current url locations for retrieving the
+            most up to date API data files
+
+    Returns:
+        :data (json):  ec2 price api parsed data in json format
+
+    """
+    file_path = tmpdir + '/' + 'index.json'
+
+    try:
+        if not os.path.exists(file_path):
+            path = urllib.request.urlretrieve(service_url, file_path)[0]
+        else:
+            path = file_path
+
+        if os.path.exists(file_path) and path:
+            with open(path) as f1:
+                data = json.loads(f1.read())
+        else:
+            return None
+    except urllib.error.HTTPError as e:
+        logger.exception(
+            '%s: Failed to retrive file object: %s. Exception: %s, data: %s' %
+            (inspect.stack()[0][3], file_path, str(e), e.read()))
+        raise e
+    return data
 
 
 def sizetypes(pricefile):
