@@ -93,21 +93,55 @@ class PostInstall(install):
     """
     Summary.
 
-        Postinstall script to place prompt completion artifacts
+        Postinstall script to place bash completion artifacts
         on local filesystem
 
     """
-    def run(self):
-        config_dir = user_home() + '/.config/' + _package
-        userdata_dir = user_home() + '/.config/' + _package + '/userdata'
-        lconfig_dir = user_home() + '/.config/' + _package + '/launchconfigs'
+    def valid_os_shell(self):
+        """
+        Summary.
 
-        if not os.path.exists(os_parityPath(config_dir)):
-            create_artifact(os_parityPath(config_dir), 'dir')
-        if not os.path.exists(os_parityPath(userdata_dir)):
-            create_artifact(os_parityPath(userdata_dir), 'dir')
-        if not os.path.exists(os_parityPath(lconfig_dir)):
-            create_artifact(os_parityPath(lconfig_dir), 'dir')
+            Validates install environment for Linux and Bash shell
+
+        Returns:
+            Success | Failure, TYPE bool
+
+        """
+        if platform.system() == 'Windows':
+            return False
+        elif which('bash'):
+            return True
+        elif 'bash' in subprocess.getoutput('echo $SHELL'):
+            return True
+        return False
+
+    def run(self):
+        """
+        Summary.
+
+            Executes post installation configuration only if correct
+            environment detected
+
+        """
+        if self.valid_os_shell():
+
+            completion_file = user_home() + '/.bash_completion'
+            completion_dir = user_home() + '/.bash_completion.d'
+            config_dir = user_home() + '/.config/keyup'
+
+            if not os.path.exists(os_parityPath(completion_file)):
+                create_artifact(os_parityPath(completion_file), 'file')
+            if not os.path.exists(os_parityPath(completion_dir)):
+                create_artifact(os_parityPath(completion_dir), 'dir')
+            if not os.path.exists(os_parityPath(config_dir)):
+                create_artifact(os_parityPath(config_dir), 'dir')
+
+            if _root_user():
+                copyfile(
+                        completion_dir + '/' + _comp_fname,
+                        '/etc/bash_completion.d/' + _comp_fname,
+                    )
+                os.remove(completion_dir + '/' + _comp_fname)
         install.run(self)
 
 
