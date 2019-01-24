@@ -41,7 +41,6 @@ rst = Colors.RESET
 
 def download_fileobject(url):
     """Retrieve latest ec2 pricefile"""
-
     def exists(object):
         if os.path.exists(tmpdir + '/' + filename):
             return True
@@ -51,15 +50,14 @@ def download_fileobject(url):
             stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
             return False
 
-    if isinstance(objects, str):
-        objects = [objects]
-
     try:
+
         path = tmpdir + '/' + filename
         filename = os.path.split(url)[1]
         r = urllib.request.urlretrieve(url, path)
         if not exists(filename):
             stdout_message(message=f'Failed to retrieve file object {path}', prefix='WARN')
+
     except urllib.error.HTTPError as e:
         stdout_message(
             message='%s: Failed to retrive file object: %s. Exception: %s, data: %s' %
@@ -133,11 +131,12 @@ def write_sizetypes(path, types_list):
 output_path = git_root() + '/scripts/' + output_filename
 
 # download, process index file
-price_url = download_fileobject(index_url)
+index_path = download_fileobject(index_url)
 if price_url:
     stdout_message(message='index file {index_url} downloaded successfully')
 
 # download, process  price file
+price_url = current_priceurl(index_path)
 if download_fileobject(pricefile_url):
     stdout_message(message='Price file {pricefile} downloaded successfully')
 
