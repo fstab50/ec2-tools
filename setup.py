@@ -37,6 +37,7 @@ requires = [
     'botocore>=1.10.1',
     'pyaws>=0.2.24',
     'Pygments>=2.2.0',
+    'requests',
     'VeryPrettyTable'
 ]
 
