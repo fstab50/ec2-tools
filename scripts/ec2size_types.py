@@ -33,6 +33,7 @@ except Exception as e:
 
 
 MAX_AGE_DAYS = 10
+FORCE = False
 index_url = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/index.json'
 tmpdir = '/tmp'
 pricee_url = None
@@ -252,7 +253,10 @@ def write_sizetypes(path, types_list):
 
 output_path = git_root() + '/bash/' + output_filename
 
-if os.path.exists(output_path) and file_age(output_path, 'days') < MAX_AGE_DAYS:
+if len(sys.argv) > 1:
+    FORCE = True
+
+if os.path.exists(output_path) and file_age(output_path, 'days') < MAX_AGE_DAYS and not FORCE:
     filename = os.path.split(output_path)[1]
     age = file_age(output_path, 'days')
     stdout_message(
