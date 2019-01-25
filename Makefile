@@ -119,11 +119,12 @@ update-source-install:     ## Update Install (source: local source).
 
 .PHONY: sizetypes
 build-sizetypes:		##  create or refresh ec2 sizes.txt file
-	cp $(CUR_DIR)
+	cp $(MODULE_PATH)/_version.py $(SCRIPTS)/
 	if [ -d $(VENV_DIR) ]; then . $(VENV_DIR)/bin/activate && \
-	$(PYTHON3_PATH) $(SCRIPTS)/ec2sizetypes.py; else \
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py; else \
 	$(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
 	$(PYTHON3_PATH) $(SCRIPTS)/ec2sizetypes.py; fi
+	rm -f $(SCRIPTS)/_version.py
 
 
 .PHONY: help
