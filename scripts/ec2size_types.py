@@ -17,7 +17,7 @@ import urllib.error
 import requests
 from pyaws import Colors
 from pyaws.utils import stdout_message
-from scripts import logger
+from __init__ import logger
 
 try:
 
@@ -235,7 +235,7 @@ if index_path:
 
 # download, process  price file
 price_url = get_service_url(index_path)
-price_file = download_fileobject(pricefile_url):
+price_file = download_fileobject(price_url)
 if price_file:
     stdout_message(message=f'Price file {pricefile} downloaded successfully')
 
