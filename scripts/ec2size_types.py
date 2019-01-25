@@ -15,9 +15,9 @@ import inspect
 import urllib.request
 import urllib.error
 import requests
-from pyaws import logd, Colors
+from pyaws import Colors
 from pyaws.utils import stdout_message
-
+from scripts import logger
 
 try:
 
@@ -28,6 +28,8 @@ except Exception as e:
     msg = 'Import Error: %s. Exit' % str(e)
     stdout_message(msg, 'WARN')
     sys.exit(exit_codes['E_DEPENDENCY']['Code'])
+
+
 
 
 index_url = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/index.json'
@@ -52,8 +54,8 @@ def download_fileobject(url):
 
     try:
 
-        path = tmpdir + '/' + filename
         filename = os.path.split(url)[1]
+        path = tmpdir + '/' + filename
         r = urllib.request.urlretrieve(url, path)
         if not exists(filename):
             stdout_message(message=f'Failed to retrieve file object {path}', prefix='WARN')
@@ -76,7 +78,7 @@ def eliminate_duplicates(d_list):
     return uniques
 
 
-def get_service_url(service, url=INDEXURL):
+def get_service_url(service, url=index_url):
     """
     Summary.
 
@@ -116,6 +118,33 @@ def git_root():
     """
     cmd = 'git rev-parse --show-toplevel 2>/dev/null'
     return subprocess.getoutput(cmd).strip()
+
+
+def name_lookup(service, url=index_url):
+    """Summary.
+
+        Lookup Table to convert boto3 Amazon Service names to Amazon index file names
+
+    Args:
+        :service (str): boto service descriptor (s3, ec2, sqs, etc)
+        :url (str): universal resource locator for Amazon API Index file.
+            index file details the current url locations for retrieving the
+            most up to date API data files
+    Returns:
+        Corrected Service Name, TYPE (str), None if not found
+
+    """
+    key = None
+
+    r = requests.get(url)
+
+    try:
+        for key in [x for x in json.loads(r.content)['offers']]:
+            if (service.upper() or service.title()) in key:
+                return key
+    except KeyError as e:
+        logger.exception(f'{inspect.stack()[0][3]}: KeyError while converting index keys: {e}')
+    return None
 
 
 def retrieve_raw_data(service_url):
@@ -168,15 +197,17 @@ def sizetypes(pricefile):
 
     """
     sizes = []
+    count = 0
 
     with open(pricefile) as f1:
         f2 = json.loads(f1.read())
 
     for sku in [x for x in f2['products']]:
         try:
-            sizes.append(f2['products'][sku]['attributes']['instanceType']
+            sizes.append(f2['products'][sku]['attributes']['instanceType'])
+            count += 1
         except KeyError:
-            print(f'fail at count {count}, sku {sku}')
+            #logger.info(f'fail at count {count}, sku {sku}')
             continue
     return sizes
 
@@ -196,19 +227,20 @@ def write_sizetypes(path, types_list):
 
 
 output_path = git_root() + '/scripts/' + output_filename
-
+"""
 # download, process index file
 index_path = download_fileobject(index_url)
-if price_url:
+if index_path:
     stdout_message(message=f'index file {index_url} downloaded successfully')
 
 # download, process  price file
-price_url = current_priceurl(index_path)
-if download_fileobject(pricefile_url):
+price_url = get_service_url(index_path)
+price_file = download_fileobject(pricefile_url):
+if price_file:
     stdout_message(message=f'Price file {pricefile} downloaded successfully')
 
 # generate new size type list; dedup list
-current_sizetypes = eliminate_duplicates(sizetype(tmpdir + '/' + 'index.json'))
+current_sizetypes = eliminate_duplicates(sizetypes(price_file))
 
 if write_sizetypes(output_path, current_sizetypes):
     stdout_message(message=f'New EC2 sizetype file ({output_path}) created successfully')
@@ -221,3 +253,4 @@ else:
             prefix='WARN'
         )
     sys.exist(1)
+"""
