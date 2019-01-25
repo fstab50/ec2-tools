@@ -123,7 +123,7 @@ build-sizetypes:		##  create or refresh ec2 sizes.txt file
 	if [ -d $(VENV_DIR) ]; then . $(VENV_DIR)/bin/activate && \
 	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py; else \
 	$(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
-	$(PYTHON3_PATH) $(SCRIPTS)/ec2sizetypes.py; fi
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py; fi
 	rm -f $(SCRIPTS)/_version.py
 
 
