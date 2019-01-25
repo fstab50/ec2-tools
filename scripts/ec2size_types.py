@@ -43,6 +43,10 @@ yl = Colors.GOLD3
 rst = Colors.RESET
 
 
+def clean(dirty):
+    return [x.strip() for x in dirty]
+
+
 def display_resultset(results):
     """Displays results in columnar format"""
     columns = 4
@@ -51,7 +55,8 @@ def display_resultset(results):
     l1, l2, l3, l4 = split_list(results, columns)
 
     for line in zip(clean(l1), clean(l2), clean(l3), clean(l4)):
-    print('\t{}\t{}\t{}\t{}'.format(line[0], line[1], line[2], line[3]))
+        print('\t{}\t{}\t{}\t{}'.format(line[0], line[1], line[2], line[3]))
+    print('\n')
     return True
 
 
