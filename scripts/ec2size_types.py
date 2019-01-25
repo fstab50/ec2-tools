@@ -10,6 +10,7 @@ Summary.
 import os
 import sys
 import json
+import datetime
 import subprocess
 import inspect
 import urllib.request
@@ -251,11 +252,11 @@ def write_sizetypes(path, types_list):
 
 output_path = git_root() + '/bash/' + output_filename
 
-if os.path.exists(output_path) and file_age(output_path, 'days') > MAX_AGE_DAYS:
+if os.path.exists(output_path) and file_age(output_path, 'days') < MAX_AGE_DAYS:
     filename = os.path.split(output_path)[1]
     age = file_age(output_path, 'days')
     stdout_message(
-        'File {} age ({} days) is less than {} day refresh threashold. Skip'.format(filename, age, MAX_AGE_DAYS)
+        '{} age ({} days) is less than {} day refresh threashold. Skip refresh.'.format(bdwt + filename + rst, age, MAX_AGE_DAYS)
     )
     sys.exit(0)
 
@@ -276,9 +277,9 @@ else:
     # generate new size type list; dedup list
     current_sizetypes = eliminate_duplicates(sizetypes(price_file))
 
-    if write_sizetypes(output_path, current_sizetypes):
+    if write_sizetypes(output_path, sorted(current_sizetypes)):
         stdout_message(message=f'New EC2 sizetype file ({output_path}) created successfully')
-        stdout_message(message='File contains {len(current_sizetypes)} size types')
+        stdout_message(message=f'File contains {len(current_sizetypes)} size types')
         sys.exit(0)
 
     else:
