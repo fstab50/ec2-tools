@@ -226,7 +226,7 @@ def write_sizetypes(path, types_list):
 # --- main   ---------------------------------------------------------------------------------------
 
 
-output_path = git_root() + '/scripts/' + output_filename
+output_path = git_root() + '/bash/' + output_filename
 
 # download, process index file
 index_path = download_fileobject(index_url)
@@ -234,10 +234,10 @@ if index_path:
     stdout_message(message=f'index file {index_url} downloaded successfully')
 
 # download, process  price file
-price_url = get_service_url(index_path)
+price_url = get_service_url('ec2')
 price_file = download_fileobject(price_url)
 if price_file:
-    stdout_message(message=f'Price file {pricefile} downloaded successfully')
+    stdout_message(message=f'Price file {price_file} downloaded successfully')
 
 # generate new size type list; dedup list
 current_sizetypes = eliminate_duplicates(sizetypes(price_file))
