@@ -1,5 +1,5 @@
 import os
-from scripts._version import __version__ as version
+from _version import __version__ as version
 from pyaws import logd
 
 __author__ = 'Blake Huber'
