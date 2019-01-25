@@ -207,7 +207,7 @@ def sizetypes(pricefile):
             sizes.append(f2['products'][sku]['attributes']['instanceType'])
             count += 1
         except KeyError:
-            #logger.info(f'fail at count {count}, sku {sku}')
+            logger.info(f'No size type found at count {count}, sku {sku}')
             continue
     return sizes
 
