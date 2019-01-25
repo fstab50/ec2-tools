@@ -257,6 +257,9 @@ if len(sys.argv) > 1:
     FORCE = True
 
 if os.path.exists(output_path) and file_age(output_path, 'days') < MAX_AGE_DAYS and not FORCE:
+    ############################################
+    ##      skip refresh size types file      ##
+    ############################################
     filename = os.path.split(output_path)[1]
     age = file_age(output_path, 'days')
     stdout_message(
@@ -265,7 +268,9 @@ if os.path.exists(output_path) and file_age(output_path, 'days') < MAX_AGE_DAYS 
     sys.exit(0)
 
 else:
-    # create new or refresh size types file
+    ############################################
+    ## create new or refresh size types file  ##
+    ############################################
 
     # download, process index file
     index_path = download_fileobject(index_url)
