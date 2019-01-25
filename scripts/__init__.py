@@ -8,10 +8,10 @@ __email__ = "blakeca00@gmail.com"
 
 home = os.environ.get('HOME')
 
-PACKAGE = 'scripts'
+PACKAGE = 'ec2tools'
 enable_logging = True
-log_mode = 'STREAM'          # log to cloudwatch logs
-log_filename = ''
+log_mode = 'FILE'
+log_filename = PACKAGE + '.log'
 log_dir = home + '/logs'
 log_path = log_dir + '/' + log_filename
 
