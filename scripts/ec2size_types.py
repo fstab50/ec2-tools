@@ -31,7 +31,7 @@ except Exception as e:
 
 
 
-
+MAX_AGE_DAYS = 10
 index_url = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/index.json'
 tmpdir = '/tmp'
 pricee_url = None
@@ -76,6 +76,29 @@ def eliminate_duplicates(d_list):
         if record not in uniques and '.' in record:
             uniques.append(record)
     return uniques
+
+
+def file_age(filepath, unit='seconds'):
+    """
+    Summary.
+
+        Calculates file age in seconds
+
+    Args:
+        :filepath (str): path to file
+        :unit (str): unit of time measurement returned.
+    Returns:
+        age (int)
+    """
+    ctime = os.path.getctime(filepath)
+    dt = datetime.datetime.fromtimestamp(ctime)
+    now = datetime.datetime.utcnow()
+    delta = now - dt
+    if unit == 'days':
+        return round(delta.days, 2)
+    elif unit == 'hours':
+        round(delta.seconds / 3600, 2)
+    return round(delta.seconds, 2)
 
 
 def get_service_url(service, url=index_url):
@@ -228,28 +251,39 @@ def write_sizetypes(path, types_list):
 
 output_path = git_root() + '/bash/' + output_filename
 
-# download, process index file
-index_path = download_fileobject(index_url)
-if index_path:
-    stdout_message(message=f'index file {index_url} downloaded successfully')
-
-# download, process  price file
-price_url = get_service_url('ec2')
-price_file = download_fileobject(price_url)
-if price_file:
-    stdout_message(message=f'Price file {price_file} downloaded successfully')
-
-# generate new size type list; dedup list
-current_sizetypes = eliminate_duplicates(sizetypes(price_file))
-
-if write_sizetypes(output_path, current_sizetypes):
-    stdout_message(message=f'New EC2 sizetype file ({output_path}) created successfully')
-    stdout_message(message='File contains {len(current_sizetypes)} size types')
+if os.path.exists(output_path) and file_age(output_path, 'days') > MAX_AGE_DAYS:
+    filename = os.path.split(output_path)[1]
+    age = file_age(output_path, 'days')
+    stdout_message(
+        'File {} age ({} days) is less than {} day refresh threashold. Skip'.format(filename, age, MAX_AGE_DAYS)
+    )
     sys.exit(0)
 
 else:
-    stdout_message(
-            message=f'Uknown problem creating new EC2 sizetype file ({output_path})',
-            prefix='WARN'
-        )
-    sys.exist(1)
+    # create new or refresh size types file
+
+    # download, process index file
+    index_path = download_fileobject(index_url)
+    if index_path:
+        stdout_message(message=f'index file {index_url} downloaded successfully')
+
+    # download, process  price file
+    price_url = get_service_url('ec2')
+    price_file = download_fileobject(price_url)
+    if price_file:
+        stdout_message(message=f'Price file {price_file} downloaded successfully')
+
+    # generate new size type list; dedup list
+    current_sizetypes = eliminate_duplicates(sizetypes(price_file))
+
+    if write_sizetypes(output_path, current_sizetypes):
+        stdout_message(message=f'New EC2 sizetype file ({output_path}) created successfully')
+        stdout_message(message='File contains {len(current_sizetypes)} size types')
+        sys.exit(0)
+
+    else:
+        stdout_message(
+                message=f'Uknown problem creating new EC2 sizetype file ({output_path})',
+                prefix='WARN'
+            )
+        sys.exist(1)
