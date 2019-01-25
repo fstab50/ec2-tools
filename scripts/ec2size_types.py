@@ -227,7 +227,7 @@ def write_sizetypes(path, types_list):
 
 
 output_path = git_root() + '/scripts/' + output_filename
-"""
+
 # download, process index file
 index_path = download_fileobject(index_url)
 if index_path:
@@ -253,4 +253,3 @@ else:
             prefix='WARN'
         )
     sys.exist(1)
-"""
