@@ -94,7 +94,7 @@ def download_fileobject(url, overwrite=False):
             return path
 
         r = urllib.request.urlretrieve(url, path)
-        if not exists(filename):
+        if not exists(path):
             stdout_message(message=f'Failed to retrieve file object {path}', prefix='WARN')
 
     except urllib.error.HTTPError as e:
@@ -333,15 +333,10 @@ else:
     # download, process  price file
     price_url = get_service_url('ec2')
 
-    # remove previously downloaded index file
-    os.remove(index_path)
-
     # download, process price file
-    price_file = download_fileobject(price_url)
+    price_file = download_fileobject(price_url, overwrite=True)
     if price_file:
         stdout_message(message=f'Price file {price_file} downloaded successfully')
-        os.rename(price_file, tmpdir + '/pricefile.json')
-        price_file = tmpdir + '/pricefile.json'
 
     # generate new size type list; dedup list
     current_sizetypes = eliminate_duplicates(sizetypes(price_file))
