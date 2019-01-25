@@ -117,6 +117,15 @@ update-source-install:     ## Update Install (source: local source).
 	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
+.PHONY: sizetypes
+build-sizetypes:		##  create or refresh ec2 sizes.txt file
+	cp $(CUR_DIR)
+	if [ -d $(VENV_DIR) ]; then . $(VENV_DIR)/bin/activate && \
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2sizetypes.py; else \
+	$(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2sizetypes.py; fi
+
+
 .PHONY: help
 help:   ## Print help index
 	@printf "\n\033[0m %-15s\033[0m %-13s\u001b[37;1m%-15s\u001b[0m\n\n" " " "make targets: " $(PROJECT)
