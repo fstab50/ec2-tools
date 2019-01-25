@@ -60,21 +60,39 @@ def display_resultset(results):
     return True
 
 
-def download_fileobject(url):
-    """Retrieve latest ec2 pricefile"""
-    def exists(object):
-        if os.path.exists(tmpdir + '/' + filename):
+def download_fileobject(url, overwrite=False):
+    """
+    Summary.
+
+        Retrieve latest ec2 pricefile
+
+    Args:
+        :url (str): http/s universal resource locator
+        :overwrite (bool): flag optionally force overwrite of objects
+         previously downloaded
+
+    Returns:
+        path (str):  full fs path to downloaded file object
+
+    """
+    def exists(object_path):
+        if os.path.exists(object_path):
             return True
         else:
-            msg = 'File object %s failed to download to %s. Exit' % (filename, tmpdir)
+            msg = 'File object %s failed to download' % (object_path)
             logger.warning(msg)
             stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
             return False
 
     try:
-
         filename = os.path.split(url)[1]
         path = tmpdir + '/' + filename
+
+        if overwrite and exists(path):
+            os.remove(path)
+        elif not overwrite and exists(path):
+            return path
+
         r = urllib.request.urlretrieve(url, path)
         if not exists(filename):
             stdout_message(message=f'Failed to retrieve file object {path}', prefix='WARN')
@@ -298,7 +316,7 @@ if os.path.exists(output_path) and file_age(output_path, 'days') < MAX_AGE_DAYS 
     filename = os.path.split(output_path)[1]
     age = file_age(output_path, 'days')
     stdout_message(
-        '{} age ({} days) is less than {} day refresh threashold. Skip refresh.'.format(bdwt + filename + rst, age, MAX_AGE_DAYS)
+        '{} age of {} days is less than {} day refresh threshold. Skip refresh.'.format(bdwt + filename + rst, age, MAX_AGE_DAYS)
     )
     sys.exit(0)
 
@@ -314,9 +332,16 @@ else:
 
     # download, process  price file
     price_url = get_service_url('ec2')
+
+    # remove previously downloaded index file
+    os.remove(index_path)
+
+    # download, process price file
     price_file = download_fileobject(price_url)
     if price_file:
         stdout_message(message=f'Price file {price_file} downloaded successfully')
+        os.rename(price_file, tmpdir + '/pricefile.json')
+        price_file = tmpdir + '/pricefile.json'
 
     # generate new size type list; dedup list
     current_sizetypes = eliminate_duplicates(sizetypes(price_file))
