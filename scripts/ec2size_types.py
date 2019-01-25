@@ -43,6 +43,18 @@ yl = Colors.GOLD3
 rst = Colors.RESET
 
 
+def display_resultset(results):
+    """Displays results in columnar format"""
+    columns = 4
+
+    # create 4 columns of equal length
+    l1, l2, l3, l4 = split_list(results, columns)
+
+    for line in zip(clean(l1), clean(l2), clean(l3), clean(l4)):
+    print('\t{}\t{}\t{}\t{}'.format(line[0], line[1], line[2], line[3]))
+    return True
+
+
 def download_fileobject(url):
     """Retrieve latest ec2 pricefile"""
     def exists(object):
@@ -237,6 +249,24 @@ def sizetypes(pricefile):
     return sizes
 
 
+def split_list(monolith, n):
+    """
+    Summary.
+
+        splits a list into equal parts as allowed, given n segments
+
+    Args:
+        :monolith (list):  a single list containing multiple elements
+        :n (int):  Number of segments in which to split the list
+
+    Returns:
+        generator object
+
+    """
+    k, m = divmod(len(monolith), n)
+    return (monolith[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
+
+
 def write_sizetypes(path, types_list):
     try:
         with open(path, 'w') as out1:
@@ -289,6 +319,7 @@ else:
     if write_sizetypes(output_path, sorted(current_sizetypes)):
         stdout_message(message=f'New EC2 sizetype file ({output_path}) created successfully')
         stdout_message(message=f'File contains {len(current_sizetypes)} size types')
+        display_resultset(sorted(current_sizetypes))
         sys.exit(0)
 
     else:
