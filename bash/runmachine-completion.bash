@@ -203,7 +203,7 @@ function _runmachine_completions(){
     ##
     ##  Completion structures for runmachine exectuable
     ##
-    local numargs numoptions cur prev initcmd
+    local numargs numoptions cur prev initcmd subcommands
     local completion_dir
 
     completion_dir="$HOME/.bash_completion.d"
@@ -220,10 +220,6 @@ function _runmachine_completions(){
 
     # option strings
     commands='--debug --image --instance-size --help --quantity --profile --region --version'
-    commands_image='--instance-size --profile --region --quantity '
-    commands_quantity='--image --instance-size --profile --region'
-    commands_size='--image --quantity --profile --region'
-    commands_region='--image --instance-size --profile --quantity'
     image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
                 ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
 
@@ -237,8 +233,9 @@ function _runmachine_completions(){
             declare -a horsemen
             horsemen=(  '--image' '--instance-size' '--profile' '--quantity' '--region' )
             subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
+            numargs=$(_numargs "$subcommands")
 
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( $(_numargs "$subcommands") > 2 )); then
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( "$numargs" > 2 )); then
                 _complete_4_horsemen_subcommands "${subcommands}"
             else
                 COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
