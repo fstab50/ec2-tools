@@ -701,7 +701,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
         :subid (str): AWS subnet id (subnet-abcxyz)
         :sgroup (str): Security group id
         :kp (str): keypair name matching pre-existing keypair in the targeted AWS account
-        :ud (str): Path to userdata file; otherwise, None
+        :userdata (str): Path to userdata file; otherwise, None
         :debug (bool): debug flag to enable verbose logging
 
     Returns:
@@ -711,9 +711,9 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
     # ec2 client instantiation for launch
     client = boto3_session('ec2', region=region, profile=pf)
 
-    if ud is None:
+    if userdata is None:
         userdata_str = '#!/usr/bin/env bash\n'
-    elif ud == 'default':
+    elif userdata == 'default':
         # prep default userdata if none specified
         if imagetype.split('.')[0] in ('ubuntu18'):
             from ec2tools import python3_userdata as userdata
@@ -750,7 +750,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
                 ImageId=imageid,
                 InstanceType=size,
                 KeyName=kp,
-                MaxCount=count,
+                MaxCount=int(count),
                 MinCount=1,
                 SecurityGroupIds=[sgroup],
                 SubnetId=subid,
@@ -769,7 +769,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
                 ImageId=imageid,
                 InstanceType=size,
                 KeyName=kp,
-                MaxCount=count,
+                MaxCount=int(count),
                 MinCount=1,
                 SecurityGroupIds=[sgroup],
                 SubnetId=subid,
