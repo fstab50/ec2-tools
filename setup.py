@@ -28,7 +28,7 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 from codecs import open
 from shutil import copy2 as copyfile
-from shutil import rmtree
+from shutil import rmtree, which
 import ec2tools
 
 
@@ -127,7 +127,7 @@ class PostInstall(install):
 
             completion_file = user_home() + '/.bash_completion'
             completion_dir = user_home() + '/.bash_completion.d'
-            config_dir = user_home() + '/.config/keyup'
+            config_dir = user_home() + '/.config/' + _package
 
             if not os.path.exists(os_parityPath(completion_file)):
                 create_artifact(os_parityPath(completion_file), 'file')
