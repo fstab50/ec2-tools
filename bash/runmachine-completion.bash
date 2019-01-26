@@ -238,7 +238,7 @@ function _runmachine_completions(){
             horsemen=(  '--image' '--instance-size' '--profile' '--quantity' '--region' )
             subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
 
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( $(_numargs "$subcommands") > 1 )); then
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( $(_numargs "$subcommands") > 2 )); then
                 _complete_4_horsemen_subcommands "${subcommands}"
             else
                 COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
