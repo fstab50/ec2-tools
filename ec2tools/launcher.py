@@ -182,6 +182,25 @@ def choose_resource(choices, selector='letters', default='a'):
     return resourceid
 
 
+def debug_mode(header, data_object, debug=False, halt=False):
+    """ debug output """
+    if debug:
+        print('\n  ' + str(header) + '\n')
+        try:
+            if type(data_object) is dict:
+                export_json_object(data_object)
+            elif type(data_object) is str:
+                stdout_message(
+                    message=f'{globals()[data_object]} parameter is {data_object}',
+                    prefix='DEBUG'
+                )
+        except Exception:
+            print(data_object)
+        if halt:
+            sys.exit(0)
+    return True
+
+
 def display_table(table, tabspaces=4):
     """Print Table Object offset from left by tabspaces"""
     indent = ('\t').expandtabs(tabspaces)
@@ -384,11 +403,19 @@ def get_contents(content):
 def get_imageid(profile, image, region, debug):
     if which('machineimage'):
         cmd = 'machineimage --profile {} --image {} --region {}'.format(profile, image, region)
-        response = json.loads(subprocess.getoutput(cmd))
+        response = subprocess.getoutput(cmd + ' 2>/dev/null')
+
+        # response not returned if inadequate iam or role permissions
+        if not response:
+            stdout_message(
+                message='No AMI Image ID retrieved. Inadequate iam user or role permissions?',
+                prefix='WARN'
+            )
+            sys.exit(exit_codes['E_DEPENDENCY']['Code'])
     else:
         stdout_message('machineimage executable could not be located. Exit', prefix='WARN')
-        sys.exit(1)
-    return response[region]
+        sys.exit(exit_codes['E_DEPENDENCY']['Code'])
+    return json.loads(response)[region]
 
 
 def get_subnet(account_file, region, debug):
