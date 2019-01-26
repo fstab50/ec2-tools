@@ -248,11 +248,11 @@ function _runmachine_completions(){
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
-                COMPREPLY=( $(compgen -W "--instance-size --quanitity --region" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--instance-size --quantity --region" -- ${cur}) )
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--profile --quanitity --region" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--profile --quantity --region" -- ${cur}) )
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
@@ -264,7 +264,7 @@ function _runmachine_completions(){
                 return 0
 
             else
-                _complete_4_horsemen_subcommands  "--profile --instance-size --quanitity --region"
+                _complete_4_horsemen_subcommands  "--profile --instance-size --quantity --region"
                 return 0
             fi
             ;;
@@ -321,11 +321,11 @@ function _runmachine_completions(){
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--image --quanitity --region" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--image --quantity --region" -- ${cur}) )
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
-                COMPREPLY=( $(compgen -W "--profile --quanitity --region" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--profile --quantity --region" -- ${cur}) )
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
@@ -337,7 +337,8 @@ function _runmachine_completions(){
                 return 0
 
             else
-                _complete_4_horsemen_subcommands "--profile --image --quanitity --region"
+                #_complete_4_horsemen_subcommands "--image --instance-size --quantity --region"
+                COMPREPLY=( $(compgen -W "--image --instance-size --quantity --region" -- ${cur}) )
                 return 0
             fi
             ;;
@@ -394,11 +395,11 @@ function _runmachine_completions(){
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
-                COMPREPLY=( $(compgen -W "--image --quanitity --region" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--image --quantity --region" -- ${cur}) )
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
-                COMPREPLY=( $(compgen -W "--profile --quanitity --region" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "--profile --quantity --region" -- ${cur}) )
                 return 0
 
             elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
@@ -410,7 +411,7 @@ function _runmachine_completions(){
                 return 0
 
             else
-                _complete_4_horsemen_subcommands "--profile --image --quanitity --region"
+                _complete_4_horsemen_subcommands "--profile --image --quantity --region"
                 return 0
             fi
             ;;
@@ -471,7 +472,7 @@ function _runmachine_completions(){
             return 0
             ;;
 
-        '--quantity')
+        '--quantity' | "--qua*")
             ## EC2 instances count
             subcommands="$(_quantity_subcommands)"
 
@@ -480,7 +481,7 @@ function _runmachine_completions(){
                 _complete_quantity_subcommands "${subcommands}"
 
             else
-                COMPREPLY=( $(compgen -W "$(_quantity_subcommands)" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
             fi
             return 0
             ;;
