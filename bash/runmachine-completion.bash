@@ -166,6 +166,21 @@ function _quantity_subcommands(){
 }
 
 
+function _numargs(){
+    ##
+    ## Returns count of number of parameter args passed
+    ##
+    local parameters="$1"
+    local numargs
+
+    for i in $(echo $parameters); do
+        numargs=$(( $numargs + 1 ))
+    done
+    printf -- '%s\n' "$numargs"
+    return 0
+}
+
+
 function _parse_compwords(){
     ##
     ##  Interogate compwords to discover which of the  5 horsemen are missing
@@ -214,158 +229,20 @@ function _runmachine_completions(){
 
     case "${initcmd}" in
 
-        '--image')
-            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
-               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
-                COMPREPLY=( $(compgen -W "--instance-size" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--quantity" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--profile" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                COMPREPLY=( $(compgen -W "--quantity --instance-size" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
-                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--profile --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
-                COMPREPLY=( $(compgen -W "--region --instance-size" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--quantity --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
-                COMPREPLY=( $(compgen -W "--instance-size --quantity --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--profile --quantity --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
-                COMPREPLY=( $(compgen -W "--profile --instance-size --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                COMPREPLY=( $(compgen -W "--profile --quantity --instance-size" -- ${cur}) )
-                return 0
-
-            else
-                _complete_4_horsemen_subcommands  "--profile --instance-size --quantity --region"
-                return 0
-            fi
-            ;;
-
-        '--profile')
-            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
-               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
-               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
-               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
-                COMPREPLY=( $(compgen -W "--region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\region')" ]; then
-                COMPREPLY=( $(compgen -W "--quantity" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                COMPREPLY=( $(compgen -W "--instance-size" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
-                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
-                COMPREPLY=( $(compgen -W "--image" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
-                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                COMPREPLY=( $(compgen -W "--quantity --instance-size" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
-                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--quantity --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
-                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
-                COMPREPLY=( $(compgen -W "--region --image" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
-                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
-                COMPREPLY=( $(compgen -W "--quantity --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                COMPREPLY=( $(compgen -W "--image --quantity --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
-                COMPREPLY=( $(compgen -W "--profile --quantity --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ]; then
-                COMPREPLY=( $(compgen -W "--instance-size --image --region" -- ${cur}) )
-                return 0
-
-            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                COMPREPLY=( $(compgen -W "--image --quantity --image" -- ${cur}) )
-                return 0
-
-            else
-                #_complete_4_horsemen_subcommands "--image --instance-size --quantity --region"
-                COMPREPLY=( $(compgen -W "--image --instance-size --quantity --region" -- ${cur}) )
-                return 0
-            fi
-            ;;
-
-        '--instance-size' | '--quantity' | '--region')
+        '--instance-size' | '--image' | '--profile' | '--quantity' | '--region')
+            ##
+            ##  Return compreply with any of the 5 comp_words that
+            ##  not already present on the command line
+            ##
             declare -a horsemen
             horsemen=(  '--image' '--instance-size' '--profile' '--quantity' '--region' )
             subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
-            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( $(_numargs "$subcommands") > 1 )); then
+                _complete_4_horsemen_subcommands "${subcommands}"
+            else
+                COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            fi
             return 0
             ;;
 
