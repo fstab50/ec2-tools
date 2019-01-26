@@ -60,6 +60,7 @@ for f in "${artifacts[@]}"; do
 done
 
 
+## upload objects to s3 ##
 for f in "${artifacts[@]}"; do
     #echo -e "\n\t[${bd}$pkg${rst}]:  uploading artifact ${accent}$f${rst} to Amazon S3...\n"
     std_message "Uploading artifact ${accent}$f${rst} to Amazon S3..." "INFO"
@@ -67,6 +68,8 @@ for f in "${artifacts[@]}"; do
     if [[ $debug ]]; then echo -e "\t$r"; fi
 done
 
+
+## set public acls on objects ##
 for f in "${artifacts[@]}"; do
     #echo -e "\n\t[${bd}$pkg${rst}]: setting acl on artifact ${accent}$f${rst}...\n"
     std_message "Setting acl on artifact ${accent}$f${rst}..." "OK"
