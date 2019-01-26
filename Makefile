@@ -27,7 +27,7 @@ VERSION_FILE = $(CUR_DIR)/$(PROJECT)/_version.py
 
 .PHONY: fresh-install fresh-test-install deploy-test deploy-prod
 
-zero-source-install: clean source-install   ## Install (source: local). Zero prebuild artifacts
+zero-source-install: clean source-install build-sizes  ## Install (source: local). Zero prebuild artifacts
 
 zero-test-install: clean setup-venv test-install  ## Install (source: testpypi). Zero prebuild artifacts
 
@@ -77,14 +77,24 @@ build: pre-build setup-venv    ## Build dist, increment version || force version
 	cd $(CUR_DIR) && $(PYTHON3_PATH) setup.py sdist
 
 
+.PHONY: build-sizes
+build-sizes:	##  Create ec2 sizes.txt if 10 days age. FORCE=true trigger refresh
+	cp $(MODULE_PATH)/_version.py $(SCRIPTS)/
+	if [ -d $(VENV_DIR) ]; then . $(VENV_DIR)/bin/activate && \
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py $(FORCE); else \
+	$(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py $(FORCE); fi
+	rm -f $(SCRIPTS)/_version.py
+
+
 .PHONY: testpypi
-testpypi: build     ## Deploy to testpypi without regenerating prebuild artifacts
+testpypi: build-sizes build ## Deploy to testpypi without regenerating prebuild artifacts
 	@echo "Deploy $(PROJECT) to test.pypi.org"
 	. $(VENV_DIR)/bin/activate && twine upload --repository testpypi dist/*
 
 
 .PHONY: pypi
-pypi: clean build    ## Deploy to pypi without regenerating prebuild artifacts
+pypi: clean build-sizes build ## Deploy to pypi without regenerating prebuild artifacts
 	@echo "Deploy $(PROJECT) to pypi.org"
 	. $(VENV_DIR)/bin/activate && twine upload --repository pypi dist/*
 
@@ -115,16 +125,6 @@ update-source-install:     ## Update Install (source: local source).
  	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
 	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
 	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
-
-
-.PHONY: sizetypes
-build-sizetypes:	##  Create ec2 sizes.txt if 10 days age. FORCE=true trigger refresh
-	cp $(MODULE_PATH)/_version.py $(SCRIPTS)/
-	if [ -d $(VENV_DIR) ]; then . $(VENV_DIR)/bin/activate && \
-	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py $(FORCE); else \
-	$(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
-	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py $(FORCE); fi
-	rm -f $(SCRIPTS)/_version.py
 
 
 .PHONY: help
