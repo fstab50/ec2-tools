@@ -285,7 +285,7 @@ if [[ "$PYTHON3" ]]; then
     logger --tag $info "Executing $PYTHON3_SCRIPT userdata"
 
     download 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
-    $PYTHON3 $PWD/$PYTHON3_SCRIPT
+    $PYTHON3 $PYTHON3_SCRIPT
 
 elif download "$PYTHON2_SCRIPT"; then
     logger --tag $info "Only python2 binary identified, executing $PYTHON2_SCRIPT userdata"
