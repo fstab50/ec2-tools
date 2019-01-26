@@ -44,6 +44,7 @@ rst = Colors.RESET
 
 
 def clean(dirty):
+    """Stips each element in parameter list"""
     return [x.strip() for x in dirty]
 
 
