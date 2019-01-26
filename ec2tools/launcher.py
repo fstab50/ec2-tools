@@ -17,7 +17,7 @@ from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, 
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
-from ec2tools import current_ami, logd, __version__
+from ec2tools import about, current_ami, logd, __version__
 from ec2tools.environment import profile_securitygroups, profile_keypairs, profile_subnets
 
 try:
@@ -467,6 +467,14 @@ def nametag(imagetype, date, default=True):
     return default_tag
 
 
+def package_version():
+    """
+    Prints package version and requisite PACKAGE info
+    """
+    print(about.about_object)
+    sys.exit(exit_codes['EX_OK']['Code'])
+
+
 def parameters_approved(alias, region, subid, imageid, sg, kp, ip, size, ct):
     print('\tEC2 Instance Launch Summary:\n')
     print('\t' + bd + 'AWS Account' + rst + ': \t\t{}'.format(alias))
@@ -818,6 +826,9 @@ def init_cli():
     elif args.help:
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
+
+    elif args.version:
+        package_version()
 
     elif args.imagetype is None:
         stdout_message(f'You must enter an os image type (--image)', prefix='WARN')
