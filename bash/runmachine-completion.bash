@@ -166,6 +166,24 @@ function _quantity_subcommands(){
 }
 
 
+function _parse_compwords(){
+    ##
+    ##  Interogate compwords to discover which of the  5 horsemen are missing
+    ##
+    compwords=("${!1}")
+    four=("${!2}")
+
+    declare -a missing_words
+
+    for key in "${four[@]}"; do
+        if [[ ! "$(echo "${compwords[@]}" | grep ${key##*-})" ]]; then
+            missing_words=( "${missing_words[@]}" "$key" )
+        fi
+    done
+    printf -- '%s\n' "${missing_words[@]}"
+}
+
+
 function _runmachine_completions(){
     ##
     ##  Completion structures for runmachine exectuable
@@ -414,6 +432,14 @@ function _runmachine_completions(){
                 _complete_4_horsemen_subcommands "--profile --image --quantity --region"
                 return 0
             fi
+            ;;
+
+        '--region')
+            declare -a horsemen
+            horsemen=(  '--image' '--instance-size' '--profile' '--quantity' '--region' )
+            subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
             ;;
 
     esac
