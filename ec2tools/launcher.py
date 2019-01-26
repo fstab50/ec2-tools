@@ -883,13 +883,15 @@ def init_cli():
             role_arn = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
             qty = args.quantity
 
-        if args.debug:
-            stdout_message(f'Account Alias: {account_alias}', prefix='DEBUG')
-            stdout_message(f'Output filename: {DEFAULT_OUTPUTFILE}', prefix='DEBUG')
-            stdout_message(f'Subnet ID: {subnet}', prefix='DEBUG')
-            stdout_message(f'ImageId ID: {image}', prefix='DEBUG')
-            stdout_message(f'Secgroup ID: {securitygroup}', prefix='DEBUG')
-            stdout_message(f'Keypair Name: {keypair}', prefix='DEBUG')
+            #pdb.set_trace()
+
+            if args.debug:
+                stdout_message(f'Account Alias: {account_alias}', prefix='DEBUG')
+                stdout_message(f'Output filename: {DEFAULT_OUTPUTFILE}', prefix='DEBUG')
+                stdout_message(f'Subnet ID: {subnet}', prefix='DEBUG')
+                stdout_message(f'ImageId ID: {image}', prefix='DEBUG')
+                stdout_message(f'Secgroup ID: {securitygroup}', prefix='DEBUG')
+                stdout_message(f'Keypair Name: {keypair}', prefix='DEBUG')
 
             if any(x for x in launch_prereqs) is None:
                 stdout_message(
