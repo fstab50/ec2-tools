@@ -381,7 +381,7 @@ def get_contents(content):
     return None
 
 
-def get_imageid(profile, image, region):
+def get_imageid(profile, image, region, debug):
     if which('machineimage'):
         cmd = 'machineimage --profile {} --image {} --region {}'.format(profile, image, region)
         response = json.loads(subprocess.getoutput(cmd))
@@ -391,7 +391,7 @@ def get_imageid(profile, image, region):
     return response[region]
 
 
-def get_subnet(account_file, region):
+def get_subnet(account_file, region, debug):
     """
     Summary.
 
@@ -841,16 +841,28 @@ def init_cli():
 
         regioncode = args.regioncode or default_region(args.profile)
 
+        if args.debug:
+            stdout_message(f'Region code: {regioncode}', prefix='DEBUG')
+            stdout_message(f'Profilename is: {args.profile}', prefix='DEBUG')
+
         if authenticated(profile=parse_profiles(args.profile)):
 
             account_alias = get_account_identifier(parse_profiles(args.profile or 'default'))
             DEFAULT_OUTPUTFILE = account_alias + '.profile'
-            subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
-            image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
+            subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode, args.debug)
+            image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode, args.debug)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
             role_arn = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
             qty = args.quantity
+
+        if args.debug:
+            stdout_message(f'Account Alias: {account_alias}', prefix='DEBUG')
+            stdout_message(f'Output filename: {DEFAULT_OUTPUTFILE}', prefix='DEBUG')
+            stdout_message(f'Subnet ID: {subnet}', prefix='DEBUG')
+            stdout_message(f'ImageId ID: {image}', prefix='DEBUG')
+            stdout_message(f'Secgroup ID: {securitygroup}', prefix='DEBUG')
+            stdout_message(f'Keypair Name: {keypair}', prefix='DEBUG')
 
             if any(x for x in launch_prereqs) is None:
                 stdout_message(
