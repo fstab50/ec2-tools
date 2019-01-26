@@ -163,7 +163,7 @@ function install_python3(){
         yum install -y python3*
 
     elif [ "$os" = "amzn2" ]; then
-        yum install -y python3*
+        amazon-linux-extras install python3
 
     elif [ "$os" = "redhat" ] || [ "$os" = "centos" ]; then
         yum install -y python36*
