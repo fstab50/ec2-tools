@@ -115,6 +115,8 @@ test-install:  setup-venv ## Install (source: testpypi). Build artifacts exist
 source-install:  setup-venv  ## Install (source: local source). Build artifacts exist
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
 	$(PIP_CALL) install .
+	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi \
+	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
 	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
@@ -123,6 +125,7 @@ update-source-install:     ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
 	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; else \
  	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
+	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi \
 	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
 	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
