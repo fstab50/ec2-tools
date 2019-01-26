@@ -36,6 +36,23 @@ artifacts=(
     'userdata.sh'
 )
 
+function verify_object_acl(){
+    ##
+    ##  Verifies object + public acl applied
+    ##
+    bucket="$1"     # s3 bucket
+    key="$2"        # file object
+    profile="$3"    # awscli profile name
+
+    var1=$(aws s3api get-object-acl --bucket $bucket --key $key --profile $profile)
+
+    if [[ $(echo $var1 | grep 'AllUsers') ]]; then
+        std_message "Verified acl on s3 object ${accent}$f${rst}..." "OK"
+    else
+        std_warn "Unable to verify upload of object ${accent}$f${rst}..."
+    fi
+}
+
 
 # --- main -----------------------------------------------------------------------------------------
 
@@ -72,9 +89,10 @@ done
 ## set public acls on objects ##
 for f in "${artifacts[@]}"; do
     #echo -e "\n\t[${bd}$pkg${rst}]: setting acl on artifact ${accent}$f${rst}...\n"
-    std_message "Setting acl on artifact ${accent}$f${rst}..." "OK"
+    std_message "Setting acl on artifact ${accent}$f${rst}..." "INFO"
     r=$(aws s3api put-object-acl --key files/$f --acl $acltype --bucket $bucketname --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
+    verify_object_acl "$bucketname" "files/$f" "$profilename"
 done
 
 cd $pwd || exit 1
