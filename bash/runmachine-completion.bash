@@ -503,85 +503,81 @@ function _runmachine_completions(){
 
         [0-9] | [0-9][0-9])
             ## EC2 instances size types
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+            if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
+               [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
+                return 0
 
-                if [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                   [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-                   [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
-                   [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
+                COMPREPLY=( $(compgen -W "--image" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                    [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-                    [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                    COMPREPLY=( $(compgen -W "--image" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\image')" ]; then
+                COMPREPLY=( $(compgen -W "--quantity" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                    [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-                    [ "$(echo "${COMP_WORDS[@]}" | grep '\-\image')" ]; then
-                    COMPREPLY=( $(compgen -W "--quantity" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\image')" ]; then
+                COMPREPLY=( $(compgen -W "--region" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                    [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
-                    [ "$(echo "${COMP_WORDS[@]}" | grep '\-\image')" ]; then
-                    COMPREPLY=( $(compgen -W "--region" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
+                [ "$(echo "${COMP_WORDS[@]}" | grep '\-\image')" ]; then
+                COMPREPLY=( $(compgen -W "--profile" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ] && \
-                    [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-quantity')" ] && \
-                    [ "$(echo "${COMP_WORDS[@]}" | grep '\-\image')" ]; then
-                    COMPREPLY=( $(compgen -W "--profile" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
+                COMPREPLY=( $(compgen -W "--instance-size --image" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                     [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                    COMPREPLY=( $(compgen -W "--instance-size --image" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
+                COMPREPLY=( $(compgen -W "--instance-size --region" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                     [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
-                    COMPREPLY=( $(compgen -W "--instance-size --region" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --image" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ] && \
-                     [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                    COMPREPLY=( $(compgen -W "--profile --image" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
+                COMPREPLY=( $(compgen -W "--image --region" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ] && \
-                     [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                    COMPREPLY=( $(compgen -W "--image --region" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
+                 [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --instance-size" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ] && \
-                     [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                    COMPREPLY=( $(compgen -W "--profile --instance-size" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
+                COMPREPLY=( $(compgen -W "--image --instance-size --region" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-profile')" ]; then
-                    COMPREPLY=( $(compgen -W "--image --instance-size --region" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --instance-size --image" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-region')" ]; then
-                    COMPREPLY=( $(compgen -W "--profile --instance-size --image" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --instance-size --region" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-image')" ]; then
-                    COMPREPLY=( $(compgen -W "--profile --instance-size --region" -- ${cur}) )
-                    return 0
+            elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
+                COMPREPLY=( $(compgen -W "--profile --region --image" -- ${cur}) )
+                return 0
 
-                elif [ "$(echo "${COMP_WORDS[@]}" | grep '\-\-instance-size')" ]; then
-                    COMPREPLY=( $(compgen -W "--profile --region --image" -- ${cur}) )
-                    return 0
-
-                else
-                    _complete_4_horsemen_subcommands '--profile --image --instance-size --region'
-                    return 0
-                fi
+            else
+                _complete_4_horsemen_subcommands '--profile --image --instance-size --region'
+                return 0
             fi
-            return 0
             ;;
 
         'runmachine')
