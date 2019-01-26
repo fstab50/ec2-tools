@@ -220,6 +220,13 @@ setup(
         (
             user_home() + '/' + '.config/' + _package + '/userdata',
             ['userdata/python2_generic.py', 'userdata/userdata.sh']
+        ),
+        (
+            user_home() + '/' + '.bash_completion.d', ['bash/' + _comp_fname]
+        ),
+        (
+            user_home() + '/' + '.config/' + _package,
+            ['bash/iam_users.py', 'bash/regions.py', 'bash/sizes.txt']
         )
     ],
     entry_points={
