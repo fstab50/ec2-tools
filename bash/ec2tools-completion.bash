@@ -228,7 +228,7 @@ function _machineimage_completions(){
 
     case "${initcmd}" in
 
-        '--details' | '--image' | '--filename' | '--format' | '--profile' | '--region')
+        '--image' | '--filename' | '--format' | '--profile' | '--region')
             ##
             ##  Return compreply with any of the 5 comp_words that
             ##  not already present on the command line
@@ -287,6 +287,11 @@ function _machineimage_completions(){
             else
                 COMPREPLY=( $(compgen -W "${iam_users}" -- ${cur}) )
             fi
+            return 0
+            ;;
+
+        '--format')
+            COMPREPLY=( $(compgen -W "text json" -- ${cur}) )
             return 0
             ;;
 
