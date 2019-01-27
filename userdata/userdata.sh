@@ -12,7 +12,6 @@ PYTHON2_SCRIPT='python2-generic.py'
 PYTHON3_SCRIPT='python3-generic.py'
 CALLER=$(basename $0)
 SOURCE_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files'
-SOURCE_URL="https://s3.us-east-2.amazonaws.com/awscloud.center/files"
 EPEL_URL='https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
 
 # log tags
