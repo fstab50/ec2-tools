@@ -354,7 +354,8 @@ function _machineimage_completions(){
     esac
 
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
-
+    #
+    # <--- end fucntion _machineimage_completions --->
 }
 
 
@@ -519,7 +520,8 @@ function _runmachine_completions(){
     esac
 
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
-
+    #
+    # <--- end fucntion _runmachine_completions --->
 }
 
 
