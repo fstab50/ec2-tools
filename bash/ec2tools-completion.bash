@@ -59,9 +59,9 @@ function _complete_4_horsemen_subcommands(){
 }
 
 
-function _complete_runmachine_commands(){
+function _complete_machineimage_commands(){
     local cmds="$1"
-    local split='5'       # times to split screen width
+    local split='6'       # times to split screen width
     local ct="0"
     local IFS=$' \t\n'
     local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
@@ -110,6 +110,24 @@ function _complete_quantity_subcommands(){
     return 0
     #
     # <-- end function _complete_quantity_subcommands -->
+}
+
+
+function _complete_runmachine_commands(){
+    local cmds="$1"
+    local split='5'       # times to split screen width
+    local ct="0"
+    local IFS=$' \t\n'
+    local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
+
+    for i in "${!formatted_cmds[@]}"; do
+        formatted_cmds[$i]="$(printf '%*s' "-$(($COLUMNS/$split))"  "${formatted_cmds[$i]}")"
+    done
+
+    COMPREPLY=( "${formatted_cmds[@]}")
+    return 0
+    #
+    # <-- end function _complete_runmachine_commands -->
 }
 
 
@@ -328,7 +346,7 @@ function _machineimage_completions(){
         'machineimage')
             if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
 
-                _complete_runmachine_commands "${commands}"
+                _complete_machineimage_commands "${commands}"
                 return 0
 
             fi
@@ -337,7 +355,7 @@ function _machineimage_completions(){
 
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
 
-} && complete -F _machineimage_completions machineimage
+}
 
 
 function _runmachine_completions(){
@@ -502,4 +520,9 @@ function _runmachine_completions(){
 
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
 
-} && complete -F _runmachine_completions runmachine
+}
+
+
+# completiongs
+complete -F _machineimage_completions machineimage
+complete -F _runmachine_completions runmachine
