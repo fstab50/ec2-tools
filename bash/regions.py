@@ -24,7 +24,8 @@ except Exception:
     sys.exit(1)
 
 
-CONFIG_DIR = os.getenv('HOME') + '/' + '.config/ec2cli'
+PACKAGE = 'ec2tools'
+CONFIG_DIR = os.getenv('HOME') + '/.config/' + PACKAGE
 REFERENCE = CONFIG_DIR + '/' + 'regions.list'
 MAX_AGE_DAYS = 3
 
