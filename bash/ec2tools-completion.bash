@@ -203,10 +203,11 @@ function _runmachine_completions(){
     ##
     ##  Completion structures for runmachine exectuable
     ##
-    local numargs numoptions cur prev initcmd subcommands
-    local completion_dir
+    local numargs subcommands
+    local cur
+    local prev
+    local initcmd
 
-    completion_dir="$HOME/.bash_completion.d"
     config_dir="$HOME/.config/ec2tools"
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
@@ -216,7 +217,6 @@ function _runmachine_completions(){
     # initialize vars
     COMPREPLY=()
     numargs=0
-    numoptions=0
 
     # option strings
     commands='--debug --image --instance-size --help --quantity --profile --region --version'
