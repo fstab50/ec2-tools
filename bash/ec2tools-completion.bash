@@ -225,9 +225,9 @@ function _machineimage_completions(){
     local subcommands               #  subcommands are parameters provided after a command
     local image_subcommands         #  parameters provided after --image command
     local numargs                   #  integer count of number of commands, subcommands
-    local cur                       #  completion word at current index position 0 in COMP_WORDS array
-    local prev                      #  completion word at current index position -1 in COMP_WORDS array
-    local initcmd                   #  completion word at current index position -2 in COMP_WORDS array
+    local cur                       #  completion word at index position 0 in COMP_WORDS array
+    local prev                      #  completion word at index position -1 in COMP_WORDS array
+    local initcmd                   #  completion word at index position -2 in COMP_WORDS array
 
     config_dir="$HOME/.config/ec2tools"
     cur="${COMP_WORDS[COMP_CWORD]}"
