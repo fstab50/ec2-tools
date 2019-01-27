@@ -33,7 +33,7 @@ function _list_iam_users(){
     if [ ! $profile_name ]; then
         profile_name="default"
     fi
-    for user in $(aws iam list-users  --profile $profile_name --output json | jq .Users[].UserName); do
+    for user in $(aws iam list-users --profile $profile_name --output json | jq .Users[].UserName); do
         profiles=(  "${profiles[@]}" "$user"  )
     done
     echo "${profiles[@]}"
