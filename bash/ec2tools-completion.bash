@@ -199,6 +199,142 @@ function _parse_compwords(){
 }
 
 
+function _machineimage_completions(){
+    ##
+    ##  Completion structures for runmachine exectuable
+    ##
+    local commands                  #  commandline parameters (--*)
+    local subcommands               #  subcommands are parameters provided after a command
+    local image_subcommands         #  parameters provided after --image command
+    local numargs                   #  integer count of number of commands, subcommands
+    local cur                       #  completion word at current index position 0 in COMP_WORDS array
+    local prev                      #  completion word at current index position -1 in COMP_WORDS array
+    local initcmd                   #  completion word at current index position -2 in COMP_WORDS array
+
+    config_dir="$HOME/.config/ec2tools"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    initcmd="${COMP_WORDS[COMP_CWORD-2]}"
+    #echo "cur: $cur, prev: $prev"
+
+    # initialize vars
+    COMPREPLY=()
+    numargs=0
+
+    # option strings
+    commands='--debug --details --filename --format --image --help --profile --region --version'
+    image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
+                ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
+
+    case "${initcmd}" in
+
+        '--details' | '--image' | '--filename' | '--format' | '--profile' | '--region')
+            ##
+            ##  Return compreply with any of the 5 comp_words that
+            ##  not already present on the command line
+            ##
+            declare -a horsemen
+            horsemen=(  '--details' '--image' '--filename' '--format' '--profile' '--region' )
+            subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
+            numargs=$(_numargs "$subcommands")
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( "$numargs" > 2 )); then
+                _complete_4_horsemen_subcommands "${subcommands}"
+            else
+                COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+    esac
+    case "${cur}" in
+        'machineimage')
+            COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
+            ;;
+
+        '--version' | '--help')
+            return 0
+            ;;
+
+    esac
+    case "${prev}" in
+
+        '--details')
+            ##
+            ##  Return compreply with any of the 5 comp_words that
+            ##  not already present on the command line
+            ##
+            declare -a horsemen
+            horsemen=(  '--details' '--image' '--filename' '--format' '--profile' '--region' )
+            subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
+            numargs=$(_numargs "$subcommands")
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( "$numargs" > 2 )); then
+                _complete_4_horsemen_subcommands "${subcommands}"
+            else
+                COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+        '--profile')
+            python3=$(which python3)
+            iam_users=$($python3 "$config_dir/iam_users.py")
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+                # display full completion subcommands
+                _complete_profile_subcommands "${iam_users}"
+            else
+                COMPREPLY=( $(compgen -W "${iam_users}" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+        '--image' | '--images')
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+                _complete_sizes_subcommands "${image_subcommands}"
+                return 0
+
+            else
+                COMPREPLY=( $(compgen -W "${image_subcommands}" -- ${cur}) )
+                return 0
+            fi
+            ;;
+
+        '--debug' | '--version' | '--help')
+            return 0
+            ;;
+
+        '--region' | "--re*")
+            ##  complete AWS region codes
+            python3=$(which python3)
+            regions=$($python3 "$config_dir/regions.py")
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+
+                _complete_region_subcommands "${regions}"
+
+            else
+                COMPREPLY=( $(compgen -W "${regions}" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+        'machineimage')
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; then
+
+                _complete_runmachine_commands "${commands}"
+                return 0
+
+            fi
+            ;;
+    esac
+
+    COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
+
+} && complete -F _machineimage_completions machineimage
+
+
 function _runmachine_completions(){
     ##
     ##  Completion structures for runmachine exectuable
