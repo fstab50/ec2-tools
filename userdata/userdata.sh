@@ -8,8 +8,8 @@
 ##
 ##
 
-PYTHON2_SCRIPT='python2-generic.py'
-PYTHON3_SCRIPT='userdata.py'
+PYTHON_SCRIPT='userdata.py'
+PYTHON2_SCRIPT_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files/python2_generic.py'
 PYTHON3_SCRIPT_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
 CALLER=$(basename $0)
 SOURCE_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files'
@@ -87,7 +87,7 @@ function download_pyscript(){
     local objectname
 
     objectname=$(echo $url | awk -F '/' '{print $NF}')
-    fname="$HOME/$PYTHON3_SCRIPT"
+    fname="$HOME/$PYTHON_SCRIPT"
 
     # download object from Amazon s3
     wget -O "$fname" "$url"
@@ -290,14 +290,14 @@ logger --tag $info "python3 binary identified as:  $PYTHON3"
 
 if [[ "$PYTHON3" ]]; then
 
-    logger --tag $info "Executing $PYTHON3_SCRIPT userdata"
+    logger --tag $info "Executing $PYTHON_SCRIPT userdata"
 
     download_pyscript 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
-    $PYTHON3 "$HOME/$PYTHON3_SCRIPT"
+    $PYTHON3 "$HOME/$PYTHON_SCRIPT"
 
-elif download_pyscript "$PYTHON2_SCRIPT"; then
-    logger --tag $info "Only python2 binary identified, executing $PYTHON2_SCRIPT userdata"
-    python "$HOME/$PYTHON2_SCRIPT"
+elif download_pyscript "$PYTHON2_SCRIPT_URL"; then
+    logger --tag $info "Only python2 binary identified, executing $HOME/$PYTHON_SCRIPT"
+    python "$HOME/$PYTHON_SCRIPT"
 fi
 
 exit 0
