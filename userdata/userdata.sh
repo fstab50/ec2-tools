@@ -249,14 +249,86 @@ function python3_binary(){
 }
 
 
+function upgrade_pip(){
+    ##
+    ##  - upgrades pip3, setuptools
+    ##  - sets symlink to pip for python3
+    ##  - multiple update cycles to accommodate pip 9.x > pip 10.x > pip 18.x
+    ##
+    local pip_bin
+    local count="0"
+    #
+    pip_bin="$(which pip3 2>/dev/null)"
+
+    # set path to pip binary
+    if [ "$pip_bin" ]; then
+        logger --tag $info "Found pip3 at path: $pip_bin"
+    else
+        if [ -f "/usr/local/bin/pip3" ]; then
+            pip_bin="/usr/local/bin/pip3"
+
+        elif [ "$(which pip 2>/dev/null)" ]; then
+            pip_bin="$(which pip)"
+
+        elif [ -f "/usr/local/bin/pip" ]; then
+            pip_bin="/usr/local/bin/pip"
+
+        else
+            logger --tag $warn "Skipping pip / pip3 upgrade -- pip executable could not be found"
+            return 1
+        fi
+    fi
+
+    # upgrade pip; setuptools
+    if [ "$pip_bin" ]; then
+        while (( $count <= 2 )); do
+            # check for latest version, pip
+            if [ "$($pip_bin list --outdated  2>/dev/null | grep pip)" ]; then
+                logger --tag $info "Upgrade pip3 to latest, set python3 symlink for pip" "INFO"
+                $pip_bin install -U pip  >> $LOG_CONSOLE 2>/dev/null &
+
+            else
+                logger --tag $info "pip $($pip_bin --version 2>/dev/null | awk '{print $2}') installed - latest" "INFO"
+                break
+            fi
+
+            # check for latest version, setuptools
+            if [ "$($pip_bin list --outdated 2>/dev/null | grep setuptools)" ]; then
+                logger --tag $info "Upgrade setuptools to latest" "INFO"
+                $pip_bin install -U setuptools >> $LOG_CONSOLE  2>/dev/null &
+
+            else
+                logger --tag $info "setuptools $($pip_bin list | grep setuptools | awk '{print $2}') installed - latest" "INFO"
+            fi
+
+            count=$(( $count + 1 ))
+
+        done
+    else
+        logger --tag $warn "Unable to upgrade pip3, setuptools. Please use manual upgrade"
+    fi
+    #
+    # <-- end function upgrade_pip -->
+}
+
+
+
 # --- main ----------------------------------------------------------------------------------------
 
 
 # log os type
 os=$(os_type)
 
+if [[ "$os" = "debian" ]] || [[ "$os" = "ubuntu" ]]; then
+    LOG_FILE='/var/log/syslog'
+else
+    LOG_FILE='/var/log/messages'
+fi
+
 logger --tag $info "Operating System Type identified:  $os"
 logger --tag $info "Package manager type: $(packagemanager_type)"
+logger --tag $info "Logging to file: $LOG_FILE"
+
 
 case $os in
     'amzn1' | 'amzn2')
@@ -292,6 +364,7 @@ fi
 
 
 # install pypi packages
+upgrade_pip
 install_package_deps
 
 # verify python package installation
