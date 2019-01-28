@@ -301,10 +301,13 @@ def ip_lookup(profile, region, debug):
 
 def is_tty():
     """
-    Summary:
+    Summary.
+
         Determines if output is displayed to the screen or redirected
+
     Returns:
         True if tty terminal | False is redirected, TYPE: bool
+
     """
     return sys.stdout.isatty()
 
@@ -375,10 +378,13 @@ def keypair_lookup(profile, region, debug):
 
 def options(parser):
     """
-    Summary:
+    Summary.
+
         parse cli parameter options
+
     Returns:
         TYPE: argparse object, parser argument set
+
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
