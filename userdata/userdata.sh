@@ -285,20 +285,22 @@ function upgrade_pip(){
             # check for latest version, pip
             if [ "$($pip_bin list --outdated  2>/dev/null | grep pip)" ]; then
                 logger --tag $info "Upgrade pip3 to latest, set python3 symlink for pip" "INFO"
-                $pip_bin install -U pip  >> $LOG_CONSOLE 2>/dev/null &
+                $pip_bin install -U pip
+                logger --tag $info "pip version $($pip_bin list | grep pip | awk '{print $2}')"
 
             else
-                logger --tag $info "pip $($pip_bin --version 2>/dev/null | awk '{print $2}') installed - latest" "INFO"
+                logger --tag $info "pip $($pip_bin --version 2>/dev/null | awk '{print $2}') installed - latest"
                 break
             fi
 
             # check for latest version, setuptools
             if [ "$($pip_bin list --outdated 2>/dev/null | grep setuptools)" ]; then
                 logger --tag $info "Upgrade setuptools to latest" "INFO"
-                $pip_bin install -U setuptools >> $LOG_CONSOLE  2>/dev/null &
+                $pip_bin install -U setuptools
+                logger --tag $info "setuptools version $($pip_bin list | grep setuptools | awk '{print $2}')"
 
             else
-                logger --tag $info "setuptools $($pip_bin list | grep setuptools | awk '{print $2}') installed - latest" "INFO"
+                logger --tag $info "setuptools $($pip_bin list | grep setuptools | awk '{print $2}') installed - latest"
             fi
 
             count=$(( $count + 1 ))
@@ -310,7 +312,6 @@ function upgrade_pip(){
     #
     # <-- end function upgrade_pip -->
 }
-
 
 
 # --- main ----------------------------------------------------------------------------------------
@@ -361,7 +362,6 @@ esac
 if ! binary_installed_boolean "python3"; then
     install_python3 "$(os_type)"
 fi
-
 
 # install pypi packages
 upgrade_pip
