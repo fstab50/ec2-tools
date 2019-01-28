@@ -340,7 +340,7 @@ case $os in
         # update os
         yum update -y
         # install binaries if available
-        yum install -y wget jq source-highlight souce-highlight-devel
+        yum install -y wget jq source-highlight highlight
         ;;
 
     'redhat' | 'centos')
