@@ -1,0 +1,141 @@
+# .bashrc
+
+CONFIG_DIR="$HOME/.config/bash"
+source "$CONFIG_DIR/colors.sh" 2>/dev/null
+bdwt=$(echo -e ${bold}${BRIGHTWHITE})
+
+# ------------------------------------------------------------------------------
+#  function declarations
+# ------------------------------------------------------------------------------
+
+function indent02() { sed 's/^/  /'; }
+
+
+function basher() {
+     if [[ $1 = 'run' ]]; then
+         shift
+    	 /usr/bin/docker run -e HIST_FILE=/root/.bash_history \
+    	     -v $HOME/.bash_history:/root/.bash_history "$@"
+     else
+         /usr/bin/docker "$@"
+     fi
+}
+
+
+# pip command completion
+function _pip_completion(){
+	    COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
+	                   COMP_CWORD=$COMP_CWORD \
+	                   PIP_AUTO_COMPLETE=1 $1 ) )
+	}
+	complete -o default -F _pip_completion pip
+	complete -o default -F _pip_completion pip3
+
+
+# autocompletion for python cheat cli app
+function _cheat_autocomplete {
+    sheets=$(cheat -l | cut -d' ' -f1)
+    COMPREPLY=()
+    if [ $COMP_CWORD = 1 ]; then
+	COMPREPLY=(`compgen -W "$sheets" -- $2`)
+    fi
+}
+complete -F _cheat_autocomplete cheat
+
+
+function motd(){
+    #
+    # Name:   motd.sh
+    # Usage:  this script must be located at /etc/profile.d/motd.sh
+    # Requires: figlet
+    #
+	if [[ $(which screenfetch 2>/dev/null) ]]; then
+	    echo -e '\n'
+	    neofetch | indent02
+		# load averages
+        # Parameters:   A,B,C, or D for format, <# spaces 1> <$ spaces 2>
+        # spaces are from LHS
+		sh .config/bash/loadavg-flat-layout.sh C 34 45
+	else
+        HOSTNAME=`uname -n`
+        KERNEL=`uname -r`
+        CPU=$(cat /proc/cpuinfo | grep 'model name' | tail -1 | cut -c 14-60)
+        ARCH=`uname -m`
+        UTIME=`uptime | sed -e 's/ [0-9:]* up />/' -e 's/,.*//'`
+        # The different colours as variables
+        blue=$(tput setaf 4)
+        cyan=$(tput setaf 6)
+        green=$(tput setaf 2)
+        purple=$(tput setaf 5)
+        red=$(tput setaf 1)
+        white=$(tput setaf 7)
+        bold=$(tput bold)
+        wb=${white}${bold}
+        yellow=$(tput setaf 3)
+        rst=$(tput sgr0)
+        echo ""
+        echo "$R==================================================================="
+        echo ""
+        echo -e "        Welcome to ${cyan}$HOSTNAME     \n               "
+        echo -e "       ${white} ARCH  ${rst}   :  ${pv_green}$ARCH                           "
+        echo -e "       ${white} KERNEL${rst}   :  ${pv_green}$KERNEL                  "
+        echo -e "       ${white} CPU   ${rst}   :  ${pv_green}$CPU                        "
+        echo -e "       ${white} Uptime${rst}   :  ${bold}$UTIME ${rst}                     "
+        echo ""
+        echo  "==================================================================="
+        echo ""
+	fi
+}
+
+
+# --------------------------------------------------------------------------------
+# User specific variables
+# --------------------------------------------------------------------------------
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+# AWS exported env vars
+source "$CONFIG_DIR/aws-environment.source"  2>/dev/null
+
+# cheat
+export CHEAT_EDITOR="/usr/bin/vim"
+export CHEATCOLORS=true
+
+# setup terminal
+export TERM='xterm-256color'
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# display motd
+if tty -s; then
+    # interactive terminal stuff here
+    motd
+fi
+
+# AWS Marketplace Owner IDs
+AMAZON=137112412989
+CENTOS=679593333241
+UBUNTU=099720109477
+
+# Path
+PATH=$PATH:$HOME/.local/bin:$HOME/bin:$EC2_HOME/bin
+export PATH
+
+# Enable cmd completion for aws tools
+complete -C aws_completer aws
+
+# source highlighting (less)
+export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"    # fedora linux
+export LESS=' -R'
+
+# --------------------------------------------------------------------------------
+# User specific aliases
+# --------------------------------------------------------------------------------
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
