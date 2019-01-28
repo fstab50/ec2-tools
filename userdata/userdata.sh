@@ -20,7 +20,6 @@ info="[INFO]: $CALLER"
 warn="[WARN]: $CALLER"
 
 packages=(
-    'pip'
     'distro'
 )
 
@@ -113,7 +112,8 @@ function enable_epel_repo(){
 function install_package_deps(){
     ## pypi package dep install
     local pip_bin
-    pip_bin=$(_pip_binary)
+
+    pip_bin=$(which pip3 2>/dev/null)
 
     if [[ $pip_bin ]]; then
         for pkg in "${packages[@]}"; do
@@ -294,6 +294,7 @@ fi
 # install pypi packages
 install_package_deps
 
+# verify python package installation
 for pkg in "${packages[@]}"; do
     if package_verified "$pkg"; then
         logger --tag $info "Successfully installed $pkg package via pip"
@@ -308,9 +309,7 @@ PYTHON3=$(python3_binary)
 logger --tag $info "python3 binary identified as:  $PYTHON3"
 
 if [[ "$PYTHON3" ]]; then
-
-
-    download_pyscript 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
+    download_pyscript "$PYTHON3_SCRIPT_URL"
     logger --tag $info "Executing $HOME/$PYTHON_SCRIPT"
     $PYTHON3 "$HOME/$PYTHON_SCRIPT"
 
