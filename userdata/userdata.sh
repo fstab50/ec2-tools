@@ -9,7 +9,8 @@
 ##
 
 PYTHON2_SCRIPT='python2-generic.py'
-PYTHON3_SCRIPT='python3-generic.py'
+PYTHON3_SCRIPT='userdata.py'
+PYTHON3_SCRIPT_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
 CALLER=$(basename $0)
 SOURCE_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files'
 EPEL_URL='https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
@@ -63,14 +64,6 @@ function amazonlinux_version_number(){
 }
 
 
-function packagemanager_type(){
-    if [[ $(which rpm 2>/dev/null) ]]; then
-        echo "redhat"
-    elif [[ $(which apt 2>/dev/null) ]]; then
-        echo "debian"
-    fi
-}
-
 function os_type(){
     local os
 
@@ -97,6 +90,15 @@ function os_type(){
 }
 
 
+function packagemanager_type(){
+    if [[ $(which rpm 2>/dev/null) ]]; then
+        echo "redhat"
+    elif [[ $(which apt 2>/dev/null) ]]; then
+        echo "debian"
+    fi
+}
+
+
 function binary_installed_boolean(){
     ##
     ## return boolean value if binary dependencies installed ##
@@ -114,15 +116,19 @@ function binary_installed_boolean(){
 }
 
 
-function download(){
+function download_pyscript(){
     local url="$1"
     local fname
+    local objectname
 
-    fname=$(echo $url | awk -F '/' '{print $NF}')
-    wget "$url"
+    objectname=$(echo $url | awk -F '/' '{print $NF}')
+    fname="$HOME/$PYTHON3_SCRIPT"
+
+    # download object from Amazon s3
+    wget -O "$fname" "$url"
 
     if [[ -f $fname ]]; then
-        logger --tag $info "$fname downloaded successfully"
+        logger --tag $info "$objectname downloaded successfully as $fname"
         return 0
     else
         logger "ERROR:  Problem downloading $fname"
@@ -141,7 +147,7 @@ function enable_epel_repo(){
 function install_package_deps(){
     ## pypi package dep install
     local pip_bin
-    pip_bin=$(pip_binary)
+    pip_bin=$(_pip_binary)
 
     if [[ $pip_bin ]]; then
         for pkg in "${packages[@]}"; do
@@ -173,7 +179,7 @@ function install_python3(){
 }
 
 
-function pip_binary(){
+function _pip_binary(){
     ## id current pip binary
     local pip_bin
 
@@ -188,7 +194,10 @@ function pip_binary(){
     fi
     if $pip_bin; then
         logger --tag $info "pip binary identified as: $pip_bin"
-        echo $pip_bin
+        logger --tag $info "Upgrading pip binary"
+        $pip_bin install -U pip
+        logger --tag $info "pip3 version: $(which pip3 --version)"
+        echo "$(which pip3 2>/dev/null)"
         return 0
     else
         logger --tag $warn "Unable to identify pip binary"
@@ -268,7 +277,7 @@ fi
 
 # install pypi packages
 if install_package_deps; then
-    logger --tag $info "successfully installed pypi packages via pip"
+    logger --tag $info "Successfully installed PYPI packages via pip"
 else
     logger --tag $warn "Problem installing pypi packages via pip"
 fi
@@ -283,12 +292,12 @@ if [[ "$PYTHON3" ]]; then
 
     logger --tag $info "Executing $PYTHON3_SCRIPT userdata"
 
-    download 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
-    $PYTHON3 $PYTHON3_SCRIPT
+    download_pyscript 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
+    $PYTHON3 "$HOME/$PYTHON3_SCRIPT"
 
-elif download "$PYTHON2_SCRIPT"; then
+elif download_pyscript "$PYTHON2_SCRIPT"; then
     logger --tag $info "Only python2 binary identified, executing $PYTHON2_SCRIPT userdata"
-    python "$PYTHON2_SCRIPT"
+    python "$HOME/$PYTHON2_SCRIPT"
 fi
 
 exit 0
