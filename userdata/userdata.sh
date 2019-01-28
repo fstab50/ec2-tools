@@ -20,7 +20,8 @@ info="[INFO]: $CALLER"
 warn="[WARN]: $CALLER"
 
 packages=(
-    "distro"
+    'pip'
+    'distro'
 )
 
 
@@ -116,7 +117,7 @@ function install_package_deps(){
 
     if [[ $pip_bin ]]; then
         for pkg in "${packages[@]}"; do
-            $pip_bin install $pkg
+            $pip_bin install -U $pkg
         done
         return 0
     fi
@@ -179,6 +180,22 @@ function packagemanager_type(){
 }
 
 
+function package_verified(){
+    ##
+    ##  Verifies python package installation
+    ##
+    local package="$1"
+    local pip_bin
+    pip_bin=$(_pip_binary)
+
+    if [[ "$($pip_bin list 2>/dev/null | grep $package)" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
 function _pip_binary(){
     ## id current pip binary
     local pip_bin
@@ -194,10 +211,8 @@ function _pip_binary(){
     fi
     if $pip_bin; then
         logger --tag $info "pip binary identified as: $pip_bin"
-        logger --tag $info "Upgrading pip binary"
-        $pip_bin install -U pip
-        logger --tag $info "pip3 version: $(which pip3 --version)"
-        echo "$(which pip3 2>/dev/null)"
+        logger --tag $info "pip version: $($pip_bin --version)"
+        echo "$pip_bin"
         return 0
     else
         logger --tag $warn "Unable to identify pip binary"
@@ -276,12 +291,15 @@ fi
 
 
 # install pypi packages
-if install_package_deps; then
-    logger --tag $info "Successfully installed PYPI packages via pip"
-else
-    logger --tag $warn "Problem installing pypi packages via pip"
-fi
+install_package_deps
 
+for pkg in "${packages[@]}"; do
+    if package_verified "$pkg"; then
+        logger --tag $info "Successfully installed $pkg package via pip"
+    else
+        logger --tag $warn "Problem installing $pkg package -- Not Found"
+    fi
+done
 
 # download and execute python userdata script
 PYTHON3=$(python3_binary)
@@ -290,9 +308,9 @@ logger --tag $info "python3 binary identified as:  $PYTHON3"
 
 if [[ "$PYTHON3" ]]; then
 
-    logger --tag $info "Executing $PYTHON_SCRIPT userdata"
 
     download_pyscript 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
+    logger --tag $info "Executing $HOME/$PYTHON_SCRIPT"
     $PYTHON3 "$HOME/$PYTHON_SCRIPT"
 
 elif download_pyscript "$PYTHON2_SCRIPT_URL"; then
