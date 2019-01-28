@@ -13,6 +13,8 @@ profilename='gcreds-da-atos'
 acltype='public-read'
 git_root=$(git rev-parse --show-toplevel 2>/dev/null)
 scripts_dir="$git_root/scripts"
+profile_dirname='profiles-bash'
+profile_dir="$git_root/$profile_dirname"
 pwd=$PWD
 errors='/dev/null'
 debug="$1"
@@ -28,12 +30,17 @@ bd=$(echo -e $bold)
 rst=$(echo -e $resetansi)
 
 
-declare -a artifacts
+declare -a  host_artifacts userdata_scripts
+
 # artifacts=(  "$(ls .)" )    # DOES NOT WORK FOR SOME STRANGE REASON
-artifacts=(
+userdata_scripts=(
     'python2_generic.py'
     'python3_generic.py'
     'userdata.sh'
+)
+
+host_artifacts=(
+    $(ls $profile_dir)
 )
 
 function verify_object_acl(){
@@ -67,27 +74,37 @@ elif [[ ! $(gcreds -s | grep $profilename) ]] || [[ $(gcreds -s | grep expired) 
     exit 0
 fi
 
+
 cd "$git_root/userdata" || echo "ERROR: unable to cd to userdata directory"
 
 
+std_message "Userdata artifacts for upload to Amazon S3:" "INFO"
+for f in "${userdata_scripts[@]}" "${host_artifacts[@]}"; do
+    echo -e "\t\t- $f"
+done
 
-std_message "Artifacts for upload to Amazon S3:" "INFO"
-for f in "${artifacts[@]}"; do
+std_message "$bash artifacts for upload to Amazon S3:" "INFO"
+for f in  "${host_artifacts[@]}"; do
     echo -e "\t\t- $f"
 done
 
 
 ## upload objects to s3 ##
-for f in "${artifacts[@]}"; do
-    #echo -e "\n\t[${bd}$pkg${rst}]:  uploading artifact ${accent}$f${rst} to Amazon S3...\n"
-    std_message "Uploading artifact ${accent}$f${rst} to Amazon S3..." "INFO"
+for f in "${userdata_scripts[@]}" ; do
+    std_message "Uploading artifact $scripts_dir/${accent}$f${rst} to Amazon S3..." "INFO"
     r=$(aws s3 cp $f s3://$bucketname/files/$f --profile $profilename 2>$errors)
+    if [[ $debug ]]; then echo -e "\t$r"; fi
+done
+
+for f in "${host_artifacts[@]}"; do
+    std_message "Uploading artifact $profile_dirname/${accent}$f${rst} to Amazon S3..." "INFO"
+    r=$(aws s3 cp "$profile_dir/$f" s3://$bucketname/files/$f --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
 done
 
 
 ## set public acls on objects ##
-for f in "${artifacts[@]}"; do
+for f in "${userdata_scripts[@]}" "${host_artifacts[@]}"; do
     #echo -e "\n\t[${bd}$pkg${rst}]: setting acl on artifact ${accent}$f${rst}...\n"
     std_message "Setting acl on artifact ${accent}$f${rst}..." "INFO"
     r=$(aws s3api put-object-acl --key files/$f --acl $acltype --bucket $bucketname --profile $profilename 2>$errors)
