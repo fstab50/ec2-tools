@@ -64,41 +64,6 @@ function amazonlinux_version_number(){
 }
 
 
-function os_type(){
-    local os
-
-    if [[ $(grep -i amazon /etc/os-release 2>/dev/null) ]]; then
-        case $(amazonlinux_version_number) in
-            '1') os='amzn1' ;;
-            '2') os='amzn2' ;;
-        esac
-
-    elif [[ $(grep -i redhat /etc/os-release 2>/dev/null) ]]; then
-        os='redhat'
-
-    elif [[ $(grep -i centos /etc/os-release 2>/dev/null) ]]; then
-        os='centos'
-
-    elif [[ $(grep -i ubuntu /etc/os-release 2>/dev/null) ]]; then
-        os='ubuntu'
-
-    elif [[ $(grep -i debian /etc/os-release 2>/dev/null) ]]; then
-        os='debian'
-    fi
-    echo $os
-    return 0
-}
-
-
-function packagemanager_type(){
-    if [[ $(which rpm 2>/dev/null) ]]; then
-        echo "redhat"
-    elif [[ $(which apt 2>/dev/null) ]]; then
-        echo "debian"
-    fi
-}
-
-
 function binary_installed_boolean(){
     ##
     ## return boolean value if binary dependencies installed ##
@@ -175,6 +140,41 @@ function install_python3(){
 
     elif [ "$os" = "debian" ] || [ "$os" = "ubuntu" ]; then
         apt install -y python3.6*
+    fi
+}
+
+
+function os_type(){
+    local os
+
+    if [[ $(grep -i amazon /etc/os-release 2>/dev/null) ]]; then
+        case $(amazonlinux_version_number) in
+            '1') os='amzn1' ;;
+            '2') os='amzn2' ;;
+        esac
+
+    elif [[ $(grep -i redhat /etc/os-release 2>/dev/null) ]]; then
+        os='redhat'
+
+    elif [[ $(grep -i centos /etc/os-release 2>/dev/null) ]]; then
+        os='centos'
+
+    elif [[ $(grep -i ubuntu /etc/os-release 2>/dev/null) ]]; then
+        os='ubuntu'
+
+    elif [[ $(grep -i debian /etc/os-release 2>/dev/null) ]]; then
+        os='debian'
+    fi
+    echo $os
+    return 0
+}
+
+
+function packagemanager_type(){
+    if [[ $(which rpm 2>/dev/null) ]]; then
+        echo "redhat"
+    elif [[ $(which apt 2>/dev/null) ]]; then
+        echo "debian"
     fi
 }
 
