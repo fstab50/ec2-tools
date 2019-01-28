@@ -76,6 +76,7 @@ def help_menu():
                         [-h, --help      ]
 
   """ + bd + """OPTIONS
+
       -i, --image""" + rst + """  (string):  Amazon  Machine  Image Operating System type
           Returns the latest AMI of the type specified from the list below
 
