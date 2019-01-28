@@ -21,6 +21,14 @@ CONFIG_PATH = $(HOME)/.config/$(PROJECT)
 REQUIREMENT = $(CUR_DIR)/requirements.txt
 VERSION_FILE = $(CUR_DIR)/$(PROJECT)/_version.py
 
+# formatting
+org := \033[38;5;95;38;5;214m
+bold := \u001b[1m
+bbl := \033[38;5;51m
+byg := \033[38;5;95;38;5;155m
+bwt := \033[38;5;15m
+rst := \u001b[0m
+
 
 # --- rollup targets  ------------------------------------------------------------------------------
 
@@ -95,7 +103,7 @@ testpypi: build-sizes build ## Deploy to testpypi without regenerating prebuild 
 
 .PHONY: pypi
 pypi: clean build-sizes build ## Deploy to pypi without regenerating prebuild artifacts
-	@echo "Deploy $(PROJECT) to pypi.org"
+	@echo "Deploy $(bd)$(bbl)$(PROJECT)$(rst) to pypi.org"
 	. $(VENV_DIR)/bin/activate && twine upload --repository pypi dist/*
 
 
@@ -117,6 +125,11 @@ source-install:  setup-venv  ## Install (source: local source). Build artifacts 
 	$(PIP_CALL) install .
 	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi; \
 	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
+	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
+
+
+.PHONY: upload-s3-artifacts
+upload-s3-artifacts:     ## Upload ec2 configuration mgmt files to Amazon S3
 	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
