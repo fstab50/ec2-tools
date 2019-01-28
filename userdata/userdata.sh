@@ -306,15 +306,17 @@ done
 # download and execute python userdata script
 PYTHON3=$(python3_binary)
 
-logger --tag $info "python3 binary identified as:  $PYTHON3"
 
 if [[ "$PYTHON3" ]]; then
+    logger --tag $info "Python3 binary identified as:  $PYTHON3"
+    logger --tag $info "Python3 version detected:  $($PYTHON3 --version)"
     download_pyscript "$PYTHON3_SCRIPT_URL"
     logger --tag $info "Executing $HOME/$PYTHON_SCRIPT"
     $PYTHON3 "$HOME/$PYTHON_SCRIPT"
 
 elif download_pyscript "$PYTHON2_SCRIPT_URL"; then
     logger --tag $info "Only python2 binary identified, executing $HOME/$PYTHON_SCRIPT"
+    logger --tag $info "Python2 version detected:  $(python --version)"
     python "$HOME/$PYTHON_SCRIPT"
 fi
 
