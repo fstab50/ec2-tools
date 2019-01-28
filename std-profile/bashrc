@@ -4,6 +4,15 @@ CONFIG_DIR="$HOME/.config/bash"
 source "$CONFIG_DIR/colors.sh" 2>/dev/null
 bdwt=$(echo -e ${bold}${BRIGHTWHITE})
 
+if [ -f $CONFIG_DIR/os_distro.sh ]; then
+    OS_INFO=$(sh $CONFIG_DIR/os_distro.sh 2>/dev/null)
+    os_family=$(echo $OS_INFO | awk '{print $1}')
+    os_release=$(echo $OS_INFO | awk '{print $2}')
+else
+    printf -- '%s\n' "os_distro.sh not found in local config dir ($CONFIG_DIR)"
+fi
+
+
 # ------------------------------------------------------------------------------
 #  function declarations
 # ------------------------------------------------------------------------------
@@ -138,4 +147,34 @@ export LESS=' -R'
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
+fi
+
+
+# --------------------------------------------------------------------------------
+#  Syntax Highlighting
+#-------------------------------------------------------------------------------
+
+if { [ "$os_family" = "Mint" ] && [ "$(echo $os_release | grep 18)" ]; } || \
+   { [ "$os_family" = "Ubuntu" ] && [ "$(echo $os_release | grep 16)" ]; }; then
+    # syntax highlighting - less -- DEPRECATED
+    export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"    # ubuntu
+    # export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"    # fedora linux
+    export LESS='-R -C -M -j 10 -# 4'
+    # Pipe Highlight to less -- NEW
+    #export LESSOPEN="| $(which highlight) %s --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
+    alias less='less -m -N -g -i -J --underline-special'
+
+    # Use "highlight" in place of "cat"
+    alias lcat="/usr/local/bin/highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
+
+elif [ "$os_family" = "Ubuntu" ] && [ "$(echo $os_release | grep 18)" ]; then
+    # Pipe Highlight to less
+    LESSOPEN="| $(which highlight) %s --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
+    export LESSOPEN
+    export LESS=" -R"
+    alias less='less -m -g -i -J --underline-special'
+    alias more='less'
+
+    # Use "highlight" in place of "cat"
+    alias lcat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
 fi
