@@ -8,12 +8,14 @@
 ##
 ##
 
+USERDATA_VERSION='0.8.7'
 PYTHON_SCRIPT='userdata.py'
 PYTHON2_SCRIPT_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files/python2_generic.py'
 PYTHON3_SCRIPT_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files/python3_generic.py'
 CALLER=$(basename $0)
 SOURCE_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files'
 EPEL_URL='https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
+
 
 # log tags
 info="[INFO]: $CALLER"
@@ -317,6 +319,8 @@ function upgrade_pip(){
 # --- main ----------------------------------------------------------------------------------------
 
 
+logger --tag $info "Userdata version $USERDATA_VERSION START"
+
 # log os type
 os=$(os_type)
 
@@ -336,14 +340,14 @@ case $os in
         # update os
         yum update -y
         # install binaries if available
-        yum install -y wget jq
+        yum install -y wget jq source-highlight souce-highlight-devel
         ;;
 
     'redhat' | 'centos')
         # update os
         yum update -y
         # install binaries if available
-        yum install -y wget jq
+        yum install -y wget jq source-highlight souce-highlight-devel
         # install epel
         enable_epel_repo
         ;;
@@ -353,7 +357,7 @@ case $os in
         apt update -y
         apt upgrade -y
         # install binaries if available
-        apt install -y wget jq
+        apt install -y wget jq source-highlight souce-highlight-devel
         ;;
 esac
 
@@ -376,6 +380,7 @@ for pkg in "${packages[@]}"; do
     fi
 done
 
+
 # download and execute python userdata script
 PYTHON3=$(python3_binary)
 
@@ -392,5 +397,8 @@ elif download_pyscript "$PYTHON2_SCRIPT_URL"; then
     logger --tag $info "Python2 version detected:  $(python --version)"
     python "$HOME/$PYTHON_SCRIPT"
 fi
+
+
+logger --tag $info "Userdata version $USERDATA_VERSION END"
 
 exit 0
