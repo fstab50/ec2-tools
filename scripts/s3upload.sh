@@ -25,9 +25,10 @@ if [[ -d $scripts_dir ]]; then
 fi
 
 # colors
-accent=$pv_orange
-bd=$(echo -e $bold)
-rst=$(echo -e $resetansi)
+accent=${pv_orange}
+bd=$(echo -e ${bold})
+bdwt=$(echo -e ${bold}${a_brightwhite})
+rst=$(echo -e ${resetansi})
 
 
 declare -a  host_artifacts userdata_scripts
@@ -64,6 +65,9 @@ function verify_object_acl(){
 # --- main -----------------------------------------------------------------------------------------
 
 
+echo -e "\n\t${bdwt}Uploading ec2 cm artifacts to ${accent}Amazon S3${rst}\n"
+
+
 if [[ ! $(which gcreds) ]]; then
     std_warn "gcreds binary not found; skipping upload of Amazon S3 artifacts" "INFO"
     exit 0
@@ -91,13 +95,13 @@ done
 
 ## upload objects to s3 ##
 for f in "${userdata_scripts[@]}" ; do
-    std_message "Uploading artifact $scripts_dir/${accent}$f${rst} to Amazon S3..." "INFO"
+    std_message "Uploading artifact ${bd}$scripts_dir/${accent}$f${rst} to Amazon S3..." "INFO"
     r=$(aws s3 cp $f s3://$bucketname/files/$f --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
 done
 
 for f in "${host_artifacts[@]}"; do
-    std_message "Uploading artifact $profile_dirname/${accent}$f${rst} to Amazon S3..." "INFO"
+    std_message "Uploading artifact ${bd}$profile_dirname/${accent}$f${rst} to Amazon S3..." "INFO"
     r=$(aws s3 cp "$profile_dir/$f" s3://$bucketname/files/$f --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
 done
