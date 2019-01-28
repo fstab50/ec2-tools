@@ -18,6 +18,7 @@ fi
 # ------------------------------------------------------------------------------
 
 function indent02() { sed 's/^/  /'; }
+function indent04() { sed 's/^/    /'; }
 
 
 function basher() {
@@ -58,13 +59,13 @@ function motd(){
     # Usage:  this script must be located at /etc/profile.d/motd.sh
     # Requires: figlet
     #
-	if [[ $(which screenfetch 2>/dev/null) ]]; then
+	if [[ $(which neofetch 2>/dev/null) ]]; then
 	    echo -e '\n'
-	    neofetch | indent02
+	    neofetch | indent04
 		# load averages
         # Parameters:   A,B,C, or D for format, <# spaces 1> <$ spaces 2>
         # spaces are from LHS
-		sh .config/bash/loadavg-flat-layout.sh C 34 45
+		sh  "$HOME/.config/bash/loadavg-flat-layout.sh" 'C' '5' '2'
 	else
         HOSTNAME=`uname -n`
         KERNEL=`uname -r`
@@ -85,11 +86,11 @@ function motd(){
         echo ""
         echo "$R==================================================================="
         echo ""
-        echo -e "        Welcome to ${cyan}$HOSTNAME     \n               "
-        echo -e "       ${white} ARCH  ${rst}   :  ${pv_green}$ARCH                           "
-        echo -e "       ${white} KERNEL${rst}   :  ${pv_green}$KERNEL                  "
-        echo -e "       ${white} CPU   ${rst}   :  ${pv_green}$CPU                        "
-        echo -e "       ${white} Uptime${rst}   :  ${bold}$UTIME ${rst}                     "
+        echo -e "        Welcome to ${cyan}$HOSTNAME     \n                         "
+        echo -e "       ${pv_lgray} ARCH  ${rst}   :  ${pv_green}$ARCH    ${rst}    "
+        echo -e "       ${pv_lgray} KERNEL${rst}   :  ${pv_blue}$KERNEL  ${rst}    "
+        echo -e "       ${pv_lgray} CPU   ${rst}   :  ${pv_blue}$CPU  ${rst}       "
+        echo -e "       ${pv_lgray} Uptime${rst}   :  ${bold}$UTIME ${rst}          "
         echo ""
         echo  "==================================================================="
         echo ""
