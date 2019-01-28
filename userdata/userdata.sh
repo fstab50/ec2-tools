@@ -186,6 +186,7 @@ function package_verified(){
     ##
     local package="$1"
     local pip_bin
+
     pip_bin=$(_pip_binary)
 
     if [[ "$($pip_bin list 2>/dev/null | grep $package)" ]]; then
