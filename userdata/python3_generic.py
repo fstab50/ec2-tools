@@ -12,6 +12,15 @@ import logging.handlers
 url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bashrc'
 url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bash_aliases'
 url_colors = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/colors.sh'
+s3_origin = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files'
+
+homedir_files = ['bashrc', 'bash_aliases']
+
+config_bash_files = [
+    'colors.sh',
+    'loadavg-flat-layout.sh',
+    'os_distro.sh'
+]
 
 def download(url_list):
     """
@@ -140,16 +149,21 @@ def local_profile_setup(distro):
             os.chown(filename, groupid, userid)
             os.chmod(filename, 0o700)
 
-        filename = 'colors.sh'
+        # download and place ~/.config/bash artifacts
         destination = home_dir + '/.config/bash'
-        if download([url_colors]):
-            logger.info('Download of {} successful to {}'.format(filename, home_dir))
 
-            if not os.path.exists(destination):
-                os.makedirs(destination)
-            os.rename(filename, destination + '/' + filename)
-            os.chown(filename, groupid, userid)
-            os.chmod(filename, 0o700)
+        if not os.path.exists(destination):
+            os.makedirs(destination)
+
+        for filename in config_bash_files:
+            if download([s3_origin + '/' + filename]):
+                os.rename(filename, destination + '/' + filename)
+                os.chown(filename, groupid, userid)
+                os.chmod(filename, 0o700)
+            if os.path.exists(destination + '/' + filename):
+                logger.info('Download of {} successful to {}'.format(filename, destination))
+            else:
+                logger.warning('Failed to download and place {}'.format(filename))
 
     except OSError as e:
         logger.exception(
