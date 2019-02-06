@@ -432,7 +432,7 @@ def profile_subnets(profile, region):
     try:
         client = boto3_session('ec2', region=region, profile=profile)
         r = client.describe_subnets()['Subnets']
-        subnets[region] = [
+        return [
                 {
                     x['SubnetId']: {
                             'AvailabilityZone': x['AvailabilityZone'],
@@ -447,8 +447,6 @@ def profile_subnets(profile, region):
         logger.warning(
             '{}: Unable to retrieve subnets for region {}: {}'.format(inspect.stack()[0][3], region, e)
             )
-        continue
-    return subnets
 
 
 def get_subnet(profile, region, debug):
