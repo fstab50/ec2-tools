@@ -140,7 +140,6 @@ update-source-install:     ## Update Install (source: local source).
  	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
 	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi;  \
 	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
-	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
 .PHONY: help
