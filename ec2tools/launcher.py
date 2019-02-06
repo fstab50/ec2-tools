@@ -910,7 +910,7 @@ def init_cli():
 
             account_alias = get_account_identifier(parse_profiles(args.profile or 'default'))
             DEFAULT_OUTPUTFILE = account_alias + '.profile'
-            subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode, args.debug)
+            subnet = get_subnet(parse_profiles(args.profile), regioncode, args.debug)
             image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode, args.debug)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
