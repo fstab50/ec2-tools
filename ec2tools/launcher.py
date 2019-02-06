@@ -18,7 +18,7 @@ from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
 from ec2tools import about, current_ami, logd, __version__
-from ec2tools.environment import profile_securitygroups, profile_keypairs, profile_subnets
+from ec2tools.environment import profile_securitygroups, profile_keypairs
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -425,7 +425,33 @@ def get_imageid(profile, image, region, debug):
     return json.loads(response)[region]
 
 
-def get_subnet(account_file, region, debug):
+def profile_subnets(profile, region):
+    """ Profiles all subnets in an account """
+    subnets = {}
+
+    try:
+        client = boto3_session('ec2', region=region, profile=profile)
+        r = client.describe_subnets()['Subnets']
+        subnets[region] = [
+                {
+                    x['SubnetId']: {
+                            'AvailabilityZone': x['AvailabilityZone'],
+                            'CidrBlock': x['CidrBlock'],
+                            'State': x['State'],
+                            'IpAddresses': 'Public' if x['MapPublicIpOnLaunch'] else 'Private',
+                            'VpcId': x['VpcId']
+                        }
+                } for x in r
+            ]
+    except ClientError as e:
+        logger.warning(
+            '{}: Unable to retrieve subnets for region {}: {}'.format(inspect.stack()[0][3], region, e)
+            )
+        continue
+    return subnets
+
+
+def get_subnet(profile, region, debug):
     """
     Summary.
 
@@ -453,7 +479,8 @@ def get_subnet(account_file, region, debug):
         bd + 'VpcId' + frame
     ]
 
-    subnets = get_contents(account_file)[region]['Subnets']
+    #subnets = get_contents(account_file)[region]['Subnets']
+    subnets = profile_subnets(profile, region)
 
     # populate table
     lookup = {}
