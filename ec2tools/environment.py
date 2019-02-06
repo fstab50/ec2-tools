@@ -133,7 +133,10 @@ def profile_subnets(profile):
 
 
 def profile_securitygroups(profile, region=None):
-    """ Profiles securitygroups in an aws account """
+    """ Profiles securitygroups in an aws account
+    THIS IS BROKEN -- ONLY WORKS WHEN GIVEN region,
+    LOOPING THRU REGIONS FAILS
+    """
     sgs = {}
     regions = [region] or get_regions()
 
@@ -151,8 +154,9 @@ def profile_securitygroups(profile, region=None):
                     } for x in r
                 ]
         except ClientError as e:
+            stack = inspect.stack()[0][3]
             logger.warning(
-                '{}: Unable to retrieve securitygroups for region {}'.format(inspect.stack()[0][3], rgn)
+                '{}: Unable to retrieve securitygroups for region {}. Error: {}'.format(stack, rgn, e)
                 )
             continue
     return sgs
@@ -311,7 +315,7 @@ def init_cli():
 
             container = {}
             default_outputfile = get_account_identifier(parse_profiles(args.profile)) + '.profile'
-            dregion = default_region(args.profile)
+            region = default_region(args.profile)
 
             # add aws account identifiers
             container['AccountId'] = get_account_identifier(parse_profiles(args.profile), returnAlias=False)
@@ -324,12 +328,17 @@ def init_cli():
 
             # assemble profile data into single json schema
             if r_subnets and r_sgs and r_keypairs:
-                for region in get_regions():
-                    temp = {}
-                    temp['Subnets'] = r_subnets[region]
-                    temp['SecurityGroups'] = r_sgs[region]
-                    temp['KeyPairs'] = r_keypairs[region]
-                    container[region] = temp
+
+                try:
+                    for region in get_regions():
+                        temp = {}
+                        temp['Subnets'] = r_subnets[region]
+                        temp['SecurityGroups'] = r_sgs[region]
+                        temp['KeyPairs'] = r_keypairs[region]
+                        container[region] = temp
+                except KeyError as e:
+                    raise e
+
                 if args.outputfile:
                     export_json_object(container, FILE_PATH + '/' + default_outputfile)
                 elif is_tty():
