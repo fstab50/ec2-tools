@@ -226,7 +226,7 @@ setup(
         ),
         (
             user_home() + '/' + '.config/' + _package,
-            ['bash/iam_users.py', 'bash/regions.py', 'bash/sizes.txt']
+            ['bash/iam_identities.py', 'bash/regions.py', 'bash/sizes.txt']
         )
     ],
     entry_points={
