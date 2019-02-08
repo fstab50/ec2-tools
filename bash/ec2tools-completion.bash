@@ -242,7 +242,7 @@ function _machineimage_completions(){
     # option strings
     commands='--debug --details --filename --format --image --help --profile --region --version'
     image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
-                ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
+                ubuntu14.04 ubuntu16.04 ubuntu18.04 windows2012 windows2016'
 
     case "${initcmd}" in
 
