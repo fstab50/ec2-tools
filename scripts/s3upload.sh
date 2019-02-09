@@ -13,7 +13,8 @@ profilename='gcreds-da-atos'
 acltype='public-read'
 git_root=$(git rev-parse --show-toplevel 2>/dev/null)
 scripts_dir="$git_root/scripts"
-profile_dirname='profiles-bash'
+config_bash='config/bash'
+config_motd='config/neofetch'
 profile_dir="$git_root/$profile_dirname"
 pwd=$PWD
 errors='/dev/null'
@@ -41,7 +42,8 @@ userdata_scripts=(
 )
 
 host_artifacts=(
-    $(ls $profile_dir)
+    $(for i in $(ls $config_bash); do echo "config/bash/$i"; done)
+    $(for j in $(ls $config_motd); do echo "config/neofetch/$j"; done)
 )
 
 function verify_object_acl(){
