@@ -97,7 +97,7 @@ def userdata_lookup(debug):
 
     # populate table
     lookup = {}
-    for index, filename in enumerate(paths):
+    for index, path in enumerate(paths):
 
             lookup[index] = paths[index]
 
@@ -105,7 +105,7 @@ def userdata_lookup(debug):
                 [
                     rst + str(index) + '.' + frame,
                     rst + filenames[index] + frame,
-                    rst + paths[index] + frame,
+                    rst + path + frame,
                     rst + ctimes[index] + frame,
                     rst + mtimes[index] + frame
                 ]
