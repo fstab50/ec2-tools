@@ -39,7 +39,7 @@ def range_test(min, max, value):
         Success | Failure, TYPE: bool
 
     """
-    if isinstance(int(value), int):
+    if isinstance(value, int):
         if value in range(min, max + 1):
             return True
     return False
