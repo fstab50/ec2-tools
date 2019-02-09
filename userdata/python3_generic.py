@@ -128,7 +128,9 @@ def getLogger(*args, **kwargs):
 
 
 def os_dependent():
+
     d = distro.linux_distribution()[0]
+    logger.info('Distro identified as {}'.format(d))
 
     if 'Amazon' or 'amazon' in d:
         return 'config-amazonlinux.conf'
@@ -220,7 +222,7 @@ def local_profile_setup(distro):
             os.makedirs(destination)
 
         if download([s3_origin + filename]):
-            os.rename(filename, destination + '/' + filename)
+            os.rename(filename, destination + '/config.conf')
             os.chown(filename, groupid, userid)
             os.chmod(filename, 0o700)
         if os.path.exists(destination + '/' + filename):
