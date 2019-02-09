@@ -3,6 +3,8 @@
 CONFIG_DIR="$HOME/.config/bash"
 source "$CONFIG_DIR/colors.sh" 2>/dev/null
 bdwt=$(echo -e ${bold}${BRIGHTWHITE})
+ENV_LIBRARY="$HOME/git/library-utilities/function-library"
+CONFIG_DIR="$HOME/.config/bash"
 
 if [ -f $CONFIG_DIR/os_distro.sh ]; then
     OS_INFO=$(sh $CONFIG_DIR/os_distro.sh 2>/dev/null)
@@ -11,6 +13,19 @@ if [ -f $CONFIG_DIR/os_distro.sh ]; then
 else
     printf -- '%s\n' "os_distro.sh not found in local config dir ($CONFIG_DIR)"
 fi
+
+# formatting
+source "$CONFIG_DIR/colors.sh"
+bd=$(echo -e ${bold})
+bgf=$(echo -e ${greenbold_frame})
+bg=$(echo -e ${brightgreen})
+obf=$(echo -e ${bold}${orange})
+bbf=$(echo -e ${bluebold_frame})
+bcy=$(echo -e ${cyan})
+wbf=$(echo -e ${whitebold_frame})
+wgc=$(echo -e ${wgray})                  # white gray
+datec=$(echo -e ${blue})
+rst=${reset}
 
 
 # ------------------------------------------------------------------------------
@@ -54,18 +69,43 @@ complete -F _cheat_autocomplete cheat
 
 
 function motd(){
+
+    else
+		# run legacy motd
+		sh ~/git/scripts-host/init/motd-ubuntu16.04.sh
+	fi
+}
+
+function motd(){
     #
     # Name:   motd.sh
     # Usage:  this script must be located at /etc/profile.d/motd.sh
     # Requires: figlet
     #
-	if [[ $(which neofetch 2>/dev/null) ]]; then
+    local bin="$1"
+    local os="$os_family"
+    #
+	if [ "$bin" = "screenfetch" ] &&  [ "$os" = "ubuntu" ]; then
 	    echo -e '\n'
-	    neofetch | indent04
+	    screenfetch | indent02
 		# load averages
         # Parameters:   A,B,C, or D for format, <# spaces 1> <$ spaces 2>
         # spaces are from LHS
-		sh  "$HOME/.config/bash/loadavg-flat-layout.sh" 'C' '5' '2'
+		sh $CONFIG_DIR/loadavg-flat-layout.sh "D" "41" "26"
+
+    elif [ "$bin" = "neofetch" ] &&  [ "$os" = "ubuntu" ]; then
+        echo -e "\n";
+       # neofetch --ascii_distro ubuntu_old  --disk_display barinfo --bar_colors 1 10 | indent02
+        neofetch --ascii_distro ubuntu_old --disk_display barinfo --bar_colors 1 10 | indent02
+        sh $CONFIG_DIR/loadavg-flat-layout.sh "C" "38" "4"
+
+    elif [ "$bin" = "neofetch" ] &&  [ "$os" = "amazonlinux" ]; then
+        # Neofetch motd - Amazon Linux
+        echo -e "\n"; neofetch --disk_display barinfo --bar_colors 1 8 | indent02
+        #    --gtk3 on --install_time on --install_time_format 24h --bold on \
+        #    --ascii_distro Amazon --ascii_colors 208 --colors 208 7 8 7 10 7
+        sh "$CONFIG_DIR/loadavg-flat-layout.sh" "C" 34 0
+
 	else
         HOSTNAME=`uname -n`
         KERNEL=`uname -r`
@@ -123,7 +163,7 @@ esac
 # display motd
 if tty -s; then
     # interactive terminal stuff here
-    motd
+    motd $(which neofetch) $(which screenfetch)
 fi
 
 # AWS Marketplace Owner IDs
