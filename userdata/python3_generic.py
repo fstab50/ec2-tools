@@ -128,13 +128,13 @@ def getLogger(*args, **kwargs):
 
 
 def os_dependent():
-    distro = distro.linux_distribution()[0]
+    d = distro.linux_distribution()[0]
 
-    if 'Amazon' or 'amazon' in distro:
+    if 'Amazon' or 'amazon' in d:
         return 'config-amazonlinux.conf'
-    elif 'Redhat' or 'redhat' or 'rhel' in distro:
+    elif 'Redhat' or 'redhat' or 'rhel' in d:
         return 'config-redhat.config'
-    elif 'Ubuntu' or 'ubuntu' in distro:
+    elif 'Ubuntu' or 'ubuntu' in d:
         return 'config-redhat.config'
     return None
 
