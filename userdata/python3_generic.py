@@ -127,6 +127,19 @@ def getLogger(*args, **kwargs):
     return logger
 
 
+def os_dependent():
+    distro = distro.linux_distribution()[0]
+
+    if 'Amazon' or 'amazon' in distro:
+        return 'config-amazonlinux.conf'
+    elif 'Redhat' or 'redhat' or 'rhel' in distro:
+        return 'config-redhat.config'
+    elif 'Ubuntu' or 'ubuntu' in distro:
+        return 'config-redhat.config'
+    return None
+
+
+
 def os_type():
     """
     Summary.
@@ -199,8 +212,25 @@ def local_profile_setup(distro):
             else:
                 logger.warning('Failed to download and place {}'.format(filename))
 
+        # download and place ~/.config/neofetch artifacts
+        destination = home_dir + '/.config/neofetch'
+        filename = os_dependent() or 'config.conf'
+
+        if not os.path.exists(destination):
+            os.makedirs(destination)
+
+        if download([s3_origin + filename]):
+            os.rename(filename, destination + '/' + filename)
+            os.chown(filename, groupid, userid)
+            os.chmod(filename, 0o700)
+        if os.path.exists(destination + '/' + filename):
+            logger.info('Download of {} successful to {}'.format(filename, destination))
+        else:
+            logger.warning('Failed to download and place {}'.format(filename))
+
+
         # reset owner to normal user for .config/bash (desination):
-        directory_operations(destination, groupid, userid, 0700)
+        directory_operations(destination, groupid, userid, 0o700)
 
     except OSError as e:
         logger.exception(
