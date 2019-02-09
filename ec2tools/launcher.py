@@ -19,6 +19,7 @@ from pyaws import Colors
 from ec2tools.statics import local_config
 from ec2tools import about, current_ami, logd, __version__
 from ec2tools.environment import profile_securitygroups, profile_keypairs
+from ec2tools.userdata import userdata_lookup
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -394,7 +395,7 @@ def options(parser):
     parser.add_argument("-r", "--region", dest='regioncode', nargs='?', default=None, required=False)
     parser.add_argument("-s", "--instance-size", dest='instance_size', nargs='?', default='t3.micro', required=False)
     parser.add_argument("-t", "--tags", dest='tags', action='store_true', default=False, required=False)
-    parser.add_argument("-u", "--userdata", dest='userdata', nargs='?', default=None, required=False)
+    parser.add_argument("-u", "--userdata", dest='userdata', action='store_true', default=False, required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
     return parser.parse_args()
@@ -743,17 +744,15 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
     # ec2 client instantiation for launch
     client = boto3_session('ec2', region=region, profile=pf)
 
-    if userdata is None:
-        userdata_str = '#!/usr/bin/env bash\n'
-    elif userdata == 'default':
+    if userdata:
         # prep default userdata if none specified
         if imagetype.split('.')[0] in ('ubuntu18'):
             from ec2tools import python3_userdata as userdata
             userdata_str = read(os.path.abspath(userdata.__file__))
         else:
-            #from ec2tools import userdata
-            #userdata_str = userdata.content
-            userdata_str = read(os.path.abspath(GENERIC_USERDATA))
+            #userdata_str = read(os.path.abspath(GENERIC_USERDATA))
+            script_path = userdata_lookup(debug)
+            userdata_str = read(script_path)
 
     if debug:
         print('USERDATA CONTENT: \n{}'.format(userdata_str))
