@@ -707,10 +707,10 @@ def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, k
         'profile': pf,
         'imageId': imageid,
         'subnetId': subid,
-        'SecurityGroupIds': [ sgroup ],
-        'KeypairNames': [ kp ],
-        'InstanceProfileArn': 'None' if ip_arn is None else ip_arn,
-        'InstanceType': size,
+        'securityGroupIds': [ sgroup ],
+        'keypairNames': [ kp ],
+        'instanceProfileArn': 'None' if ip_arn is None else ip_arn,
+        'instanceType': size,
         'userdata':  ud
     }
 
