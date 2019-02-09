@@ -1,0 +1,181 @@
+# .bashrc
+
+CONFIG_DIR="$HOME/.config/bash"
+source "$CONFIG_DIR/colors.sh" 2>/dev/null
+bdwt=$(echo -e ${bold}${BRIGHTWHITE})
+
+if [ -f $CONFIG_DIR/os_distro.sh ]; then
+    OS_INFO=$(sh $CONFIG_DIR/os_distro.sh 2>/dev/null)
+    os_family=$(echo $OS_INFO | awk '{print $1}')
+    os_release=$(echo $OS_INFO | awk '{print $2}')
+else
+    printf -- '%s\n' "os_distro.sh not found in local config dir ($CONFIG_DIR)"
+fi
+
+
+# ------------------------------------------------------------------------------
+#  function declarations
+# ------------------------------------------------------------------------------
+
+function indent02() { sed 's/^/  /'; }
+function indent04() { sed 's/^/    /'; }
+
+
+function basher() {
+     if [[ $1 = 'run' ]]; then
+         shift
+    	 /usr/bin/docker run -e HIST_FILE=/root/.bash_history \
+    	     -v $HOME/.bash_history:/root/.bash_history "$@"
+     else
+         /usr/bin/docker "$@"
+     fi
+}
+
+
+# pip command completion
+function _pip_completion(){
+	    COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
+	                   COMP_CWORD=$COMP_CWORD \
+	                   PIP_AUTO_COMPLETE=1 $1 ) )
+	}
+	complete -o default -F _pip_completion pip
+	complete -o default -F _pip_completion pip3
+
+
+# autocompletion for python cheat cli app
+function _cheat_autocomplete {
+    sheets=$(cheat -l | cut -d' ' -f1)
+    COMPREPLY=()
+    if [ $COMP_CWORD = 1 ]; then
+	COMPREPLY=(`compgen -W "$sheets" -- $2`)
+    fi
+}
+complete -F _cheat_autocomplete cheat
+
+
+function motd(){
+    #
+    # Name:   motd.sh
+    # Usage:  this script must be located at /etc/profile.d/motd.sh
+    # Requires: figlet
+    #
+	if [[ $(which neofetch 2>/dev/null) ]]; then
+	    echo -e '\n'
+	    neofetch | indent04
+		# load averages
+        # Parameters:   A,B,C, or D for format, <# spaces 1> <$ spaces 2>
+        # spaces are from LHS
+		sh  "$HOME/.config/bash/loadavg-flat-layout.sh" 'C' '5' '2'
+	else
+        HOSTNAME=`uname -n`
+        KERNEL=`uname -r`
+        CPU=$(cat /proc/cpuinfo | grep 'model name' | tail -1 | cut -c 14-60)
+        ARCH=`uname -m`
+        UTIME=`uptime | sed -e 's/ [0-9:]* up />/' -e 's/,.*//'`
+        # The different colours as variables
+        blue=$(tput setaf 4)
+        cyan=$(tput setaf 6)
+        green=$(tput setaf 2)
+        purple=$(tput setaf 5)
+        red=$(tput setaf 1)
+        white=$(tput setaf 7)
+        bold=$(tput bold)
+        wb=${white}${bold}
+        yellow=$(tput setaf 3)
+        rst=$(tput sgr0)
+        echo ""
+        echo "$R==================================================================="
+        echo ""
+        echo -e "        Welcome to ${cyan}$HOSTNAME     \n                         "
+        echo -e "       ${pv_lgray} ARCH  ${rst}   :  ${pv_green}$ARCH    ${rst}    "
+        echo -e "       ${pv_lgray} KERNEL${rst}   :  ${pv_blue}$KERNEL  ${rst}    "
+        echo -e "       ${pv_lgray} CPU   ${rst}   :  ${pv_blue}$CPU  ${rst}       "
+        echo -e "       ${pv_lgray} Uptime${rst}   :  ${bold}$UTIME ${rst}          "
+        echo ""
+        echo  "==================================================================="
+        echo ""
+	fi
+}
+
+
+# --------------------------------------------------------------------------------
+# User specific variables
+# --------------------------------------------------------------------------------
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+# AWS exported env vars
+source "$CONFIG_DIR/aws-environment.source"  2>/dev/null
+
+# cheat
+export CHEAT_EDITOR="/usr/bin/vim"
+export CHEATCOLORS=true
+
+# setup terminal
+export TERM='xterm-256color'
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# display motd
+if tty -s; then
+    # interactive terminal stuff here
+    motd
+fi
+
+# AWS Marketplace Owner IDs
+AMAZON=137112412989
+CENTOS=679593333241
+UBUNTU=099720109477
+
+# Path
+PATH=$PATH:$HOME/.local/bin:$HOME/bin:$EC2_HOME/bin
+export PATH
+
+# Enable cmd completion for aws tools
+complete -C aws_completer aws
+
+# source highlighting (less)
+export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"    # fedora linux
+export LESS=' -R'
+
+# --------------------------------------------------------------------------------
+# User specific aliases
+# --------------------------------------------------------------------------------
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+
+# --------------------------------------------------------------------------------
+#  Syntax Highlighting
+#-------------------------------------------------------------------------------
+
+if { [ "$os_family" = "Mint" ] && [ "$(echo $os_release | grep 18)" ]; } || \
+   { [ "$os_family" = "Ubuntu" ] && [ "$(echo $os_release | grep 16)" ]; }; then
+    # syntax highlighting - less -- DEPRECATED
+    export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"    # ubuntu
+    # export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"    # fedora linux
+    export LESS='-R -C -M -j 10 -# 4'
+    # Pipe Highlight to less -- NEW
+    #export LESSOPEN="| $(which highlight) %s --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
+    alias less='less -m -N -g -i -J --underline-special'
+
+    # Use "highlight" in place of "cat"
+    alias lcat="/usr/local/bin/highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
+
+elif [ "$os_family" = "Ubuntu" ] && [ "$(echo $os_release | grep 18)" ]; then
+    # Pipe Highlight to less
+    LESSOPEN="| $(which highlight) %s --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
+    export LESSOPEN
+    export LESS=" -R"
+    alias less='less -m -g -i -J --underline-special'
+    alias more='less'
+
+    # Use "highlight" in place of "cat"
+    alias lcat="highlight $1 --out-format xterm256 --line-numbers --quiet --force --style solarized-light"
+fi
