@@ -17,7 +17,7 @@ from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, 
 from pyaws import Colors
 from ec2tools.statics import local_config
 from ec2tools import logd, __version__
-from ec2tools.userchoice import choose_resource
+from ec2tools.user_selection import choose_resource
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -54,7 +54,7 @@ def source_local_userdata(paths=False):
     return [os.path.join(_scriptdir, x) for x in os.listdir(_scriptdir)]
 
 
-def userdata_lookup(profile, region, debug):
+def userdata_lookup(debug):
     """
     Summary.
 
