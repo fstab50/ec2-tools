@@ -25,8 +25,16 @@ except Exception:
     from pyaws.core.oscodes_win import exit_codes    # non-specific os-safe codes
 
 
-_scriptdir = local_config['USERDATA_DIR']
+# globals
+module = os.path.basename(__file__)
+_scriptdir = local_config['CONFIG']['USERDATA_DIR']
 logger = logd.getLogger(__version__)
+act = Colors.ORANGE
+yl = Colors.YELLOW
+bd = Colors.BOLD + Colors.WHITE
+frame = Colors.BOLD + Colors.BRIGHTGREEN
+rst = Colors.RESET
+PACKAGE = 'runmachine'
 
 
 def display_table(table, tabspaces=4):
@@ -83,7 +91,7 @@ def userdata_lookup(debug):
     x.align[bd + 'LastModified' + frame] = 'c'
 
     filenames = source_local_userdata()
-    paths = source_local_userdata(path=True)
+    paths = source_local_userdata(paths=True)
     ctimes = [time.ctime(os.path.getctime(x)) for x in paths]
     mtimes = [time.ctime(os.path.getmtime(x)) for x in paths]
 

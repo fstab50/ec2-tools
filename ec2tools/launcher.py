@@ -744,19 +744,6 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
     # ec2 client instantiation for launch
     client = boto3_session('ec2', region=region, profile=pf)
 
-    if userdata:
-        # prep default userdata if none specified
-        if imagetype.split('.')[0] in ('ubuntu18'):
-            from ec2tools import python3_userdata as userdata
-            userdata_str = read(os.path.abspath(userdata.__file__))
-        else:
-            #userdata_str = read(os.path.abspath(GENERIC_USERDATA))
-            script_path = userdata_lookup(debug)
-            userdata_str = read(script_path)
-
-    if debug:
-        print('USERDATA CONTENT: \n{}'.format(userdata_str))
-
     # name tag content
     name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
 
@@ -914,6 +901,18 @@ def init_cli():
             role_arn = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
             qty = args.quantity
 
+            if args.userdata:
+                # prep default userdata if none specified
+                if args.imagetype.split('.')[0] in ('ubuntu18'):
+                    from ec2tools import python3_userdata as userdata
+                    userdata_str = read(os.path.abspath(userdata.__file__))
+                else:
+                    #userdata_str = read(os.path.abspath(GENERIC_USERDATA))
+                    script_path = userdata_lookup(args.debug)
+                    userdata_str = read(script_path)
+                if args.debug:
+                    print('USERDATA CONTENT: \n{}'.format(userdata_str))
+
             #pdb.set_trace()
 
             if args.debug:
@@ -956,7 +955,7 @@ def init_cli():
                         ip_arn=role_arn,
                         size=args.instance_size,
                         count=args.quantity,
-                        userdata=args.userdata,
+                        userdata=userdata_str,
                         debug=args.debug
                     )
                 print('\tLaunching Summary:\n')
