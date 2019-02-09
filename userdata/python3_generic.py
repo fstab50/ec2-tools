@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import inspect
 import platform
 import subprocess
@@ -205,7 +206,7 @@ def local_profile_setup(distro):
             os.makedirs(destination)
 
         for filename in config_bash_files:
-            if download([s3_origin + '/' + filename]):
+            if download([s3_origin + '/config/bash/' + filename]):
                 os.rename(filename, destination + '/' + filename)
                 os.chown(filename, groupid, userid)
                 os.chmod(filename, 0o700)
@@ -221,7 +222,7 @@ def local_profile_setup(distro):
         if not os.path.exists(destination):
             os.makedirs(destination)
 
-        if download([s3_origin + filename]):
+        if download([s3_origin + '/config/neofetch/'+ filename]):
             os.rename(filename, destination + '/config.conf')
             os.chown(filename, groupid, userid)
             os.chmod(filename, 0o700)
@@ -259,11 +260,14 @@ def which(program):
 # --- main -----------------------------------------------------------------------------------------
 
 
-# setup logging facility
-logger = getLogger('1.0')
+if __name__ == '__main__':
+    # setup logging facility
+    logger = getLogger('1.0')
 
-if platform.system() == 'Linux':
-    logger.info('Operating System type identified: Linux, {}'.format(os_type()))
-    local_profile_setup(os_type())
-else:
-    logger.info('Operating System type identified: {}'.format(os_type()))
+    if platform.system() == 'Linux':
+        logger.info('Operating System type identified: Linux, {}'.format(os_type()))
+        local_profile_setup(os_type())
+    else:
+        logger.info('Operating System type identified: {}'.format(os_type()))
+
+    sys.exit(0)
