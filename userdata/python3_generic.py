@@ -22,6 +22,40 @@ config_bash_files = [
     'os_distro.sh'
 ]
 
+
+def directory_operations(path, groupid, userid, permissions):
+    """
+    Summary.
+
+        Recursively sets owner and permissions on all file objects
+        within path given as a parameter
+
+    Args:
+        path (str):  target directory
+        permissions:  octal permissions (example: 0644)
+    """
+    try:
+        for root, dirs, files in os.walk(path):
+            for d in dirs:
+                os.chmod(os.path.join(root, d), permissions)
+                logger.info('Changed permissions on fs object {} to {}'.format(d, permissions))
+
+                os.chown(os.path.join(root, d), groupid, userid)
+                logger.info('Changed owner on fs object {} to {}'.format(d, userid))
+
+            for f in files:
+                os.chmod(os.path.join(root, f), permissions)
+                logger.info('Changed permissions on fs object {} to {}'.format(f, permissions))
+                os.chown(os.path.join(root, f), groupid, userid)
+                logger.info('Changed owner on fs object {} to {}'.format(f, userid))
+    except OSError as e:
+        logger.exception(
+            'Unknown error while resetting owner or perms on fs object (%s)' %
+            f or d
+        )
+    return True
+
+
 def download(url_list):
     """
     Retrieve remote file object
@@ -164,6 +198,9 @@ def local_profile_setup(distro):
                 logger.info('Download of {} successful to {}'.format(filename, destination))
             else:
                 logger.warning('Failed to download and place {}'.format(filename))
+
+        # reset owner to normal user for .config/bash (desination):
+        directory_operations(destination, groupid, userid, 0700)
 
     except OSError as e:
         logger.exception(
