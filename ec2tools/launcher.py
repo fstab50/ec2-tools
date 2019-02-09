@@ -693,8 +693,13 @@ def parse_userdata(ostype):
     return (str(content))
 
 
-def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size):
-    """Writes launch config to disk for reuse"""
+def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, ud):
+    """
+    Summary.
+
+        Writes launch configuration parameters to local disk for later reuse
+
+    """
     fname = alias + '_' + region + '.json'
     content = {
         'account': alias,
@@ -705,25 +710,28 @@ def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, k
         'SecurityGroupIds': [ sgroup ],
         'KeypairNames': [ kp ],
         'InstanceProfileArn': 'None' if ip_arn is None else ip_arn,
-        'InstanceType': size
+        'InstanceType': size,
+        'userdata':  ud
     }
+
     try:
+
         if not os.path.exists(FILE_PATH + '/' + 'launchconfigs'):
             os.makedirs(FILE_PATH + '/' + 'launchconfigs')
 
         with open(FILE_PATH + '/launchconfigs/' + fname, 'w') as f1:
             f1.write(json.dumps(content, indent=4))
-        stdout_message('Created terminate script: {}'.format(os.getcwd() + '/' + fname))
+
     except OSError as e:
         logger.exception(
-            '%s: Problem creating terminate script (%s) on local fs' %
+            '%s: Problem persisting launch configuration file (%s) on local fs' %
             (inspect.stack()[0][3], fname))
         return False
     return True
 
 
 def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
-                            kp, ip_arn, size, count, userdata, debug):
+                            kp, ip_arn, size, count, userdata_content, debug):
     """
     Summary.
 
@@ -772,7 +780,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
                 MinCount=1,
                 SecurityGroupIds=[sgroup],
                 SubnetId=subid,
-                UserData=userdata_str,
+                UserData=userdata_content,
                 DryRun=debug,
                 InstanceInitiatedShutdownBehavior='stop',
                 TagSpecifications=[
@@ -791,7 +799,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
                 MinCount=1,
                 SecurityGroupIds=[sgroup],
                 SubnetId=subid,
-                UserData=userdata_str,
+                UserData=userdata_content,
                 DryRun=debug,
                 IamInstanceProfile={
                     'Name': ip_arn.split('/')[-1]
@@ -942,6 +950,7 @@ def init_cli():
                         kp=keypair,
                         ip_arn=role_arn,
                         size=args.instance_size,
+                        ud=script_path
                     )
 
                 r = run_ec2_instance(
@@ -955,7 +964,7 @@ def init_cli():
                         ip_arn=role_arn,
                         size=args.instance_size,
                         count=args.quantity,
-                        userdata=userdata_str,
+                        userdata_content=userdata_str,
                         debug=args.debug
                     )
                 print('\tLaunching Summary:\n')
