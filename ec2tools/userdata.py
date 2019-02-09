@@ -1,73 +1,109 @@
 """
 Summary.
 
-    Bash userdata script for EC2 initialization encapsulated
-    as a python module
+    Userdata module: displays userdata script files found
+    on the local filesystem from which user can choose
 
 """
 
-content = '''
+import os
+import sys
+import json
+import argparse
+import inspect
+import time
+from veryprettytable import VeryPrettyTable
+from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, range_bind
+from pyaws import Colors
+from ec2tools.statics import local_config
+from ec2tools import logd, __version__
+from ec2tools.userchoice import choose_resource
 
-#!/usr/bin/env bash
-
-PYTHON2_SCRIPT='python2-userdata.py'
-PYTHON3_SCRIPT='python3-userdata.py'
-SOURCE_URL='https://s3.us-east-2.amazonaws.com/awscloud.center/files'
-
-
-function os_type(){
-    local bin
-    if [[ $(which rpm) ]]; then
-        echo "redhat"
-    elif [[ $(which apt) ]]; then
-        echo "debian"
-    fi
-}
-
-function download(){
-    local fname="$1"
-    if [[ $(which wget) ]]; then
-        wget "$SOURCE_URL/$fname"
-    else
-        curl -o $fname  "$SOURCE_URL/$fname"
-    fi
-    if [[ -f $fname ]]; then
-        logger "$fname downloaded successfully"
-        return 0
-    else
-        logger "ERROR:  Problem downloading $fname"
-        return 1
-    fi
-}
+try:
+    from pyaws.core.oscodes_unix import exit_codes
+except Exception:
+    from pyaws.core.oscodes_win import exit_codes    # non-specific os-safe codes
 
 
-# log os type
-if [[ $(which logger) ]]; then
-    logger "Package manager type: $(os_type)"
-else
-    echo "Package manager type: $(os_type)" > /root/userdata.msg
-fi
+_scriptdir = local_config['USERDATA_DIR']
+logger = logd.getLogger(__version__)
 
 
-# install wget if available
-if [[ "$(os_type)" = "redhat" ]]; then
-    yum install -y wget
-else
-    apt install -y wget
-fi
+def display_table(table, tabspaces=4):
+    """Print Table Object offset from left by tabspaces"""
+    indent = ('\t').expandtabs(tabspaces)
+    table_str = table.get_string()
+    for e in table_str.split('\n'):
+        print(indent + frame + e)
+    sys.stdout.write(Colors.RESET)
+    return True
 
 
-# download and execute python userdata script
-if [[ $(which python3) ]]; then
+def source_local_userdata(paths=False):
+    """
+    Summary.
 
-    if download "$PYTHON3_SCRIPT"; then
-        python3 "$PYTHON3_SCRIPT"
-    fi
+        returns userdata scripts found locally in configuration dir
 
-elif download "$PYTHON2_SCRIPT"; then
-    python "$PYTHON2_SCRIPT"
-fi
+    Returns:
+        userdata scripts (full path), TYPE:  str
 
-exit 0
+    """
+    if paths is False:
+        return os.listdir(_scriptdir)
+    return [os.path.join(_scriptdir, x) for x in os.listdir(_scriptdir)]
 
-'''
+
+def userdata_lookup(profile, region, debug):
+    """
+    Summary.
+
+        Instance Profile role user selection
+
+    Returns:
+        iam instance profile role ARN (str) or None
+    """
+    # setup table
+    x = VeryPrettyTable(border=True, header=True, padding_width=2)
+    field_max_width = 70
+
+    x.field_names = [
+        bd + '#' + frame,
+        bd + 'Filename' + frame,
+        bd + 'Path' + frame,
+        bd + 'CreateDate' + frame,
+        bd + 'LastModified' + frame
+    ]
+
+    # cell alignment
+    x.align[bd + '#' + frame] = 'c'
+    x.align[bd + 'Filename' + frame] = 'c'
+    x.align[bd + 'Path' + frame] = 'l'
+    x.align[bd + 'CreateDate' + frame] = 'c'
+    x.align[bd + 'LastModified' + frame] = 'c'
+
+    filenames = source_local_userdata()
+    paths = source_local_userdata(path=True)
+    ctimes = [time.ctime(os.path.getctime(x)) for x in paths]
+    mtimes = [time.ctime(os.path.getmtime(x)) for x in paths]
+
+    # populate table
+    lookup = {}
+    for index, filename in enumerate(paths):
+
+            lookup[index] = paths[index]
+
+            x.add_row(
+                [
+                    rst + str(index) + '.' + frame,
+                    rst + filenames[index] + frame,
+                    rst + paths[index] + frame,
+                    rst + ctimes[index] + frame,
+                    rst + mtimes[index] + frame
+                ]
+            )
+
+    # Table showing selections
+    print(f'\n\tUserdata Scripts (local filesystem: ~/.config/ec2tools/userdata)\n'.expandtabs(26))
+    display_table(x, tabspaces=4)
+    return choose_resource(lookup)
