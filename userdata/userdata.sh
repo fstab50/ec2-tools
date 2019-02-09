@@ -341,6 +341,8 @@ case $os in
         yum update -y
         # install binaries if available
         yum install -y wget jq source-highlight highlight
+        # install epel
+        enable_epel_repo
         ;;
 
     'redhat' | 'centos')
