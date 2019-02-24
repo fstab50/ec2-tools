@@ -69,14 +69,6 @@ complete -F _cheat_autocomplete cheat
 
 
 function motd(){
-
-    else
-		# run legacy motd
-		sh ~/git/scripts-host/init/motd-ubuntu16.04.sh
-	fi
-}
-
-function motd(){
     #
     # Name:   motd.sh
     # Usage:  this script must be located at /etc/profile.d/motd.sh
