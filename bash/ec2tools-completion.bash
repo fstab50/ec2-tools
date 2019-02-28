@@ -181,6 +181,8 @@ function _quantity_subcommands(){
         fi
     done
     printf -- '%s\n' "${arr_subcmds[@]}"
+    #
+    # <-- end function _quantity_subcommands -->
 }
 
 
@@ -200,6 +202,8 @@ function _numargs(){
         printf -- '%s\n' "$numargs"
     fi
     return 0
+    #
+    # <-- end function _numargs -->
 }
 
 
@@ -218,6 +222,8 @@ function _parse_compwords(){
         fi
     done
     printf -- '%s\n' "${missing_words[@]}"
+    #
+    # <-- end function _parse_compwords -->
 }
 
 
@@ -356,7 +362,6 @@ function _machineimage_completions(){
             fi
             ;;
     esac
-
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
     #
     # <--- end fucntion _machineimage_completions --->
@@ -524,6 +529,7 @@ function _runmachine_completions(){
     esac
 
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
+
     #
     # <--- end fucntion _runmachine_completions --->
 }
