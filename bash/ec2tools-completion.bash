@@ -191,10 +191,14 @@ function _numargs(){
     local parameters="$1"
     local numargs
 
-    for i in $(echo $parameters); do
-        numargs=$(( $numargs + 1 ))
-    done
-    printf -- '%s\n' "$numargs"
+    if [[ ! "$parameters" ]]; then
+        printf -- '%s\n' "0"
+    else
+        for i in $(echo $parameters); do
+            numargs=$(( $numargs + 1 ))
+        done
+        printf -- '%s\n' "$numargs"
+    fi
     return 0
 }
 
@@ -324,7 +328,7 @@ function _machineimage_completions(){
             fi
             ;;
 
-        '--debug' | '--version' | '--help')
+        '--debug' | '--version' | '--help' | '--filename')
             return 0
             ;;
 
