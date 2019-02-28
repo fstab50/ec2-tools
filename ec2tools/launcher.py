@@ -839,6 +839,8 @@ def init_cli():
                     userdata_str = read(script_path)
                 if args.debug:
                     print('USERDATA CONTENT: \n{}'.format(userdata_str))
+            else:
+                script_path = os.environ.get('HOME') + '/' + '.config/ec2tools'
 
             #pdb.set_trace()
 
