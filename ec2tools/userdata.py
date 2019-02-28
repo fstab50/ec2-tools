@@ -97,6 +97,7 @@ def userdata_lookup(debug):
 
     # populate table
     lookup = {}
+
     for index, path in enumerate(paths):
 
             lookup[index] = paths[index]
