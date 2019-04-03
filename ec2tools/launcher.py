@@ -33,12 +33,12 @@ logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 yl = Colors.YELLOW
 bd = Colors.BOLD + Colors.WHITE
-frame = Colors.BOLD + Colors.BRIGHTGREEN
+frame = Colors.BOLD + Colors.BRIGHT_GREEN
 rst = Colors.RESET
 PACKAGE = 'runmachine'
 PKG_ACCENT = Colors.ORANGE
 PARAM_ACCENT = Colors.WHITE
-AMI = Colors.DARKCYAN
+AMI = Colors.DARK_CYAN
 
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
 GENERIC_USERDATA =  local_config['CONFIG']['USERDATA_DIR'] + '/userdata.sh'
