@@ -1,5 +1,5 @@
 #
-#	 Makefile, ver 1.7.0
+#	 Makefile, ver 1.7.1
 #
 # --- declarations  --------------------------------------------------------------------------------
 
@@ -136,7 +136,7 @@ upload-s3-artifacts:     ## Upload ec2 configuration mgmt files to Amazon S3
 .PHONY: update-source-install
 update-source-install:     ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
-	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; else \
+	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3*/site-packages/; else \
  	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
 	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi;  \
 	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
