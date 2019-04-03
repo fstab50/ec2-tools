@@ -32,7 +32,7 @@ logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 yl = Colors.YELLOW
 bd = Colors.BOLD + Colors.WHITE
-frame = Colors.BOLD + Colors.BRIGHTGREEN
+frame = Colors.BOLD + Colors.BRIGHT_GREEN
 rst = Colors.RESET
 PACKAGE = 'runmachine'
 

@@ -9,11 +9,10 @@ import datetime
 import pdb
 import subprocess
 from shutil import which
-import boto3
 from botocore.exceptions import ClientError
 from veryprettytable import VeryPrettyTable
 from pyaws.ec2 import default_region
-from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, range_bind
+from pyaws.utils import stdout_message, export_json_object, userchoice_mapping
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
@@ -41,7 +40,7 @@ PARAM_ACCENT = Colors.WHITE
 AMI = Colors.DARK_CYAN
 
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
-GENERIC_USERDATA =  local_config['CONFIG']['USERDATA_DIR'] + '/userdata.sh'
+GENERIC_USERDATA = local_config['CONFIG']['USERDATA_DIR'] + '/userdata.sh'
 
 image, subnet, securitygroup, keypair = None, None, None, None
 launch_prereqs = (image, subnet, securitygroup, keypair)
