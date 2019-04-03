@@ -134,7 +134,7 @@ upload-s3-artifacts:     ## Upload ec2 configuration mgmt files to Amazon S3
 
 
 .PHONY: update-source-install
-update-source-install:     ## Update Install (source: local source).
+update-src-install:     ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
 	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3*/site-packages/; else \
  	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
