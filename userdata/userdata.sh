@@ -23,6 +23,7 @@ warn="[WARN]: $CALLER"
 
 packages=(
     'distro'
+    'pyaws'
 )
 
 
@@ -134,15 +135,19 @@ function install_python3(){
 
     if [ "$os" = "amzn1" ]; then
         yum install -y python3*
+        yum -y update
 
     elif [ "$os" = "amzn2" ]; then
         amazon-linux-extras install python3
+        yum -y update
 
     elif [ "$os" = "redhat" ] || [ "$os" = "centos" ]; then
         yum install -y python36*
+        yum -y update
 
     elif [ "$os" = "debian" ] || [ "$os" = "ubuntu" ]; then
         apt install -y python3.6*
+        apt -y upgrade
     fi
 }
 
