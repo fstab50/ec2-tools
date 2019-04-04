@@ -294,7 +294,6 @@ function upgrade_pip(){
                 logger --tag $info "pip $($pip_bin --version 2>/dev/null | awk '{print $2}') installed - latest"
                 break
             fi
-
             # check for latest version, setuptools
             if [ "$($pip_bin list --outdated 2>/dev/null | grep setuptools)" ]; then
                 logger --tag $info "Upgrade setuptools to latest" "INFO"

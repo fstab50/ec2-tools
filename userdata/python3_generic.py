@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+"""
+Summary.
+
+    Advanced EC2 userdata configuration script
+
+TODO:
+    1. download os_distro.sh from s3
+    2. install os_distro.sh >> ~/.config/bash dir
+    3. run yum update AFTER installing python3 with amazon-linux-extras utility
+    4. run chown -R ec2-user:ec2-user ~/.config to flip ownership to user from root
+    
+"""
 
 import os
 import sys
