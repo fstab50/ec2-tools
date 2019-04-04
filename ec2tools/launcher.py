@@ -840,7 +840,7 @@ def init_cli():
                     print('USERDATA CONTENT: \n{}'.format(userdata_str))
             else:
                 script_path = os.environ.get('HOME') + '/' + '.config/ec2tools'
-                userdata_str = read(script_path)
+                userdata_str = '#!/usr/bin/env bash\n\necho "userdata exec"'
 
             #pdb.set_trace()
 
