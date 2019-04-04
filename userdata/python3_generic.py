@@ -63,8 +63,7 @@ def directory_operations(path, groupid, userid, permissions):
                 logger.info('Changed owner on fs object {} to {}'.format(f, userid))
     except OSError as e:
         logger.exception(
-            'Unknown error while resetting owner or perms on fs object (%s)' %
-            f or d
+            'Unknown error while resetting owner or perms on fs object {}:\n{}'.format(f or d, e)
         )
     return True
 
