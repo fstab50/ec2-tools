@@ -9,7 +9,7 @@ TODO:
     2. install os_distro.sh >> ~/.config/bash dir
     3. run yum update AFTER installing python3 with amazon-linux-extras utility
     4. run chown -R ec2-user:ec2-user ~/.config to flip ownership to user from root
-    
+
 """
 
 import os
@@ -141,7 +141,7 @@ def getLogger(*args, **kwargs):
 
 
 def os_dependent():
-
+    """Determine linux os distribution"""
     d = distro.linux_distribution()[0]
     logger.info('Distro identified as {}'.format(d))
 
@@ -152,7 +152,6 @@ def os_dependent():
     elif 'Ubuntu' or 'ubuntu' in d:
         return 'config-redhat.config'
     return None
-
 
 
 def os_type():
@@ -234,7 +233,7 @@ def local_profile_setup(distro):
         if not os.path.exists(destination):
             os.makedirs(destination)
 
-        if download([s3_origin + '/config/neofetch/'+ filename]):
+        if download([s3_origin + '/config/neofetch/' + filename]):
             os.rename(filename, destination + '/config.conf')
             os.chown(filename, groupid, userid)
             os.chmod(filename, 0o700)
@@ -243,13 +242,13 @@ def local_profile_setup(distro):
         else:
             logger.warning('Failed to download and place {}'.format(filename))
 
-
         # reset owner to normal user for .config/bash (desination):
         directory_operations(destination, groupid, userid, 0o700)
 
     except OSError as e:
         logger.exception(
-            'Unknown problem downloading or installing local user profile artifacts')
+            'Unknown problem downloading or installing local user profile artifacts:\n{}'.format(e)
+            )
         return False
     return True
 
