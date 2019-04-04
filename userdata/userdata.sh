@@ -107,8 +107,13 @@ function download_pyscript(){
 
 function enable_epel_repo(){
     ## installs epel repo on redhat-distro systems
-    wget -O epel.rpm –nv $EPEL_URL
-    yum install -y ./epel.rpm
+    local ostype="$1"
+    if [ "$ostype" = "amzn2" ]; then
+        amamzon-linux-extras install epel
+    else
+        wget -O epel.rpm –nv $EPEL_URL
+        yum install -y ./epel.rpm
+    fi
 }
 
 
@@ -344,16 +349,16 @@ case $os in
         # update os
         yum update -y
         # install binaries if available
-        yum install -y wget jq source-highlight highlight
+        yum install -y 'wget' 'jq' 'source-highlight' 'highlight'
         # install epel
-        enable_epel_repo
+        enable_epel_repo "$os"
         ;;
 
     'redhat' | 'centos')
         # update os
         yum update -y
         # install binaries if available
-        yum install -y wget jq source-highlight souce-highlight-devel
+        yum install -y 'wget' 'jq'  'source-highlight' 'source-highlight-devel'
         # install epel
         enable_epel_repo
         ;;
@@ -363,7 +368,7 @@ case $os in
         apt update -y
         apt upgrade -y
         # install binaries if available
-        apt install -y wget jq source-highlight souce-highlight-devel
+        apt install -y 'wget' 'jq' 'source-highlight' 'highlight'
         ;;
 esac
 
