@@ -38,7 +38,7 @@ index_url = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/index.json'
 tmpdir = '/tmp'
 pricee_url = None
 output_filename = 'sizes.txt'
-bdwt = Colors.BOLD + Colors.BRIGHTWHITE
+bdwt = Colors.BOLD + Colors.BRIGHT_WHITE
 yl = Colors.GOLD3
 rst = Colors.RESET
 
