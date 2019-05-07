@@ -41,10 +41,12 @@ userdata_scripts=(
     'userdata.sh'
 )
 
+
 host_artifacts=(
     $(for i in $(ls $config_bash); do echo "config/bash/$i"; done)
     $(for j in $(ls $config_motd); do echo "config/neofetch/$j"; done)
 )
+
 
 function verify_object_acl(){
     ##

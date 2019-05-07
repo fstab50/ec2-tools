@@ -829,7 +829,7 @@ def init_cli():
 
             if args.userdata:
                 # prep default userdata if none specified
-                if args.imagetype.split('.')[0] in ('ubuntu18'):
+                if args.imagetype.split('.')[0] in ('ubuntuFUTURE'):
                     from ec2tools import python3_userdata as userdata
                     userdata_str = read(os.path.abspath(userdata.__file__))
                 else:
