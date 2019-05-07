@@ -2,7 +2,7 @@
 
 pkg=$(basename $0)          # pkg reported in logs will be the basename of the caller
 pkg_path=$(cd $(dirname $0); pwd -P)
-source $pkg_path/colors.sh
+. $pkg_path/colors.sh
 
 bdwt=$(echo -e ${bold}${a_brightwhite})
 bgn=$(echo -e ${bold}${a_brightgreen})
@@ -79,7 +79,7 @@ if [[ ! $1 || ! $2 || ! $3 ]]; then
     echo -e "\n  You must enter parameters:\n"
     echo -e "\t \$1: Output Format"
     echo -e "\t \$2: spaces from left for first line"
-    echo -e "\t \$3: spaces from left for first line"
+    echo -e "\t \$3: spaces from left for second line"
     exit 1
 fi
 
@@ -109,6 +109,11 @@ elif [ "$FORMAT" = "D" ]; then
     printf "%*s%s\n\n" $spaces1 '' "$text"
     text="${bdwt}LOAD AVERAGES${reset}: $(printf "1-min: $ONE_MIN | 5-min$: $FIVE_MIN | 15-min: $FIF_MIN")"
     printf "%*s%s\n\n" $spaces2 '' "$text"
+
+elif [ "$FORMAT" = "E" ]; then
+    # uses spaces parameters above
+    text="${bdwt}LOAD AVG${reset} :  $(printf "1-min: $ONE_MIN | 5-min$: $FIVE_MIN | 15-min: $FIF_MIN")"
+    printf "%*s%s\n\n" $spaces1 '' "$text"
 fi
 
 exit 0

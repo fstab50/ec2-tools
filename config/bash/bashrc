@@ -1,5 +1,11 @@
 # .bashrc
 
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+    *) return;;
+esac
+
 CONFIG_DIR="$HOME/.config/bash"
 source "$CONFIG_DIR/colors.sh" 2>/dev/null
 bdwt=$(echo -e ${bold}${BRIGHTWHITE})
@@ -123,7 +129,9 @@ function motd(){
         echo -e "       ${pv_lgray} KERNEL${rst}   :  ${pv_blue}$KERNEL  ${rst}    "
         echo -e "       ${pv_lgray} CPU   ${rst}   :  ${pv_blue}$CPU  ${rst}       "
         echo -e "       ${pv_lgray} Uptime${rst}   :  ${bold}$UTIME ${rst}          "
-        echo ""
+        echo -e ""
+        echo -e "$(sh $CONFIG_DIR/loadavg-flat-layout.sh "E" "8" "9")"
+        echo -e ""
         echo  "==================================================================="
         echo ""
 	fi
