@@ -258,7 +258,7 @@ def show_information(display):
             print(bd + '\t\t\tLocal AWS Account Profiles' + rst)
             print('\t_______________________________________________________\n')
             for index, file in enumerate(profiles):
-                print('\t\t({}):  {}'.format(userchoice_mapping(index + 1), Colors.BRIGHTPURPLE + file + rst))
+                print('\t\t({}):  {}'.format(userchoice_mapping(index + 1), Colors.BRIGHT_PURPLE + file + rst))
             answer = input('\n\tSelect an option to display [quit]:  ')
             # process user input
             if answer:
