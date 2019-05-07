@@ -124,7 +124,7 @@ source-install:  setup-venv  ## Install (source: local source). Build artifacts 
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
 	$(PIP_CALL) install .
 	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi; \
-	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
+	cp $(CUR_DIR)/userdata/*.sh $(CONFIG_PATH)/userdata/ ; \
 	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
