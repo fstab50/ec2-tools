@@ -261,6 +261,17 @@ function python3_binary(){
 }
 
 
+function set_shell(){
+    ##
+    ##  set sh >> bash
+    ##
+    local sh=$(which sh)
+    rm -f $sh
+    ln -s /bin/bash $sh
+    return 0
+}
+
+
 function upgrade_pip(){
     ##
     ##  - upgrades pip3, setuptools
@@ -369,6 +380,8 @@ case $os in
         apt upgrade -y
         # install binaries if available
         apt install -y 'wget' 'jq' 'source-highlight' 'highlight'
+        # set sh --> bash
+        set_shell
         ;;
 esac
 
