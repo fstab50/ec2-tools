@@ -391,7 +391,7 @@ function _runmachine_completions(){
     numargs=0
 
     # option strings
-    commands='--debug --image --instance-size --help --quantity --profile --region --version'
+    commands='--debug --image --instance-size --help --quantity --profile --region --userdata --version'
     image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
                 ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
 
@@ -403,7 +403,7 @@ function _runmachine_completions(){
             ##  not already present on the command line
             ##
             declare -a horsemen
-            horsemen=(  '--image' '--instance-size' '--profile' '--quantity' '--region' )
+            horsemen=(  '--image' '--instance-size' '--profile' '--quantity' '--region' '--userdata' )
             subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
             numargs=$(_numargs "$subcommands")
 
@@ -501,6 +501,24 @@ function _runmachine_completions(){
             ;;
 
         [0-9] | [0-9][0-9])
+            ##
+            ##  Return compreply with any of the 5 comp_words that
+            ##  not already present on the command line
+            ##
+            declare -a horsemen
+            horsemen=(  '--image' '--instance-size' '--profile' '--quantity' '--region' '--userdata' )
+            subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
+            numargs=$(_numargs "$subcommands")
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( "$numargs" > 2 )); then
+                _complete_4_horsemen_subcommands "${subcommands}"
+            else
+                COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
+        '--userdata')
             ##
             ##  Return compreply with any of the 5 comp_words that
             ##  not already present on the command line
