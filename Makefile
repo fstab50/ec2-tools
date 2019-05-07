@@ -139,8 +139,9 @@ update-src-install:     ## Update Install (source: local source).
 
 .PHONY: upload-artifacts
 upload-artifacts:    ## Upload ec2 configuration mgmt files to Amazon S3
-	if [ ! -e $(VENV_DIR) ]; then $(MAKE) setup-venv; fi \
-	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
+	if [ ! -e $(VENV_DIR) ]; then $(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
+	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT); else \
+	. $(VENV_DIR)/bin/activate && bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT); fi
 
 
 .PHONY: help
