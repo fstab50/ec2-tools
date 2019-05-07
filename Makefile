@@ -122,24 +122,24 @@ test-install:  setup-venv ## Install (source: testpypi). Build artifacts exist
 .PHONY: source-install
 source-install:  setup-venv  ## Install (source: local source). Build artifacts exist
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
-	$(PIP_CALL) install .
+	$(PIP_CALL) install . \
 	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi; \
 	cp $(CUR_DIR)/userdata/*.sh $(CONFIG_PATH)/userdata/ ; \
-	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
+	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT);
 
 
-.PHONY: upload-s3-artifacts
-upload-s3-artifacts:     ## Upload ec2 configuration mgmt files to Amazon S3
-	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
-
-
-.PHONY: update-source-install
+.PHONY: update-src-install
 update-src-install:     ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
 	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3*/site-packages/; else \
  	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
 	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi;  \
 	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
+
+
+.PHONY: upload-s3-artifacts
+upload-s3-artifacts:  setup-venv   ## Upload ec2 configuration mgmt files to Amazon S3
+	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
 .PHONY: help
