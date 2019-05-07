@@ -152,6 +152,9 @@ function install_python3(){
 
     elif [ "$os" = "debian" ] || [ "$os" = "ubuntu" ]; then
         apt install -y python3.6*
+        logger --tag $info "Installing python3-pip"
+        apt install -y python3-pip
+        logger --tag $info "Initate apt upgrade"
         apt -y upgrade
     fi
 }
