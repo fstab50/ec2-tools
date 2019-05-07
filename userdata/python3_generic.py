@@ -72,13 +72,12 @@ def download(url_list):
     """
     Retrieve remote file object
     """
-    def exists(object):
-        if os.path.exists(os.getcwd() + '/' + filename):
+    def exists(fname):
+        if os.path.exists(os.getcwd() + '/' + fname):
             return True
         else:
-            msg = 'File object %s failed to download to %s. Exit' % (filename, os.getcwd())
+            msg = 'File object %s failed to download to %s. Exit' % (fname, os.getcwd())
             logger.warning(msg)
-            stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
             return False
     try:
         for url in url_list:
@@ -198,9 +197,9 @@ def local_profile_setup(distro):
         filename = '.bashrc'
         if download([url_bashrc]):
             logger.info('Download of {} successful to {}'.format(filename, home_dir))
-            os.rename(os.path.split(url_bashrc)[1], filename)
-            os.chown(filename, groupid, userid)
-            os.chmod(filename, 0o700)
+            os.rename(home_dir + '/' + os.path.split(url_bashrc)[1], home_dir + '/' + filename)
+            os.chown(home_dir + '/' + filename, groupid, userid)
+            os.chmod(home_dir + '/' + filename, 0o700)
 
         filename = '.bash_aliases'
         if download([url_aliases]):
