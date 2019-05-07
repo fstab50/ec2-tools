@@ -1,118 +1,283 @@
+#!/usr/bin/env python3
 """
 Summary.
 
-    Userdata module: displays userdata script files found
-    on the local filesystem from which user can choose
+    Advanced EC2 userdata configuration script
+
+TODO:
+    1. download os_distro.sh from s3
+    2. install os_distro.sh >> ~/.config/bash dir
+    3. run yum update AFTER installing python3 with amazon-linux-extras utility
+    4. run chown -R ec2-user:ec2-user ~/.config to flip ownership to user from root
 
 """
 
 import os
 import sys
-import json
-import argparse
 import inspect
-import time
-from veryprettytable import VeryPrettyTable
-from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, range_bind
-from pyaws import Colors
-from ec2tools.statics import local_config
-from ec2tools import logd, __version__
-from ec2tools.user_selection import choose_resource
-
-try:
-    from pyaws.core.oscodes_unix import exit_codes
-except Exception:
-    from pyaws.core.oscodes_win import exit_codes    # non-specific os-safe codes
+import platform
+import subprocess
+from pwd import getpwnam as userinfo
+import logging
+import logging.handlers
 
 
-# globals
-module = os.path.basename(__file__)
-_scriptdir = local_config['CONFIG']['USERDATA_DIR']
-logger = logd.getLogger(__version__)
-act = Colors.ORANGE
-yl = Colors.YELLOW
-bd = Colors.BOLD + Colors.WHITE
-frame = Colors.BOLD + Colors.BRIGHT_GREEN
-rst = Colors.RESET
-PACKAGE = 'runmachine'
+url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bashrc'
+url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bash_aliases'
+url_colors = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/colors.sh'
+s3_origin = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files'
+
+homedir_files = ['bashrc', 'bash_aliases']
+
+config_bash_files = [
+    'colors.sh',
+    'loadavg-flat-layout.sh',
+    'os_distro.sh'
+]
 
 
-def display_table(table, tabspaces=4):
-    """Print Table Object offset from left by tabspaces"""
-    indent = ('\t').expandtabs(tabspaces)
-    table_str = table.get_string()
-    for e in table_str.split('\n'):
-        print(indent + frame + e)
-    sys.stdout.write(Colors.RESET)
+def directory_operations(path, groupid, userid, permissions):
+    """
+    Summary.
+
+        Recursively sets owner and permissions on all file objects
+        within path given as a parameter
+
+    Args:
+        path (str):  target directory
+        permissions:  octal permissions (example: 0644)
+    """
+    try:
+        for root, dirs, files in os.walk(path):
+            for d in dirs:
+                os.chmod(os.path.join(root, d), permissions)
+                logger.info('Changed permissions on fs object {} to {}'.format(d, permissions))
+
+                os.chown(os.path.join(root, d), groupid, userid)
+                logger.info('Changed owner on fs object {} to {}'.format(d, userid))
+
+            for f in files:
+                os.chmod(os.path.join(root, f), permissions)
+                logger.info('Changed permissions on fs object {} to {}'.format(f, permissions))
+                os.chown(os.path.join(root, f), groupid, userid)
+                logger.info('Changed owner on fs object {} to {}'.format(f, userid))
+    except OSError as e:
+        logger.exception(
+            'Unknown error while resetting owner or perms on fs object {}:\n{}'.format(f or d, e)
+        )
     return True
 
 
-def source_local_userdata(paths=False):
+def download(url_list):
+    """
+    Retrieve remote file object
+    """
+    def exists(object):
+        if os.path.exists(os.getcwd() + '/' + filename):
+            return True
+        else:
+            msg = 'File object %s failed to download to %s. Exit' % (filename, os.getcwd())
+            logger.warning(msg)
+            stdout_message('%s: %s' % (inspect.stack()[0][3], msg))
+            return False
+    try:
+        for url in url_list:
+
+            if which('wget'):
+                cmd = 'wget ' + url
+                subprocess.getoutput(cmd)
+                logger.info("downloading " + url)
+
+            elif which('curl'):
+                cmd = 'curl -o ' + os.path.basename(url) + ' ' + url
+                subprocess.getoutput(cmd)
+                logger.info("downloading " + url)
+
+            else:
+                logger.info('Failed to download {} no url binary found'.format(os.path.basename(url)))
+                return False
+    except Exception as e:
+        logger.info(
+            'Error downloading file: {}, URL: {}, Error: {}'.format(os.path.basename(url), url, e)
+        )
+        return False
+    return True
+
+
+def getLogger(*args, **kwargs):
+    """
+    Summary:
+        custom format logger
+
+    Args:
+        mode (str):  The Logger module supprts the following log modes:
+            - log to system logger (syslog)
+
+    Returns:
+        logger object | TYPE: logging
+    """
+    syslog_facility = 'local7'
+    syslog_format = '[INFO] - %(pathname)s - %(name)s - [%(levelname)s]: %(message)s'
+
+    # all formats
+    asctime_format = "%Y-%m-%d %H:%M:%S"
+
+    # objects
+    logger = logging.getLogger(*args, **kwargs)
+    logger.propagate = False
+
+    try:
+        if not logger.handlers:
+            # branch on output format, default to stream
+            sys_handler = logging.handlers.SysLogHandler(address='/dev/log', facility=syslog_facility)
+            sys_formatter = logging.Formatter(syslog_format)
+            sys_handler.setFormatter(sys_formatter)
+            logger.addHandler(sys_handler)
+            logger.setLevel(logging.DEBUG)
+    except OSError as e:
+        raise e
+    return logger
+
+
+def os_dependent():
+    """Determine linux os distribution"""
+    d = distro.linux_distribution()[0]
+    logger.info('Distro identified as {}'.format(d))
+
+    if 'Amazon' or 'amazon' in d:
+        return 'config-amazonlinux.conf'
+    elif 'Redhat' or 'redhat' or 'rhel' in d:
+        return 'config-redhat.config'
+    elif 'Ubuntu' or 'ubuntu' in d:
+        return 'config-redhat.config'
+    return None
+
+
+def os_type():
     """
     Summary.
 
-        returns userdata scripts found locally in configuration dir
+        Identify operation system environment
 
-    Returns:
-        userdata scripts (full path), TYPE:  str
-
+    Return:
+        os type (str) Linux | Windows
+        If Linux, return Linux distribution
     """
-    if paths is False:
-        return os.listdir(_scriptdir)
-    return [os.path.join(_scriptdir, x) for x in os.listdir(_scriptdir)]
+    if platform.system() == 'Windows':
+        return 'Windows'
+    elif platform.system() == 'Linux':
+        return 'Linux'
 
 
-def userdata_lookup(debug):
-    """
-    Summary.
+def local_profile_setup(distro):
+    """Configures local user profile"""
+    home_dir = None
 
-        Instance Profile role user selection
+    if os.path.exists('/home/ec2-user'):
+        userid = userinfo('ec2-user').pw_uid
+        groupid = userinfo('ec2-user').pw_gid
+        home_dir = '/home/ec2-user'
 
-    Returns:
-        iam instance profile role ARN (str) or None
-    """
-    # setup table
-    x = VeryPrettyTable(border=True, header=True, padding_width=2)
-    field_max_width = 70
+    elif os.path.exists('/home/ubuntu'):
+        userid = userinfo('ubuntu').pw_uid
+        groupid = userinfo('ubuntu').pw_gid
+        home_dir = '/home/ubuntu'
 
-    x.field_names = [
-        bd + '#' + frame,
-        bd + 'Filename' + frame,
-        bd + 'Path' + frame,
-        bd + 'CreateDate' + frame,
-        bd + 'LastModified' + frame
-    ]
+    elif os.path.exists('/home/centos'):
+        userid = userinfo('centos').pw_uid
+        groupid = userinfo('centos').pw_gid
+        home_dir = '/home/centos'
 
-    # cell alignment
-    x.align[bd + '#' + frame] = 'c'
-    x.align[bd + 'Filename' + frame] = 'c'
-    x.align[bd + 'Path' + frame] = 'l'
-    x.align[bd + 'CreateDate' + frame] = 'c'
-    x.align[bd + 'LastModified' + frame] = 'c'
+    else:
+        return False
 
-    filenames = source_local_userdata()
-    paths = source_local_userdata(paths=True)
-    ctimes = [time.ctime(os.path.getctime(x)) for x in paths]
-    mtimes = [time.ctime(os.path.getmtime(x)) for x in paths]
+    try:
 
-    # populate table
-    lookup = {}
+        os.chdir(home_dir)
 
-    for index, path in enumerate(paths):
+        filename = '.bashrc'
+        if download([url_bashrc]):
+            logger.info('Download of {} successful to {}'.format(filename, home_dir))
+            os.rename(os.path.split(url_bashrc)[1], filename)
+            os.chown(filename, groupid, userid)
+            os.chmod(filename, 0o700)
 
-            lookup[index] = paths[index]
+        filename = '.bash_aliases'
+        if download([url_aliases]):
+            logger.info('Download of {} successful to {}'.format(filename, home_dir))
+            os.rename(os.path.split(url_aliases)[1], '.bash_aliases')
+            os.chown(filename, groupid, userid)
+            os.chmod(filename, 0o700)
 
-            x.add_row(
-                [
-                    rst + str(index) + '.' + frame,
-                    rst + filenames[index] + frame,
-                    rst + path + frame,
-                    rst + ctimes[index] + frame,
-                    rst + mtimes[index] + frame
-                ]
+        # download and place ~/.config/bash artifacts
+        destination = home_dir + '/.config/bash'
+
+        if not os.path.exists(destination):
+            os.makedirs(destination)
+
+        for filename in config_bash_files:
+            if download([s3_origin + '/config/bash/' + filename]):
+                os.rename(filename, destination + '/' + filename)
+                os.chown(filename, groupid, userid)
+                os.chmod(filename, 0o700)
+            if os.path.exists(destination + '/' + filename):
+                logger.info('Download of {} successful to {}'.format(filename, destination))
+            else:
+                logger.warning('Failed to download and place {}'.format(filename))
+
+        # download and place ~/.config/neofetch artifacts
+        destination = home_dir + '/.config/neofetch'
+        filename = os_dependent() or 'config.conf'
+
+        if not os.path.exists(destination):
+            os.makedirs(destination)
+
+        if download([s3_origin + '/config/neofetch/' + filename]):
+            os.rename(filename, destination + '/config.conf')
+            os.chown(filename, groupid, userid)
+            os.chmod(filename, 0o700)
+        if os.path.exists(destination + '/' + filename):
+            logger.info('Download of {} successful to {}'.format(filename, destination))
+        else:
+            logger.warning('Failed to download and place {}'.format(filename))
+
+        # reset owner to normal user for .config/bash (desination):
+        directory_operations(destination, groupid, userid, 0o700)
+
+    except OSError as e:
+        logger.exception(
+            'Unknown problem downloading or installing local user profile artifacts:\n{}'.format(e)
             )
+        return False
+    return True
 
-    # Table showing selections
-    print(f'\n\tUserdata Scripts (local filesystem: ~/.config/ec2tools/userdata)\n'.expandtabs(26))
-    display_table(x, tabspaces=4)
-    return choose_resource(lookup)
+
+def which(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+
+# --- main -----------------------------------------------------------------------------------------
+
+
+if __name__ == '__main__':
+    # setup logging facility
+    logger = getLogger('1.0')
+
+    if platform.system() == 'Linux':
+        logger.info('Operating System type identified: Linux, {}'.format(os_type()))
+        local_profile_setup(os_type())
+    else:
+        logger.info('Operating System type identified: {}'.format(os_type()))
+
+    sys.exit(0)
