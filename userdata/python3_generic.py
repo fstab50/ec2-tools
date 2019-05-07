@@ -218,8 +218,8 @@ def local_profile_setup(distro):
         for filename in config_bash_files:
             if download([s3_origin + '/config/bash/' + filename]):
                 os.rename(filename, destination + '/' + filename)
-                os.chown(filename, groupid, userid)
-                os.chmod(filename, 0o700)
+                os.chown(destination + '/' + filename, groupid, userid)
+                os.chmod(destination + '/' + filename, 0o700)
             if os.path.exists(destination + '/' + filename):
                 logger.info('Download of {} successful to {}'.format(filename, destination))
             else:
