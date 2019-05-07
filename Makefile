@@ -134,11 +134,12 @@ update-src-install:     ## Update Install (source: local source).
 	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3*/site-packages/; else \
  	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
 	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi;  \
-	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/ ; \
+	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/
 
 
-.PHONY: upload-s3-artifacts
-upload-s3-artifacts:  setup-venv   ## Upload ec2 configuration mgmt files to Amazon S3
+.PHONY: upload-artifacts
+upload-artifacts:    ## Upload ec2 configuration mgmt files to Amazon S3
+	if [ ! -e $(VENV_DIR) ]; then $(MAKE) setup-venv; fi \
 	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT)
 
 
