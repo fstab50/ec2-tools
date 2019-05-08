@@ -518,6 +518,24 @@ function _runmachine_completions(){
             return 0
             ;;
 
+        "[a-z][a-z]-????-?")
+            ##
+            ##  Return compreply with any of the 5 comp_words that
+            ##  not already present on the command line
+            ##
+            declare -a horsemen
+            horsemen=(  '--image' '--instance-size' '--profile' '--quantity' '--region' '--userdata')
+            subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
+            numargs=$(_numargs "$subcommands")
+
+            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( "$numargs" > 2 )); then
+                _complete_4_horsemen_subcommands "${subcommands}"
+            else
+                COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            fi
+            return 0
+            ;;
+
         '--userdata')
             ##
             ##  Return compreply with any of the 5 comp_words that
