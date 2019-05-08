@@ -120,7 +120,7 @@ test-install:  setup-venv ## Install (source: testpypi). Build artifacts exist
 
 
 .PHONY: source-install
-source-install:  setup-venv  ## Install (source: local source). Build artifacts exist
+source-install: clean setup-venv  ## Install (source: local source). Build artifacts exist
 	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && $(PIP_CALL) install . ; \
 	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi; \
 	cp $(CUR_DIR)/userdata/*.sh $(CONFIG_PATH)/userdata/ ; \
