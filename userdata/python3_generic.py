@@ -20,6 +20,7 @@ import subprocess
 from pwd import getpwnam as userinfo
 import logging
 import logging.handlers
+import distro
 
 
 url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bashrc'
@@ -140,14 +141,14 @@ def getLogger(*args, **kwargs):
 
 def os_dependent():
     """Determine linux os distribution"""
-    d = distro.linux_distribution()[0]
+    d = distro.linux_distribution()[0].lower()
     logger.info('Distro identified as {}'.format(d))
 
-    if 'Amazon' or 'amazon' in d:
+    if 'amazon' in d:
         return 'config-amazonlinux.conf'
-    elif 'Redhat' or 'redhat' or 'rhel' in d:
+    elif 'redhat' or 'rhel' in d:
         return 'config-redhat.config'
-    elif 'Ubuntu' or 'ubuntu' in d:
+    elif 'ubuntu' in d:
         return 'config-redhat.config'
     return None
 
