@@ -11,11 +11,11 @@ pkg=$(basename $0)
 bucketname='awscloud.center'
 profilename='gcreds-da-atos'
 acltype='public-read'
-git_root=$(git rev-parse --show-toplevel 2>/dev/null)
-scripts_dir="$git_root/scripts"
+_root=$(git rev-parse --show-toplevel 2>/dev/null)
+scripts_dir="$_root/scripts"
 config_bash='config/bash'
 config_motd='config/neofetch'
-profile_dir="$git_root/$profile_dirname"
+profile_dir="$_root/$profile_dirname"
 pwd=$PWD
 errors='/dev/null'
 debug="$1"
@@ -83,7 +83,7 @@ elif [[ ! $(gcreds -s | grep $profilename) ]] || [[ $(gcreds -s | grep expired) 
 fi
 
 
-cd "$git_root/userdata" || echo "ERROR: unable to cd to userdata directory"
+cd "$_root/userdata" || echo "ERROR: unable to cd to userdata directory"
 
 
 std_message "Userdata artifacts for upload to Amazon S3:" "INFO"
