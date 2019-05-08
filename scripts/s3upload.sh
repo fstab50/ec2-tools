@@ -57,10 +57,10 @@ function verify_object_acl(){
     key="$2"        # file object
     profile="$3"    # awscli profile name
 
-    var1=$(aws s3api get-object-acl --bucket $bucket --key $key --profile $profile)
+    var1=$(aws s3api get-object-acl --bucket $bucket --key "files/$key" --profile $profile)
 
     if [[ $(echo $var1 | grep 'AllUsers') ]]; then
-        std_message "Verified acl on s3 object ${accent}$f${rst}..." "OK"
+        std_message "Verified acl on s3 object s3://$bucket/${accent}$key${rst}..." "OK"
     else
         std_warn "Unable to verify upload of object ${accent}$f${rst}..."
     fi
@@ -118,7 +118,7 @@ for f in "${userdata_scripts[@]}" "${host_artifacts[@]}"; do
     std_message "Setting acl on artifact ${accent}$f${rst}..." "INFO"
     r=$(aws s3api put-object-acl --key files/$f --acl $acltype --bucket $bucketname --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
-    verify_object_acl "$bucketname" "files/$f" "$profilename"
+    verify_object_acl "$bucketname" "$f" "$profilename"
 done
 
 cd $pwd || exit 1
