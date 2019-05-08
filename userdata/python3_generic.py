@@ -22,9 +22,9 @@ import logging
 import logging.handlers
 
 
-url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bashrc'
-url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/bash_aliases'
-url_colors = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/colors.sh'
+url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bashrc'
+url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bash_aliases'
+url_colors = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/colors.sh'
 s3_origin = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files'
 
 homedir_files = ['bashrc', 'bash_aliases']
