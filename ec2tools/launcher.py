@@ -829,9 +829,10 @@ def init_cli():
 
             if args.userdata:
                 # prep default userdata if none specified
-                if args.imagetype.split('.')[0] in ('ubuntuFUTURE'):
-                    from ec2tools import python3_userdata as userdata
-                    userdata_str = read(os.path.abspath(userdata.__file__))
+                if args.imagetype.split('.')[0] == 'FUTURE':
+                    logger.info('This is a placeholder for python3 only distros in future')
+                    #from ec2tools import python3_userdata as userdata
+                    #userdata_str = read(os.path.abspath(userdata.__file__))
                 else:
                     #userdata_str = read(os.path.abspath(GENERIC_USERDATA))
                     script_path = userdata_lookup(args.debug)
