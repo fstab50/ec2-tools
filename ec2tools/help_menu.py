@@ -11,7 +11,7 @@ from pyaws.colors import Colors
 PACKAGE = 'machineimage'
 PKG_ACCENT = Colors.ORANGE
 PARAM_ACCENT = Colors.WHITE
-AMI = Colors.DARKCYAN
+AMI = Colors.DARK_CYAN
 RESET = Colors.RESET
 BD = Colors.BOLD
 

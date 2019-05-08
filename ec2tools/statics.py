@@ -48,6 +48,8 @@ else:
     config_root = os_parityPath(user_home + '/' + '.config')
     config_dir = os_parityPath(config_root + '/' + PACKAGE)
     config_filepath = os_parityPath(config_dir + '/' + config_file)
+    launchconfig_dir = os_parityPath(config_dir + '/launchconfigs')
+    userdata_dir = os_parityPath(config_dir + '/userdata')
 
     # logging parameters
     enable_logging = True
@@ -73,7 +75,9 @@ else:
         "CONFIG": {
             "CONFIG_ROOT": config_root,
             "CONFIG_DIR": config_dir,
-            "CONFIG_FILE": config_filepath
+            "CONFIG_FILE": config_filepath,
+            "LAUNCHCONFIG_DIR": launchconfig_dir,
+            "USERDATA_DIR": userdata_dir
         }
     }
 

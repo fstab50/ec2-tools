@@ -3,6 +3,8 @@ include README.md
 include DESCRIPTION.rst
 include LICENSE
 include LICENSE.md
+recursive-include bash *
+recursive-include userdata *
 recursive-include ec2tools *
 
 # exclude

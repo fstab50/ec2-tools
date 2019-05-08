@@ -1,5 +1,5 @@
 #
-#	 Makefile, ver 1.7.0
+#	 Makefile, ver 1.7.1
 #
 # --- declarations  --------------------------------------------------------------------------------
 
@@ -15,9 +15,19 @@ ACTIVATE = $(shell . $(VENV_DIR)/bin/activate)
 MAKE = $(shell which make)
 MODULE_PATH := $(CUR_DIR)/$(PROJECT)
 SCRIPTS := $(CUR_DIR)/scripts
+S3UPLOAD_SCRIPT = s3upload.sh
 DOC_PATH := $(CUR_DIR)/docs
+CONFIG_PATH = $(HOME)/.config/$(PROJECT)
 REQUIREMENT = $(CUR_DIR)/requirements.txt
 VERSION_FILE = $(CUR_DIR)/$(PROJECT)/_version.py
+
+# formatting
+org := \033[38;5;95;38;5;214m
+bold := \u001b[1m
+bbl := \033[38;5;51m
+byg := \033[38;5;95;38;5;155m
+bwt := \033[38;5;15m
+rst := \u001b[0m
 
 
 # --- rollup targets  ------------------------------------------------------------------------------
@@ -25,7 +35,7 @@ VERSION_FILE = $(CUR_DIR)/$(PROJECT)/_version.py
 
 .PHONY: fresh-install fresh-test-install deploy-test deploy-prod
 
-zero-source-install: clean source-install   ## Install (source: local). Zero prebuild artifacts
+zero-source-install: clean source-install build-sizes  ## Install (source: local). Zero prebuild artifacts
 
 zero-test-install: clean setup-venv test-install  ## Install (source: testpypi). Zero prebuild artifacts
 
@@ -75,15 +85,25 @@ build: pre-build setup-venv    ## Build dist, increment version || force version
 	cd $(CUR_DIR) && $(PYTHON3_PATH) setup.py sdist
 
 
+.PHONY: build-sizes
+build-sizes:	##  Create ec2 sizes.txt if 10 days age. FORCE=true trigger refresh
+	cp $(MODULE_PATH)/_version.py $(SCRIPTS)/
+	if [ -d $(VENV_DIR) ]; then . $(VENV_DIR)/bin/activate && \
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py $(FORCE); else \
+	$(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py $(FORCE); fi
+	rm -f $(SCRIPTS)/_version.py
+
+
 .PHONY: testpypi
-testpypi: build     ## Deploy to testpypi without regenerating prebuild artifacts
+testpypi: build-sizes build ## Deploy to testpypi without regenerating prebuild artifacts
 	@echo "Deploy $(PROJECT) to test.pypi.org"
 	. $(VENV_DIR)/bin/activate && twine upload --repository testpypi dist/*
 
 
 .PHONY: pypi
-pypi: clean build    ## Deploy to pypi without regenerating prebuild artifacts
-	@echo "Deploy $(PROJECT) to pypi.org"
+pypi: clean build-sizes build ## Deploy to pypi without regenerating prebuild artifacts
+	@echo "Deploy $(bd)$(bbl)$(PROJECT)$(rst) to pypi.org"
 	. $(VENV_DIR)/bin/activate && twine upload --repository pypi dist/*
 
 
@@ -100,16 +120,27 @@ test-install:  setup-venv ## Install (source: testpypi). Build artifacts exist
 
 
 .PHONY: source-install
-source-install:  setup-venv  ## Install (source: local source). Build artifacts exist
-	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && \
-	$(PIP_CALL) install .
+source-install: clean setup-venv  ## Install (source: local source). Build artifacts exist
+	cd $(CUR_DIR) && . $(VENV_DIR)/bin/activate && $(PIP_CALL) install . ; \
+	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi; \
+	cp $(CUR_DIR)/userdata/*.sh $(CONFIG_PATH)/userdata/ ; \
+	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT);
 
 
-.PHONY: update-source-install
-update-source-install:     ## Update Install (source: local source).
+.PHONY: update-src-install
+update-src-install:     ## Update Install (source: local source).
 	if [ -e $(VENV_DIR) ]; then \
-	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.6/site-packages/; else \
- 	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi
+	cp -rv $(MODULE_PATH) $(VENV_DIR)/lib/python3.*/site-packages/; else \
+ 	printf -- '\n  %s\n\n' "No virtualenv built - nothing to update"; fi; \
+	if [[ ! -d $(CONFIG_PATH)/userdata ]]; then mkdir -p $(CONFIG_PATH)/userdata; fi;  \
+	cp $(CUR_DIR)/userdata/* $(CONFIG_PATH)/userdata/
+
+
+.PHONY: upload-artifacts
+upload-artifacts:    ## Upload ec2 configuration mgmt files to Amazon S3
+	if [ ! -e $(VENV_DIR) ]; then $(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
+	bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT); else \
+	. $(VENV_DIR)/bin/activate && bash $(SCRIPTS)/$(S3UPLOAD_SCRIPT); fi
 
 
 .PHONY: help

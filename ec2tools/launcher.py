@@ -9,16 +9,17 @@ import datetime
 import pdb
 import subprocess
 from shutil import which
-import boto3
 from botocore.exceptions import ClientError
 from veryprettytable import VeryPrettyTable
 from pyaws.ec2 import default_region
-from pyaws.utils import stdout_message, export_json_object, userchoice_mapping, range_bind
+from pyaws.utils import stdout_message, export_json_object, userchoice_mapping
 from pyaws.session import authenticated, boto3_session, parse_profiles
 from pyaws import Colors
 from ec2tools.statics import local_config
-from ec2tools import current_ami, logd, __version__
-from ec2tools.environment import profile_securitygroups, profile_keypairs, profile_subnets
+from ec2tools import about, current_ami, logd, __version__
+from ec2tools.environment import profile_securitygroups, profile_keypairs
+from ec2tools.user_selection import choose_resource
+from ec2tools.userdata import userdata_lookup
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -31,14 +32,15 @@ logger = logd.getLogger(__version__)
 act = Colors.ORANGE
 yl = Colors.YELLOW
 bd = Colors.BOLD + Colors.WHITE
-frame = Colors.BOLD + Colors.BRIGHTGREEN
+frame = Colors.BOLD + Colors.BRIGHT_GREEN
 rst = Colors.RESET
 PACKAGE = 'runmachine'
 PKG_ACCENT = Colors.ORANGE
 PARAM_ACCENT = Colors.WHITE
-AMI = Colors.DARKCYAN
+AMI = Colors.DARK_CYAN
 
 FILE_PATH = local_config['CONFIG']['CONFIG_DIR']
+GENERIC_USERDATA = local_config['CONFIG']['USERDATA_DIR'] + '/userdata.sh'
 
 image, subnet, securitygroup, keypair = None, None, None, None
 launch_prereqs = (image, subnet, securitygroup, keypair)
@@ -75,6 +77,7 @@ def help_menu():
                         [-h, --help      ]
 
   """ + bd + """OPTIONS
+
       -i, --image""" + rst + """  (string):  Amazon  Machine  Image Operating System type
           Returns the latest AMI of the type specified from the list below
 
@@ -106,6 +109,12 @@ def help_menu():
 
       """ + bd + """-d""" + rst + """, """ + bd + """--debug""" + rst + """: Debug mode, verbose output.
 
+      """ + bd + """-u""" + rst + """, """ + bd + """--userdata""" + rst + """: Path to userdata file on local filesystem. Example:
+
+                $  runmachine  --image redhat  \\
+                               --region us-east-1  \\
+                               --userdata "/home/bob/userdata.sh"
+
       """ + bd + """-V""" + rst + """, """ + bd + """--version""" + rst + """: Display program version information
 
       """ + bd + """-h""" + rst + """, """ + bd + """--help""" + rst + """: Print this menu
@@ -114,65 +123,23 @@ def help_menu():
     return True
 
 
-def choose_resource(choices, selector='letters', default='a'):
-    """
-
-    Summary.
-
-        validate user choice of options
-
-    Args:
-        :choices (dict): lookup table by key, for value selected
-            from options displayed via stdout
-
-    Returns:
-        user selected resource identifier
-    """
-    def safe_choice(sel_index, user_choice):
-        if sel_index == 'letters':
-            return user_choice
-        elif isinstance(user_choice, int):
-            return user_choice
-        elif isinstance(user_choice, str):
-            try:
-                return int(user_choice)
-            except TypeError:
-                return userchoice_mapping(user_choice)
-
-    validate = True
-
-    try:
-        while validate:
-            choice = input(
-                '\n\tEnter a letter to select [%s]: '.expandtabs(8) %
-                (choices[userchoice_mapping(default)] if selector == 'letters' else choices[int(default)])
-            ) or default
-
-            # prevent entering of letters for choice if numbered selector index
-            choice = safe_choice(selector, choice)
-
-            index_range = [x for x in choices]
-
-            if range_test(0, max(index_range), userchoice_mapping(choice) if selector == 'letters' else int(choice)):
-                resourceid = choices[userchoice_mapping(choice)] if selector == 'letters' else choices[int(choice)]
-                validate = False
-            else:
+def debug_mode(header, data_object, debug=False, halt=False):
+    """ debug output """
+    if debug:
+        print('\n  ' + str(header) + '\n')
+        try:
+            if type(data_object) is dict:
+                export_json_object(data_object)
+            elif type(data_object) is str:
                 stdout_message(
-                    'You must enter a %s between %s and %s' %
-                    (
-                        'letter' if selector == 'letters' else 'number',
-                        userchoice_mapping(index_range[0]) if selector == 'letters' else index_range[0],
-                        userchoice_mapping(index_range[-1]) if selector == 'letters' else index_range[-1]
-                    )
+                    message=f'{globals()[data_object]} parameter is {data_object}',
+                    prefix='DEBUG'
                 )
-    except KeyError:
-        resourceid = None
-        choice = [k for k, v in choices.items() if v is None]
-    except TypeError as e:
-        logger.exception(f'Typed input caused an exception. Error {e}')
-        sys.exit(1)
-    stdout_message('You selected choice {}, {}'.format(choice, resourceid))
-    return resourceid
+        except Exception:
+            print(data_object)
+        if halt:
+            sys.exit(0)
+    return True
 
 
 def display_table(table, tabspaces=4):
@@ -274,10 +241,13 @@ def ip_lookup(profile, region, debug):
 
 def is_tty():
     """
-    Summary:
+    Summary.
+
         Determines if output is displayed to the screen or redirected
+
     Returns:
         True if tty terminal | False is redirected, TYPE: bool
+
     """
     return sys.stdout.isatty()
 
@@ -348,10 +318,13 @@ def keypair_lookup(profile, region, debug):
 
 def options(parser):
     """
-    Summary:
+    Summary.
+
         parse cli parameter options
+
     Returns:
         TYPE: argparse object, parser argument set
+
     """
     parser.add_argument("-p", "--profile", nargs='?', default="default",
                               required=False, help="type (default: %(default)s)")
@@ -361,6 +334,7 @@ def options(parser):
     parser.add_argument("-r", "--region", dest='regioncode', nargs='?', default=None, required=False)
     parser.add_argument("-s", "--instance-size", dest='instance_size', nargs='?', default='t3.micro', required=False)
     parser.add_argument("-t", "--tags", dest='tags', action='store_true', default=False, required=False)
+    parser.add_argument("-u", "--userdata", dest='userdata', action='store_true', default=False, required=False)
     parser.add_argument("-V", "--version", dest='version', action='store_true', required=False)
     parser.add_argument("-h", "--help", dest='help', action='store_true', required=False)
     return parser.parse_args()
@@ -373,17 +347,49 @@ def get_contents(content):
     return None
 
 
-def get_imageid(profile, image, region):
+def get_imageid(profile, image, region, debug):
     if which('machineimage'):
         cmd = 'machineimage --profile {} --image {} --region {}'.format(profile, image, region)
-        response = json.loads(subprocess.getoutput(cmd))
+        response = subprocess.getoutput(cmd + ' 2>/dev/null')
+
+        # response not returned if inadequate iam or role permissions
+        if not response:
+            stdout_message(
+                message='No AMI Image ID retrieved. Inadequate iam user or role permissions?',
+                prefix='WARN'
+            )
+            sys.exit(exit_codes['E_DEPENDENCY']['Code'])
     else:
         stdout_message('machineimage executable could not be located. Exit', prefix='WARN')
-        sys.exit(1)
-    return response[region]
+        sys.exit(exit_codes['E_DEPENDENCY']['Code'])
+    return json.loads(response)[region]
 
 
-def get_subnet(account_file, region):
+def profile_subnets(profile, region):
+    """ Profiles all subnets in an account """
+    subnets = {}
+
+    try:
+        client = boto3_session('ec2', region=region, profile=profile)
+        r = client.describe_subnets()['Subnets']
+        return [
+                {
+                    x['SubnetId']: {
+                            'AvailabilityZone': x['AvailabilityZone'],
+                            'CidrBlock': x['CidrBlock'],
+                            'State': x['State'],
+                            'IpAddresses': 'Public' if x['MapPublicIpOnLaunch'] else 'Private',
+                            'VpcId': x['VpcId']
+                        }
+                } for x in r
+            ]
+    except ClientError as e:
+        logger.warning(
+            '{}: Unable to retrieve subnets for region {}: {}'.format(inspect.stack()[0][3], region, e)
+            )
+
+
+def get_subnet(profile, region, debug):
     """
     Summary.
 
@@ -411,7 +417,8 @@ def get_subnet(account_file, region):
         bd + 'VpcId' + frame
     ]
 
-    subnets = get_contents(account_file)[region]['Subnets']
+    #subnets = get_contents(account_file)[region]['Subnets']
+    subnets = profile_subnets(profile, region)
 
     # populate table
     lookup = {}
@@ -459,6 +466,14 @@ def nametag(imagetype, date, default=True):
     return default_tag
 
 
+def package_version():
+    """
+    Prints package version and requisite PACKAGE info
+    """
+    print(about.about_object)
+    sys.exit(exit_codes['EX_OK']['Code'])
+
+
 def parameters_approved(alias, region, subid, imageid, sg, kp, ip, size, ct):
     print('\tEC2 Instance Launch Summary:\n')
     print('\t' + bd + 'AWS Account' + rst + ': \t\t{}'.format(alias))
@@ -475,27 +490,6 @@ def parameters_approved(alias, region, subid, imageid, sg, kp, ip, size, ct):
 
     if choice in ('yes', 'y', True, 'True', 'true', ''):
         return True
-    return False
-
-
-def range_test(min, max, value):
-    """
-    Summary.
-
-        Tests value to determine if in range (min, max)
-
-    Args:
-        :min (int):  integer representing minimum acceptable value
-        :max (int):  integer representing maximum acceptable value
-        :value (int): value tested
-
-    Returns:
-        Success | Failure, TYPE: bool
-
-    """
-    if isinstance(int(value), int):
-        if value in range(min, max + 1):
-            return True
     return False
 
 
@@ -617,8 +611,13 @@ def parse_userdata(ostype):
     return (str(content))
 
 
-def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size):
-    """Writes launch config to disk for reuse"""
+def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, ud):
+    """
+    Summary.
+
+        Writes launch configuration parameters to local disk for later reuse
+
+    """
     fname = alias + '_' + region + '.json'
     content = {
         'account': alias,
@@ -626,27 +625,31 @@ def persist_launchconfig(alias, pf, region, imageid, imagetype, subid, sgroup, k
         'profile': pf,
         'imageId': imageid,
         'subnetId': subid,
-        'SecurityGroupIds': [ sgroup ],
-        'KeypairNames': [ kp ],
-        'InstanceProfileArn': 'None' if ip_arn is None else ip_arn,
-        'InstanceType': size
+        'securityGroupIds': [ sgroup ],
+        'keypairNames': [ kp ],
+        'instanceProfileArn': 'None' if ip_arn is None else ip_arn,
+        'instanceType': size,
+        'userdata':  ud
     }
+
     try:
+
         if not os.path.exists(FILE_PATH + '/' + 'launchconfigs'):
             os.makedirs(FILE_PATH + '/' + 'launchconfigs')
 
         with open(FILE_PATH + '/launchconfigs/' + fname, 'w') as f1:
             f1.write(json.dumps(content, indent=4))
-        stdout_message('Created terminate script: {}'.format(os.getcwd() + '/' + fname))
+
     except OSError as e:
         logger.exception(
-            '%s: Problem creating terminate script (%s) on local fs' %
+            '%s: Problem persisting launch configuration file (%s) on local fs' %
             (inspect.stack()[0][3], fname))
         return False
     return True
 
 
-def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, size, count, debug):
+def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup,
+                            kp, ip_arn, size, count, userdata_content, debug):
     """
     Summary.
 
@@ -657,6 +660,7 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
         :subid (str): AWS subnet id (subnet-abcxyz)
         :sgroup (str): Security group id
         :kp (str): keypair name matching pre-existing keypair in the targeted AWS account
+        :userdata (str): Path to userdata file; otherwise, None
         :debug (bool): debug flag to enable verbose logging
 
     Returns:
@@ -666,22 +670,9 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
     # ec2 client instantiation for launch
     client = boto3_session('ec2', region=region, profile=pf)
 
-    # prep default userdata if none specified
-    if imagetype.split('.')[0] in ('ubuntu18'):
-        from ec2tools import python3_userdata as userdata
-        userdata_str = read(os.path.abspath(userdata.__file__))
-    else:
-        #from ec2tools import userdata
-        #userdata_str = userdata.content
-        from ec2tools import python2_userdata as userdata
-        userdata_str = read(os.path.abspath(userdata.__file__))
-
-    if debug:
-        print('USERDATA CONTENT: \n{}'.format(userdata_str))
-
     # name tag content
     name_tag = nametag(imagetype, now.strftime('%Y-%m-%d'))
-    
+
     tags = [
         {
             'Key': 'Name',
@@ -703,11 +694,11 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
                 ImageId=imageid,
                 InstanceType=size,
                 KeyName=kp,
-                MaxCount=count,
+                MaxCount=int(count),
                 MinCount=1,
                 SecurityGroupIds=[sgroup],
                 SubnetId=subid,
-                UserData=userdata_str,
+                UserData=userdata_content,
                 DryRun=debug,
                 InstanceInitiatedShutdownBehavior='stop',
                 TagSpecifications=[
@@ -722,11 +713,11 @@ def run_ec2_instance(pf, region, imageid, imagetype, subid, sgroup, kp, ip_arn, 
                 ImageId=imageid,
                 InstanceType=size,
                 KeyName=kp,
-                MaxCount=count,
+                MaxCount=int(count),
                 MinCount=1,
                 SecurityGroupIds=[sgroup],
                 SubnetId=subid,
-                UserData=userdata_str,
+                UserData=userdata_content,
                 DryRun=debug,
                 IamInstanceProfile={
                     'Name': ip_arn.split('/')[-1]
@@ -807,6 +798,9 @@ def init_cli():
         help_menu()
         sys.exit(exit_codes['EX_OK']['Code'])
 
+    elif args.version:
+        package_version()
+
     elif args.imagetype is None:
         stdout_message(f'You must enter an os image type (--image)', prefix='WARN')
         stdout_message(f'Valid image types are:')
@@ -818,16 +812,46 @@ def init_cli():
 
         regioncode = args.regioncode or default_region(args.profile)
 
+        if args.debug:
+            stdout_message(f'Region code: {regioncode}', prefix='DEBUG')
+            stdout_message(f'Profilename is: {args.profile}', prefix='DEBUG')
+
         if authenticated(profile=parse_profiles(args.profile)):
 
             account_alias = get_account_identifier(parse_profiles(args.profile or 'default'))
             DEFAULT_OUTPUTFILE = account_alias + '.profile'
-            subnet = get_subnet(DEFAULT_OUTPUTFILE, regioncode)
-            image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode)
+            subnet = get_subnet(parse_profiles(args.profile), regioncode, args.debug)
+            image = get_imageid(parse_profiles(args.profile), args.imagetype, regioncode, args.debug)
             securitygroup = sg_lookup(parse_profiles(args.profile), regioncode, args.debug)
             keypair = keypair_lookup(parse_profiles(args.profile), regioncode, args.debug)
             role_arn = ip_lookup(parse_profiles(args.profile), regioncode, args.debug)
             qty = args.quantity
+
+            if args.userdata:
+                # prep default userdata if none specified
+                if args.imagetype.split('.')[0] == 'FUTURE':
+                    logger.info('This is a placeholder for python3 only distros in future')
+                    #from ec2tools import python3_userdata as userdata
+                    #userdata_str = read(os.path.abspath(userdata.__file__))
+                else:
+                    #userdata_str = read(os.path.abspath(GENERIC_USERDATA))
+                    script_path = userdata_lookup(args.debug)
+                    userdata_str = read(script_path)
+                if args.debug:
+                    print('USERDATA CONTENT: \n{}'.format(userdata_str))
+            else:
+                script_path = os.environ.get('HOME') + '/' + '.config/ec2tools'
+                userdata_str = '#!/usr/bin/env bash\n\necho "userdata exec"'
+
+            #pdb.set_trace()
+
+            if args.debug:
+                stdout_message(f'Account Alias: {account_alias}', prefix='DEBUG')
+                stdout_message(f'Output filename: {DEFAULT_OUTPUTFILE}', prefix='DEBUG')
+                stdout_message(f'Subnet ID: {subnet}', prefix='DEBUG')
+                stdout_message(f'ImageId ID: {image}', prefix='DEBUG')
+                stdout_message(f'Secgroup ID: {securitygroup}', prefix='DEBUG')
+                stdout_message(f'Keypair Name: {keypair}', prefix='DEBUG')
 
             if any(x for x in launch_prereqs) is None:
                 stdout_message(
@@ -848,6 +872,7 @@ def init_cli():
                         kp=keypair,
                         ip_arn=role_arn,
                         size=args.instance_size,
+                        ud=script_path
                     )
 
                 r = run_ec2_instance(
@@ -861,6 +886,7 @@ def init_cli():
                         ip_arn=role_arn,
                         size=args.instance_size,
                         count=args.quantity,
+                        userdata_content=userdata_str,
                         debug=args.debug
                     )
                 print('\tLaunching Summary:\n')
