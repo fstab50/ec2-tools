@@ -45,6 +45,7 @@ userdata_scripts=(
 host_artifacts=(
     $(for i in $(ls $config_bash); do echo "config/bash/$i"; done)
     $(for j in $(ls $config_motd); do echo "config/neofetch/$j"; done)
+    $(for k in $(ls config/*.*); do echo "$k"; done)
 )
 
 
