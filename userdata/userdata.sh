@@ -133,6 +133,32 @@ function install_package_deps(){
 }
 
 
+function install_ospackage_pip3(){
+    ##
+    ##  installs pip from ospackage repository
+    ##
+    local os="$1"
+
+    case $os in
+        'amzn1' | 'amzn2')
+            yum update -y
+            yum install -y 'python3-pip'
+            ;;
+
+        'redhat' | 'centos')
+            yum update -y
+            yum install -y 'python3-pip'
+            ;;
+
+        'ubuntu' | 'debian')
+            apt update -y
+            apt upgrade -y
+            apt install -y 'python3-pip'
+            ;;
+    esac
+}
+
+
 function install_python3(){
     os="$1"
 
@@ -152,8 +178,6 @@ function install_python3(){
 
     elif [ "$os" = "debian" ] || [ "$os" = "ubuntu" ]; then
         apt install -y python3.6*
-        logger --tag $info "Installing python3-pip"
-        apt install -y python3-pip
         logger --tag $info "Initate apt upgrade"
         apt -y upgrade
     fi
@@ -290,6 +314,8 @@ function upgrade_pip(){
     if [ "$pip_bin" ]; then
         logger --tag $info "Found pip3 at path: $pip_bin"
     else
+        install_ospackage_pip3 "$os"
+
         if [ -f "/usr/local/bin/pip3" ]; then
             pip_bin="/usr/local/bin/pip3"
 
