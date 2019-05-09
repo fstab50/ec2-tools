@@ -35,8 +35,8 @@ import ec2tools
 requires = [
     'boto3>=1.7.1',
     'botocore>=1.10.1',
-    'pyaws>=0.2.31',
-    'Pygments>=2.2.0',
+    'pyaws>=0.2.32',
+    'Pygments>=2.4.0',
     'requests',
     'VeryPrettyTable'
 ]
