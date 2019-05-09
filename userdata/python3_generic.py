@@ -14,9 +14,11 @@ TODO:
 
 import os
 import sys
+import json
 import inspect
 import platform
 import subprocess
+import urllib
 from pwd import getpwnam as userinfo
 import logging
 import logging.handlers
@@ -137,6 +139,33 @@ def getLogger(*args, **kwargs):
     except OSError as e:
         raise e
     return logger
+
+
+class S3Mapper():
+    """Dict mapping download artifacts to localhost destinations"""
+    def __init__(self, s3_urlpath):
+        self.map = self._construct_map(s3_urlpath)
+
+    def _construct_map(self, path):
+        try:
+            urllib.request.urlretrieve(path, 's3map.json')
+            with open('s3map.json') as f1:
+                s3map = json.loads(f1.read())
+        except OSError:
+            logger.exception('Failed to parse {}'.format(path))
+        return s3map
+
+    def artifacts(self):
+        for k, v in self.map.items():
+            fname = k
+            src = v['source']
+            dst = v['destination'] + '/' + fname
+            try:
+                urllib.request.urlretrieve(src, dst)
+                if os.path.exists(dst):
+                    logger.info('Successful download and placement of {}'.format(dst))
+            except OSError as e:
+                logger.exception('Problem paring s3 map file: {}'.format(e))
 
 
 def os_dependent():
