@@ -1,11 +1,11 @@
 {
     ".bashrc": {
         "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bashrc",
-        "destination": "~/"
+        "destination": "~"
     },
     ".bash_aliases": {
         "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bash_aliases",
-        "destination": "~/"
+        "destination": "~"
     },
     "colors.sh": {
         "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/colors.sh",
@@ -20,7 +20,8 @@
         "destination": "~/.config/bash"
     },
     "config.conf": {
-        "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/neofetch/config.conf"
+        "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/neofetch/config.conf",
+        "destination": "~/.config/neofetch"
 
     }
 }
