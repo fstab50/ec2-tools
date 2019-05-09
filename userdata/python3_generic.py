@@ -155,7 +155,7 @@ class S3Mapper():
             logger.exception('Failed to parse {}'.format(path))
         return s3map
 
-    def artifacts(self):
+    def download_artifacts(self):
         for k, v in self.map.items():
             fname = k
             src = v['source']
