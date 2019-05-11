@@ -25,10 +25,10 @@ import logging.handlers
 import distro
 
 
-url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bashrc'
-url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bash_aliases'
-url_colors = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/colors.sh'
-s3_origin = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files'
+url_bashrc = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/bashrc'
+url_aliases = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/bash_aliases'
+url_colors = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/colors.sh'
+s3_origin = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools'
 
 homedir_files = ['bashrc', 'bash_aliases']
 
