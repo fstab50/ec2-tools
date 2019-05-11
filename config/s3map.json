@@ -1,26 +1,26 @@
 {
     ".bashrc": {
-        "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bashrc",
+        "source": "https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/bashrc",
         "destination": "~"
     },
     ".bash_aliases": {
-        "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bash_aliases",
+        "source": "https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/bash_aliases",
         "destination": "~"
     },
     "colors.sh": {
-        "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/colors.sh",
+        "source": "https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/colors.sh",
         "destination": "~/.config/bash"
     },
     "loadavg-flat-layout.sh": {
-        "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/loadavg-flat-layout.sh",
+        "source": "https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/loadavg-flat-layout.sh",
         "destination": "~/.config/bash"
     },
     "os_distro.sh": {
-        "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/os_distro.sh",
+        "source": "https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/os_distro.sh",
         "destination": "~/.config/bash"
     },
     "config.conf": {
-        "source": "https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/neofetch/config.conf",
+        "source": "https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/neofetch/config.conf",
         "destination": "~/.config/neofetch"
 
     }
