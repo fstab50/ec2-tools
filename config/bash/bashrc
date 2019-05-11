@@ -163,7 +163,13 @@ esac
 # display motd
 if tty -s; then
     # interactive terminal stuff here
-    motd $(which neofetch) $(which screenfetch)
+    if [[ $($(which neofetch 2>/dev/null)) ]]; then
+        motd $(which neofetch 2>/dev/null) $(echo $os_family | | tr '[:upper:]' '[:lower:]')
+    elif [[ $($(which screenfetch 2>/dev/null)) ]]; then
+        motd $(which neofetch 2>/dev/null) $(echo $os_family | | tr '[:upper:]' '[:lower:]')
+    else
+        motd
+    fi
 fi
 
 # AWS Marketplace Owner IDs
