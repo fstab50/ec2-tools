@@ -25,6 +25,7 @@ import logging.handlers
 import distro
 
 
+map_url = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/s3map.json'
 url_bashrc = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/bashrc'
 url_aliases = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/bash_aliases'
 url_colors = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/colors.sh'
@@ -223,6 +224,29 @@ def local_profile_setup(distro):
     try:
 
         os.chdir(home_dir)
+
+        m = S3Mapper(map_url)
+
+        for k, v in m.map.items():
+            fname = k
+            src = v['source']
+            dst = v['destination'] + '/' + fname
+            try:
+                urllib.request.urlretrieve(src, dst)
+                os.chown(dst, groupid, userid)
+                os.chmod(dst, 0o700)
+
+                if os.path.exists(dst):
+                    logger.info('Successful download and placement of {}'.format(dst))
+                else:
+                    logger.warning('Failed to download and place {}'.format(dst))
+            except OSError as e:
+                logger.exception('Problem paring s3 map file: {}'.format(e))
+
+        # reset owner to normal user for .config/bash (desination):
+        directory_operations(home_dir, groupid, userid, 0o664)
+
+        return True
 
         filename = '.bashrc'
         if download([url_bashrc]):
