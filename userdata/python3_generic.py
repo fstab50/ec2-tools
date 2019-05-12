@@ -51,24 +51,29 @@ def directory_operations(path, groupid, userid, permissions):
         path (str):  target directory
         permissions:  octal permissions (example: 0644)
     """
-    try:
-        for root, dirs, files in os.walk(path):
-            for d in dirs:
+    for root, dirs, files in os.walk(path):
+        for d in dirs:
+            try:
                 os.chmod(os.path.join(root, d), permissions)
                 logger.info('Changed permissions on fs object {} to {}'.format(d, permissions))
 
                 os.chown(os.path.join(root, d), groupid, userid)
                 logger.info('Changed owner on fs object {} to {}'.format(d, userid))
+            except OSError as e:
+                logger.exception(
+                    'Error during owner or perms reset on fs object {}:\n{}'.format(d, e))
+                continue
 
-            for f in files:
+        for f in files:
+            try:
                 os.chmod(os.path.join(root, f), permissions)
                 logger.info('Changed permissions on fs object {} to {}'.format(f, permissions))
                 os.chown(os.path.join(root, f), groupid, userid)
                 logger.info('Changed owner on fs object {} to {}'.format(f, userid))
-    except OSError as e:
-        logger.exception(
-            'Unknown error while resetting owner or perms on fs object {}:\n{}'.format(f or d, e)
-        )
+            except OSError as e:
+                logger.exception(
+                    'Error during owner or perms reset on fs object {}:\n{}'.format(f, e))
+                continue
     return True
 
 
@@ -242,6 +247,7 @@ def local_profile_setup(distro):
                     logger.warning('Failed to download and place {}'.format(dst))
             except OSError as e:
                 logger.exception('Problem paring s3 map file: {}'.format(e))
+                continue
 
         # reset owner to normal user for .config/bash (desination):
         directory_operations(home_dir, groupid, userid, 0o664)
