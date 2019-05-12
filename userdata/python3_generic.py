@@ -49,7 +49,10 @@ def directory_operations(path, groupid, userid, permissions):
 
     Args:
         path (str):  target directory
+        userid (integer):  os identifier for user
+        groupid (integer):  os identifier for user group membership
         permissions:  octal permissions (example: 0644)
+
     """
     for root, dirs, files in os.walk(path):
         for d in dirs:
