@@ -242,7 +242,7 @@ def local_profile_setup(distro):
             try:
                 urllib.request.urlretrieve(src, dst)
                 os.chown(dst, groupid, userid)
-                os.chmod(dst, 0o700)
+                os.chmod(dst, 0o644)
 
                 if os.path.exists(dst):
                     logger.info('Successful download and placement of {}'.format(dst))
@@ -253,7 +253,7 @@ def local_profile_setup(distro):
                 continue
 
         # reset owner to normal user for .config/bash (desination):
-        directory_operations(home_dir, groupid, userid, 0o664)
+        directory_operations(home_dir, groupid, userid, 0o644)
 
         return True
 
