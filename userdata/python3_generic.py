@@ -150,7 +150,7 @@ def getLogger(*args, **kwargs):
     return logger
 
 
-class S3Mapper():
+class S3Map():
     """Dict mapping download artifacts to localhost destinations"""
     def __init__(self, s3_urlpath):
         self.map = self._construct_map(s3_urlpath)
@@ -233,7 +233,7 @@ def local_profile_setup(distro):
 
         os.chdir(home_dir)
 
-        m = S3Mapper(map_url)
+        m = S3Map(map_url)
 
         for k, v in m.map.items():
             fname = k
