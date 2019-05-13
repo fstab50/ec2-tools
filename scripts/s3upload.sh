@@ -104,14 +104,14 @@ cd "$_root" || echo "ERROR: unable to cd to userdata directory"
 
 ## upload objects to s3 ##
 for f in "${userdata_scripts[@]}" ; do
-    std_message "Uploading artifact $userdata_dir/${accent}$f${rst} to Amazon S3..." "INFO"
+    std_message "Uploading artifact ${url}$userdata_dir/${accent}$f${rst} to Amazon S3..." "INFO"
     r=$(aws s3 cp "$userdata_dir/$f" s3://$bucketname/$key/$f --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
 done
 
 
 for f in "${host_artifacts[@]}"; do
-    std_message "Uploading artifact ${bd}${accent}$f${rst} to Amazon S3..." "INFO"
+    std_message "Uploading artifact ${url}$_root/${accent}$f${rst} to Amazon S3..." "INFO"
     r=$(aws s3 cp "$f" s3://$bucketname/$key/$f --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
 done
