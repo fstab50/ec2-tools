@@ -20,6 +20,7 @@ import platform
 import subprocess
 import urllib
 from pwd import getpwnam as userinfo
+from shutil import which
 import logging
 import logging.handlers
 import distro
@@ -63,8 +64,9 @@ def directory_operations(path, groupid, userid, permissions):
                 os.chown(os.path.join(root, d), groupid, userid)
                 logger.info('Changed owner on fs object {} to {}'.format(d, userid))
             except OSError as e:
+                fx = inspect.stack()[0][3]
                 logger.exception(
-                    'Error during owner or perms reset on fs object {}:\n{}'.format(d, e))
+                    '{}: Error during owner or perms reset on fs object {}:\n{}'.format(fx, d, e))
                 continue
 
         for f in files:
@@ -74,8 +76,9 @@ def directory_operations(path, groupid, userid, permissions):
                 os.chown(os.path.join(root, f), groupid, userid)
                 logger.info('Changed owner on fs object {} to {}'.format(f, userid))
             except OSError as e:
+                fx = inspect.stack()[0][3]
                 logger.exception(
-                    'Error during owner or perms reset on fs object {}:\n{}'.format(f, e))
+                    '{}: Error during owner or perms reset on fs object {}:\n{}'.format(fx, f, e))
                 continue
     return True
 
@@ -174,6 +177,7 @@ class S3Map():
                 if os.path.exists(dst):
                     logger.info('Successful download and placement of {}'.format(dst))
             except OSError as e:
+                fx = inspect.stack()[0][3]
                 logger.exception('Problem paring s3 map file: {}'.format(e))
 
 
@@ -227,6 +231,7 @@ def local_profile_setup(distro):
         home_dir = '/home/centos'
 
     else:
+        logger.warning('Unable to id home directory for regular user. Exit userdata configuration')
         return False
 
     try:
@@ -314,21 +319,6 @@ def local_profile_setup(distro):
     return True
 
 
-def which(program):
-    def is_exe(fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
-    fpath, fname = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            return program
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                return exe_file
-
-
 # --- main -----------------------------------------------------------------------------------------
 
 
@@ -338,7 +328,18 @@ if __name__ == '__main__':
 
     if platform.system() == 'Linux':
         logger.info('Operating System type identified: Linux, {}'.format(os_type()))
-        local_profile_setup(os_type())
+
+        try:
+
+            linux_distro = distro.linux_distribution()[0].lower()
+            logger.info('Linux distribution identified as {}'.format(linux_distro))
+
+        except Exception:
+            logger.exception('Unable to id distribution using python distro library')
+            linux_distro = os_type()
+
+        # start configuration
+        local_profile_setup(linux_distro)
     else:
         logger.info('Operating System type identified: {}'.format(os_type()))
 
