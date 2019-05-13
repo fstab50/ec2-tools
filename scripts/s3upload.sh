@@ -119,7 +119,7 @@ done
 
 ## set public acls on objects ##
 for f in "${userdata_scripts[@]}" "${host_artifacts[@]}"; do
-    std_message "Setting acl on artifact $bucketname/$key/${accent}$f${rst}..." "INFO"
+    std_message "Setting acl on artifact ${url}$bucketname/$key/${accent}$f${rst}..." "INFO"
     r=$(aws s3api put-object-acl --key "$key/$f" --acl "$acltype" --bucket "$bucketname" --profile "$profilename" 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
     verify_object_acl "$bucketname" "$key/$f" "$profilename"
