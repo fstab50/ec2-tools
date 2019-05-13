@@ -256,7 +256,7 @@ def local_profile_setup(distro):
         directory_operations(home_dir, groupid, userid, 0o644)
 
         return True
-
+        """
         filename = '.bashrc'
         if download([url_bashrc]):
             logger.info('Download of {} successful to {}'.format(filename, home_dir))
@@ -305,7 +305,7 @@ def local_profile_setup(distro):
 
         # reset owner to normal user for .config/bash (desination):
         directory_operations(destination, groupid, userid, 0o700)
-
+        """
     except OSError as e:
         logger.exception(
             'Unknown problem downloading or installing local user profile artifacts:\n{}'.format(e)
