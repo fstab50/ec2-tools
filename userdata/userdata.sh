@@ -451,6 +451,8 @@ elif download_pyscript "$PYTHON2_SCRIPT_URL"; then
     python "$HOME/$PYTHON_SCRIPT"
 fi
 
+logger --tag $info "Resetting ownership of ~/.config configuration directory"
+chown -R $USER:$USER "$HOME/.config"
 
 logger --tag $info "Userdata version $USERDATA_VERSION END"
 
