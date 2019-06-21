@@ -389,7 +389,7 @@ case $os in
         # update os
         yum update -y
         # install binaries if available
-        yum install -y 'wget' 'jq' 'source-highlight' 'highlight'
+        yum install -y 'wget' 'jq' 'source-highlight' 'highlight' 'git'
         # install epel
         enable_epel_repo "$os"
         ;;
@@ -398,7 +398,7 @@ case $os in
         # update os
         yum update -y
         # install binaries if available
-        yum install -y 'wget' 'jq'  'source-highlight' 'source-highlight-devel'
+        yum install -y 'wget' 'jq'  'source-highlight' 'source-highlight-devel' 'git'
         # install epel
         enable_epel_repo
         ;;
@@ -408,7 +408,7 @@ case $os in
         apt update -y
         apt upgrade -y
         # install binaries if available
-        apt install -y 'wget' 'jq' 'source-highlight' 'highlight'
+        apt install -y 'wget' 'jq' 'source-highlight' 'highlight' 'git'
         # set sh --> bash
         set_shell
         ;;
