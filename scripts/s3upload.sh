@@ -20,6 +20,7 @@ config_motd='config/neofetch'
 pwd=$PWD
 errors='/dev/null'
 debug="$1"
+tab='          '
 
 if [[ -d $scripts_dir ]]; then
     source "$scripts_dir/colors.sh"
@@ -71,9 +72,9 @@ function verify_object_acl(){
     var1=$(aws s3api get-object-acl --bucket $bucket --key "$keyspace" --profile $profile)
 
     if [[ $(echo $var1 | grep 'AllUsers') ]]; then
-        std_message "Verified acl on s3 object s3://$bucket/${accent}$key${rst}..." "OK"
+        std_message "Verified acl on s3 object s3://$bucket/${accent}$keyspace${rst}..." "OK"
     else
-        std_warn "Unable to verify upload of object ${accent}$f${rst}..."
+        std_warn "Unable to verify upload of object s3://$bucket/${accent}$keyspace${rst}..."
     fi
 }
 
@@ -104,14 +105,14 @@ cd "$_root" || echo "ERROR: unable to cd to userdata directory"
 
 ## upload objects to s3 ##
 for f in "${userdata_scripts[@]}" ; do
-    std_message "Uploading artifact ${url}$userdata_dir/${accent}$f${rst} to Amazon S3..." "INFO"
+    std_message "Uploading artifact ${url}$userdata_dir/$f${rst} to Amazon S3... \n${tab}Bucket Location ${accent}s3://$bucketname/$key/$f${rst}" "INFO"
     r=$(aws s3 cp "$userdata_dir/$f" s3://$bucketname/$key/$f --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
 done
 
 
 for f in "${host_artifacts[@]}"; do
-    std_message "Uploading artifact ${url}$_root/${accent}$f${rst} to Amazon S3..." "INFO"
+    std_message "Uploading artifact ${url}$_root/$f${rst} to Amazon S3...  \n${tab}Bucket Location ${accent}s3://$bucketname/$key/$f${rst}" "INFO"
     r=$(aws s3 cp "$f" s3://$bucketname/$key/$f --profile $profilename 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
 done
@@ -119,7 +120,7 @@ done
 
 ## set public acls on objects ##
 for f in "${userdata_scripts[@]}" "${host_artifacts[@]}"; do
-    std_message "Setting acl on artifact ${url}$bucketname/$key/${accent}$f${rst}..." "INFO"
+    std_message "Setting acl on artifact ${url}s3://$bucketname/${accent}$key/$f${rst}..." "INFO"
     r=$(aws s3api put-object-acl --key "$key/$f" --acl "$acltype" --bucket "$bucketname" --profile "$profilename" 2>$errors)
     if [[ $debug ]]; then echo -e "\t$r"; fi
     verify_object_acl "$bucketname" "$key/$f" "$profilename"
