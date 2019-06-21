@@ -244,6 +244,7 @@ def local_profile_setup(distro):
             fname = k
             src = v['source']
             dst = v['destination'] + '/' + fname
+
             try:
                 urllib.request.urlretrieve(src, dst)
                 os.chown(dst, groupid, userid)
@@ -261,56 +262,7 @@ def local_profile_setup(distro):
         directory_operations(home_dir, groupid, userid, 0o644)
 
         return True
-        """
-        filename = '.bashrc'
-        if download([url_bashrc]):
-            logger.info('Download of {} successful to {}'.format(filename, home_dir))
-            os.rename(home_dir + '/' + os.path.split(url_bashrc)[1], home_dir + '/' + filename)
-            os.chown(home_dir + '/' + filename, groupid, userid)
-            os.chmod(home_dir + '/' + filename, 0o700)
 
-        filename = '.bash_aliases'
-        if download([url_aliases]):
-            logger.info('Download of {} successful to {}'.format(filename, home_dir))
-            os.rename(os.path.split(url_aliases)[1], '.bash_aliases')
-            os.chown(filename, groupid, userid)
-            os.chmod(filename, 0o700)
-
-        # download and place ~/.config/bash artifacts
-        destination = home_dir + '/.config/bash'
-
-        if not os.path.exists(destination):
-            os.makedirs(destination)
-
-        for filename in config_bash_files:
-            if download([s3_origin + '/config/bash/' + filename]):
-                os.rename(filename, destination + '/' + filename)
-                os.chown(destination + '/' + filename, groupid, userid)
-                os.chmod(destination + '/' + filename, 0o700)
-            if os.path.exists(destination + '/' + filename):
-                logger.info('Download of {} successful to {}'.format(filename, destination))
-            else:
-                logger.warning('Failed to download and place {}'.format(filename))
-
-        # download and place ~/.config/neofetch artifacts
-        destination = home_dir + '/.config/neofetch'
-        filename = os_dependent() or 'config.conf'
-
-        if not os.path.exists(destination):
-            os.makedirs(destination)
-
-        if download([s3_origin + '/config/neofetch/' + filename]):
-            os.rename(filename, destination + '/config.conf')
-            os.chown(filename, groupid, userid)
-            os.chmod(filename, 0o700)
-        if os.path.exists(destination + '/' + filename):
-            logger.info('Download of {} successful to {}'.format(filename, destination))
-        else:
-            logger.warning('Failed to download and place {}'.format(filename))
-
-        # reset owner to normal user for .config/bash (desination):
-        directory_operations(destination, groupid, userid, 0o700)
-        """
     except OSError as e:
         logger.exception(
             'Unknown problem downloading or installing local user profile artifacts:\n{}'.format(e)
