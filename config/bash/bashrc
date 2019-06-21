@@ -178,7 +178,7 @@ CENTOS=679593333241
 UBUNTU=099720109477
 
 # Path
-PATH=$PATH:$HOME/.local/bin:$HOME/bin:$EC2_HOME/bin
+PATH=$PATH:/usr/local/bin:$HOME/.local/bin:$HOME/bin:$EC2_HOME/bin
 export PATH
 
 # Enable cmd completion for aws tools
