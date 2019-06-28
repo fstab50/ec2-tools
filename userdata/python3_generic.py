@@ -14,19 +14,23 @@ TODO:
 
 import os
 import sys
+import json
 import inspect
 import platform
 import subprocess
+import urllib
 from pwd import getpwnam as userinfo
+from shutil import which
 import logging
 import logging.handlers
 import distro
 
 
-url_bashrc = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bashrc'
-url_aliases = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/bash_aliases'
-url_colors = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files/config/bash/colors.sh'
-s3_origin = 'https://s3.us-east-2.amazonaws.com/awscloud.center/files'
+map_url = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/s3map.json'
+url_bashrc = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/bashrc'
+url_aliases = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/bash_aliases'
+url_colors = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools/config/bash/colors.sh'
+s3_origin = 'https://s3.us-east-2.amazonaws.com/http-imagestore/ec2tools'
 
 homedir_files = ['bashrc', 'bash_aliases']
 
@@ -46,26 +50,36 @@ def directory_operations(path, groupid, userid, permissions):
 
     Args:
         path (str):  target directory
+        userid (integer):  os identifier for user
+        groupid (integer):  os identifier for user group membership
         permissions:  octal permissions (example: 0644)
+
     """
-    try:
-        for root, dirs, files in os.walk(path):
-            for d in dirs:
+    for root, dirs, files in os.walk(path):
+        for d in dirs:
+            try:
                 os.chmod(os.path.join(root, d), permissions)
                 logger.info('Changed permissions on fs object {} to {}'.format(d, permissions))
 
                 os.chown(os.path.join(root, d), groupid, userid)
                 logger.info('Changed owner on fs object {} to {}'.format(d, userid))
+            except OSError as e:
+                fx = inspect.stack()[0][3]
+                logger.exception(
+                    '{}: Error during owner or perms reset on fs object {}:\n{}'.format(fx, d, e))
+                continue
 
-            for f in files:
+        for f in files:
+            try:
                 os.chmod(os.path.join(root, f), permissions)
                 logger.info('Changed permissions on fs object {} to {}'.format(f, permissions))
                 os.chown(os.path.join(root, f), groupid, userid)
                 logger.info('Changed owner on fs object {} to {}'.format(f, userid))
-    except OSError as e:
-        logger.exception(
-            'Unknown error while resetting owner or perms on fs object {}:\n{}'.format(f or d, e)
-        )
+            except OSError as e:
+                fx = inspect.stack()[0][3]
+                logger.exception(
+                    '{}: Error during owner or perms reset on fs object {}:\n{}'.format(fx, f, e))
+                continue
     return True
 
 
@@ -139,6 +153,34 @@ def getLogger(*args, **kwargs):
     return logger
 
 
+class S3Map():
+    """Dict mapping download artifacts to localhost destinations"""
+    def __init__(self, s3_urlpath):
+        self.map = self._construct_map(s3_urlpath)
+
+    def _construct_map(self, path):
+        try:
+            urllib.request.urlretrieve(path, 's3map.json')
+            with open('s3map.json') as f1:
+                s3map = json.loads(f1.read())
+        except OSError:
+            logger.exception('Failed to parse {}'.format(path))
+        return s3map
+
+    def download_artifacts(self):
+        for k, v in self.map.items():
+            fname = k
+            src = v['source']
+            dst = v['destination'] + '/' + fname
+            try:
+                urllib.request.urlretrieve(src, dst)
+                if os.path.exists(dst):
+                    logger.info('Successful download and placement of {}'.format(dst))
+            except OSError as e:
+                fx = inspect.stack()[0][3]
+                logger.exception('Problem paring s3 map file: {}'.format(e))
+
+
 def os_dependent():
     """Determine linux os distribution"""
     d = distro.linux_distribution()[0].lower()
@@ -189,60 +231,37 @@ def local_profile_setup(distro):
         home_dir = '/home/centos'
 
     else:
+        logger.warning('Unable to id home directory for regular user. Exit userdata configuration')
         return False
 
     try:
 
         os.chdir(home_dir)
 
-        filename = '.bashrc'
-        if download([url_bashrc]):
-            logger.info('Download of {} successful to {}'.format(filename, home_dir))
-            os.rename(home_dir + '/' + os.path.split(url_bashrc)[1], home_dir + '/' + filename)
-            os.chown(home_dir + '/' + filename, groupid, userid)
-            os.chmod(home_dir + '/' + filename, 0o700)
+        m = S3Map(map_url)
 
-        filename = '.bash_aliases'
-        if download([url_aliases]):
-            logger.info('Download of {} successful to {}'.format(filename, home_dir))
-            os.rename(os.path.split(url_aliases)[1], '.bash_aliases')
-            os.chown(filename, groupid, userid)
-            os.chmod(filename, 0o700)
+        for k, v in m.map.items():
+            fname = k
+            src = v['source']
+            dst = v['destination'] + '/' + fname
 
-        # download and place ~/.config/bash artifacts
-        destination = home_dir + '/.config/bash'
+            try:
+                urllib.request.urlretrieve(src, dst)
+                os.chown(dst, groupid, userid)
+                os.chmod(dst, 0o644)
 
-        if not os.path.exists(destination):
-            os.makedirs(destination)
-
-        for filename in config_bash_files:
-            if download([s3_origin + '/config/bash/' + filename]):
-                os.rename(filename, destination + '/' + filename)
-                os.chown(destination + '/' + filename, groupid, userid)
-                os.chmod(destination + '/' + filename, 0o700)
-            if os.path.exists(destination + '/' + filename):
-                logger.info('Download of {} successful to {}'.format(filename, destination))
-            else:
-                logger.warning('Failed to download and place {}'.format(filename))
-
-        # download and place ~/.config/neofetch artifacts
-        destination = home_dir + '/.config/neofetch'
-        filename = os_dependent() or 'config.conf'
-
-        if not os.path.exists(destination):
-            os.makedirs(destination)
-
-        if download([s3_origin + '/config/neofetch/' + filename]):
-            os.rename(filename, destination + '/config.conf')
-            os.chown(filename, groupid, userid)
-            os.chmod(filename, 0o700)
-        if os.path.exists(destination + '/' + filename):
-            logger.info('Download of {} successful to {}'.format(filename, destination))
-        else:
-            logger.warning('Failed to download and place {}'.format(filename))
+                if os.path.exists(dst):
+                    logger.info('Successful download and placement of {}'.format(dst))
+                else:
+                    logger.warning('Failed to download and place {}'.format(dst))
+            except OSError as e:
+                logger.exception('Problem paring s3 map file: {}'.format(e))
+                continue
 
         # reset owner to normal user for .config/bash (desination):
-        directory_operations(destination, groupid, userid, 0o700)
+        directory_operations(home_dir, groupid, userid, 0o644)
+
+        return True
 
     except OSError as e:
         logger.exception(
@@ -250,21 +269,6 @@ def local_profile_setup(distro):
             )
         return False
     return True
-
-
-def which(program):
-    def is_exe(fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
-    fpath, fname = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            return program
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                return exe_file
 
 
 # --- main -----------------------------------------------------------------------------------------
@@ -276,7 +280,18 @@ if __name__ == '__main__':
 
     if platform.system() == 'Linux':
         logger.info('Operating System type identified: Linux, {}'.format(os_type()))
-        local_profile_setup(os_type())
+
+        try:
+
+            linux_distro = distro.linux_distribution()[0].lower()
+            logger.info('Linux distribution identified as {}'.format(linux_distro))
+
+        except Exception:
+            logger.exception('Unable to id distribution using python distro library')
+            linux_distro = os_type()
+
+        # start configuration
+        local_profile_setup(linux_distro)
     else:
         logger.info('Operating System type identified: {}'.format(os_type()))
 

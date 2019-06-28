@@ -163,7 +163,13 @@ esac
 # display motd
 if tty -s; then
     # interactive terminal stuff here
-    motd $(which neofetch) $(which screenfetch)
+    if [[ $($(which neofetch 2>/dev/null)) ]]; then
+        motd neofetch $(echo $os_family | | tr '[:upper:]' '[:lower:]')
+    elif [[ $($(which screenfetch 2>/dev/null)) ]]; then
+        motd screenfetch $(echo $os_family | | tr '[:upper:]' '[:lower:]')
+    else
+        motd
+    fi
 fi
 
 # AWS Marketplace Owner IDs
@@ -172,7 +178,7 @@ CENTOS=679593333241
 UBUNTU=099720109477
 
 # Path
-PATH=$PATH:$HOME/.local/bin:$HOME/bin:$EC2_HOME/bin
+PATH=$PATH:/usr/local/bin:$HOME/.local/bin:$HOME/bin:$EC2_HOME/bin
 export PATH
 
 # Enable cmd completion for aws tools

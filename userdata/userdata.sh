@@ -389,7 +389,7 @@ case $os in
         # update os
         yum update -y
         # install binaries if available
-        yum install -y 'wget' 'jq' 'source-highlight' 'highlight'
+        yum install -y 'wget' 'jq' 'source-highlight' 'highlight' 'git'
         # install epel
         enable_epel_repo "$os"
         ;;
@@ -398,7 +398,7 @@ case $os in
         # update os
         yum update -y
         # install binaries if available
-        yum install -y 'wget' 'jq'  'source-highlight' 'source-highlight-devel'
+        yum install -y 'wget' 'jq'  'source-highlight' 'source-highlight-devel' 'git'
         # install epel
         enable_epel_repo
         ;;
@@ -408,7 +408,7 @@ case $os in
         apt update -y
         apt upgrade -y
         # install binaries if available
-        apt install -y 'wget' 'jq' 'source-highlight' 'highlight'
+        apt install -y 'wget' 'jq' 'source-highlight' 'highlight' 'git'
         # set sh --> bash
         set_shell
         ;;
@@ -451,6 +451,8 @@ elif download_pyscript "$PYTHON2_SCRIPT_URL"; then
     python "$HOME/$PYTHON_SCRIPT"
 fi
 
+logger --tag $info "Resetting ownership of ~/.config configuration directory"
+chown -R $USER:$USER "$HOME/.config"
 
 logger --tag $info "Userdata version $USERDATA_VERSION END"
 
