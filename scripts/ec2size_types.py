@@ -35,6 +35,7 @@ except Exception as e:
 MAX_AGE_DAYS = 10
 FORCE = False
 index_url = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/index.json'
+index_url = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json'
 tmpdir = '/tmp'
 pricee_url = None
 output_filename = 'sizes.txt'
