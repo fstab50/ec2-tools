@@ -155,7 +155,7 @@ def get_service_url(service, url=index_url):
 
     """
     url_prefix = 'https://pricing.us-east-1.amazonaws.com'
-    converted_name = name_lookup(service)
+    converted_name = name_lookup(service, url)
 
     if not converted_name:
         logger.critical(
