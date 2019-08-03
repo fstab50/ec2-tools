@@ -4,6 +4,7 @@ from pyaws import logd
 
 sys.path.insert(0, os.path.abspath('ec2tools'))
 from ec2tools._version import __version__ as version
+sys.path.pop(0)
 
 __author__ = 'Blake Huber'
 __version__ = version
