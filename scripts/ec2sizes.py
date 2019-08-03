@@ -18,7 +18,7 @@ import urllib.error
 import requests
 from pyaws import Colors
 from pyaws.utils import stdout_message
-from __init__ import logger
+from init import logger
 
 try:
 
