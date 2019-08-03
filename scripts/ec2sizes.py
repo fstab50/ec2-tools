@@ -306,52 +306,54 @@ def write_sizetypes(path, types_list):
 # --- main   ---------------------------------------------------------------------------------------
 
 
-output_path = git_root() + '/bash/' + output_filename
+if __name__ == '__main__':
 
-if len(sys.argv) > 1:
-    FORCE = True
+    output_path = git_root() + '/bash/' + output_filename
 
-if os.path.exists(output_path) and file_age(output_path, 'days') < MAX_AGE_DAYS and not FORCE:
-    ############################################
-    ##      skip refresh size types file      ##
-    ############################################
-    filename = os.path.split(output_path)[1]
-    age = file_age(output_path, 'days')
-    stdout_message(
-        '{} age of {} days is less than {} day refresh threshold. Skip refresh.'.format(bdwt + filename + rst, age, MAX_AGE_DAYS)
-    )
-    sys.exit(0)
+    if len(sys.argv) > 1:
+        FORCE = True
 
-else:
-    ############################################
-    ## create new or refresh size types file  ##
-    ############################################
-
-    # download, process index file
-    index_path = download_fileobject(index_url)
-    if index_path:
-        stdout_message(message=f'index file {index_url} downloaded successfully')
-
-    # download, process  price file
-    price_url = get_service_url('ec2')
-
-    # download, process price file
-    price_file = download_fileobject(price_url, overwrite=True)
-    if price_file:
-        stdout_message(message=f'Price file {price_file} downloaded successfully')
-
-    # generate new size type list; dedup list
-    current_sizetypes = eliminate_duplicates(sizetypes(price_file))
-
-    if write_sizetypes(output_path, sorted(current_sizetypes)):
-        stdout_message(message=f'New EC2 sizetype file ({output_path}) created successfully')
-        stdout_message(message=f'File contains {len(current_sizetypes)} size types')
-        display_resultset(sorted(current_sizetypes))
+    if os.path.exists(output_path) and file_age(output_path, 'days') < MAX_AGE_DAYS and not FORCE:
+        ############################################
+        ##      skip refresh size types file      ##
+        ############################################
+        filename = os.path.split(output_path)[1]
+        age = file_age(output_path, 'days')
+        stdout_message(
+            '{} age of {} days is less than {} day refresh threshold. Skip refresh.'.format(bdwt + filename + rst, age, MAX_AGE_DAYS)
+        )
         sys.exit(0)
 
     else:
-        stdout_message(
-                message=f'Uknown problem creating new EC2 sizetype file ({output_path})',
-                prefix='WARN'
-            )
-        sys.exist(1)
+        ############################################
+        ## create new or refresh size types file  ##
+        ############################################
+
+        # download, process index file
+        index_path = download_fileobject(index_url)
+        if index_path:
+            stdout_message(message=f'index file {index_url} downloaded successfully')
+
+        # download, process  price file
+        price_url = get_service_url('ec2')
+
+        # download, process price file
+        price_file = download_fileobject(price_url, overwrite=True)
+        if price_file:
+            stdout_message(message=f'Price file {price_file} downloaded successfully')
+
+        # generate new size type list; dedup list
+        current_sizetypes = eliminate_duplicates(sizetypes(price_file))
+
+        if write_sizetypes(output_path, sorted(current_sizetypes)):
+            stdout_message(message=f'New EC2 sizetype file ({output_path}) created successfully')
+            stdout_message(message=f'File contains {len(current_sizetypes)} size types')
+            display_resultset(sorted(current_sizetypes))
+            sys.exit(0)
+
+        else:
+            stdout_message(
+                    message=f'Uknown problem creating new EC2 sizetype file ({output_path})',
+                    prefix='WARN'
+                )
+            sys.exist(1)
