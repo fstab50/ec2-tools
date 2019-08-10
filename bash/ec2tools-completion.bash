@@ -256,7 +256,7 @@ function _machineimage_completions(){
 
     case "${initcmd}" in
 
-        '--image' | '--filename' | '--format' | '--profile' | '--region')
+        '--details' | '--image' | '--filename' | '--format' | '--profile' | '--region')
             ##
             ##  Return compreply with any of the 5 comp_words that
             ##  not already present on the command line
@@ -266,7 +266,7 @@ function _machineimage_completions(){
             subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
             numargs=$(_numargs "$subcommands")
 
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( "$numargs" > 2 )); then
+            if { [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; } && (( "$numargs" > 2 )); then
                 _complete_4_horsemen_subcommands "${subcommands}"
             else
                 COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
@@ -275,7 +275,9 @@ function _machineimage_completions(){
             ;;
 
     esac
+
     case "${cur}" in
+
         'machineimage')
             COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
             ;;
@@ -285,6 +287,7 @@ function _machineimage_completions(){
             ;;
 
     esac
+
     case "${prev}" in
 
         '--details')
@@ -293,7 +296,7 @@ function _machineimage_completions(){
             ##  not already present on the command line
             ##
             declare -a horsemen
-            horsemen=(  '--details' '--image' '--filename' '--format' '--profile' '--region' )
+            horsemen=(  '--image' '--filename' '--format' '--profile' '--region' )
             subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
             numargs=$(_numargs "$subcommands")
 

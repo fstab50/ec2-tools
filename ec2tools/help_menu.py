@@ -6,31 +6,30 @@ Help Menu
 
 """
 
-from pyaws.colors import Colors
+from variables import c, blg, rst
 
 PACKAGE = 'machineimage'
-PKG_ACCENT = Colors.ORANGE
-PARAM_ACCENT = Colors.WHITE
-AMI = Colors.DARK_CYAN
-RESET = Colors.RESET
-BD = Colors.BOLD
+PKG_ACCENT = c.ORANGE
+PARAM_ACCENT = c.WHITE
+AMI = c.DARK_CYAN
+BD = c.BOLD
 
 synopsis_cmd = (
-    Colors.RESET + PKG_ACCENT + Colors.BOLD + PACKAGE + RESET +
-    PARAM_ACCENT + '  --image ' + Colors.RESET + '{' + AMI + 'OS_TYPE' + RESET + '}' +
-    PARAM_ACCENT + '  --profile' + Colors.RESET + ' <value>' +
-    PARAM_ACCENT + '  --region' + Colors.RESET + ' <value>'
+    rst + PKG_ACCENT + c.BOLD + PACKAGE + RESET +
+    PARAM_ACCENT + '  --image ' + rst + '{' + AMI + 'OS_TYPE' + RESET + '}' +
+    PARAM_ACCENT + '  --profile' + rst + ' <value>' +
+    PARAM_ACCENT + '  --region' + rst + ' <value>'
     )
 
-url_sc = Colors.URL + 'https://github.com/fstab50/ec2tools' + Colors.RESET
+url_sc = c.URL + 'https://github.com/fstab50/ec2tools' + rst
 
-menu_body = Colors.BOLD + Colors.WHITE + """
-  DESCRIPTION""" + Colors.RESET + """
+menu_body = c.BOLD + c.WHITE + """
+  DESCRIPTION""" + rst + """
 
             Return latest Amazon Machine Image (AMI) in a Region
             Source Code:  """ + url_sc + """
-    """ + Colors.BOLD + Colors.WHITE + """
-  SYNOPSIS""" + Colors.RESET + """
+    """ + c.BOLD + c.WHITE + """
+  SYNOPSIS""" + rst + """
 
           """ + synopsis_cmd + """
 
@@ -43,13 +42,13 @@ menu_body = Colors.BOLD + Colors.WHITE + """
                            [-d, --debug    ]
                            [-h, --help     ]
                            [-V, --version  ]
-    """ + Colors.BOLD + Colors.WHITE + """
+    """ + c.BOLD + c.WHITE + """
   OPTIONS
-    """ + Colors.BOLD + """
-        -i, --image""" + Colors.RESET + """  (string):  Amazon  Machine  Image Operating System type
+    """ + c.BOLD + """
+        -i, --image""" + rst + """  (string):  Amazon  Machine  Image Operating System type
             Returns the latest AMI of the type specified from the list below
 
-                      """ + BD + """Amazon EC2 Machine Images (AMI)""" + RESET + """:
+                      """ + blg + """Amazon EC2 Machine Images (AMI)""" + rst + """:
 
                   - """ + AMI + """amazonlinux1""" + RESET + """  :  Amazon Linux v1 (2018)
                   - """ + AMI + """amazonlinux2""" + RESET + """  :  Amazon Linux v2 (2017.12+)
@@ -64,21 +63,21 @@ menu_body = Colors.BOLD + Colors.WHITE + """
                   - """ + AMI + """windows2012""" + RESET + """   :  Microsoft Windows Server 2012 R2
                   - """ + AMI + """windows2016""" + RESET + """   :  Microsoft Windows Server 2016
 
-    """ + Colors.BOLD + Colors.WHITE + """
-        -p, --profile""" + Colors.RESET + """  (string):  Profile name of an IAM user present in the
+    """ + c.BOLD + c.WHITE + """
+        -p, --profile""" + rst + """  (string):  Profile name of an IAM user present in the
             local awscli configuration to be used when authenticating to AWS
             If omitted, defaults to "default" profilename.
-    """ + Colors.BOLD + Colors.WHITE + """
-        -d, --details""" + Colors.RESET + """:  Output all metadata  associated with each individual
+    """ + c.BOLD + c.WHITE + """
+        -d, --details""" + rst + """:  Output all metadata  associated with each individual
             Amazon Machine Image identifier returned.
-    """ + Colors.BOLD + Colors.WHITE + """
-        -f, --format""" + Colors.RESET + """ (string):  Output format, json or  plain text (DEFAULT:
+    """ + c.BOLD + c.WHITE + """
+        -f, --format""" + rst + """ (string):  Output format, json or  plain text (DEFAULT:
             json).
-    """ + Colors.BOLD + Colors.WHITE + """
-        -n, --filename""" + Colors.RESET + """  <value>:  Write output to a filesystem object with a
+    """ + c.BOLD + c.WHITE + """
+        -n, --filename""" + rst + """  <value>:  Write output to a filesystem object with a
             name specified in the --filename parameter.
-    """ + Colors.BOLD + Colors.WHITE + """
-        -r, --region""" + Colors.RESET + """ <value>: Amazon Web Services Region Code. When provided
+    """ + c.BOLD + c.WHITE + """
+        -r, --region""" + rst + """ <value>: Amazon Web Services Region Code. When provided
             as parameter, """ + PACKAGE + """ returns the Amazon Machine image only
             for a particular AWS region.  Region code examples:
 
@@ -87,10 +86,10 @@ menu_body = Colors.BOLD + Colors.WHITE + """
 
             If the region parameter is omitted,  """ + PACKAGE + """ returns Amazon
             Machine Images for all regions.
-    """ + Colors.BOLD + Colors.WHITE + """
-        -d, --debug""" + Colors.RESET + """:  Turn on verbose log output.
-    """ + Colors.BOLD + Colors.WHITE + """
-        -V, --version""" + Colors.RESET + """:  Print package version and License information.
-    """ + Colors.BOLD + Colors.WHITE + """
-        -h, --help""" + Colors.RESET + """:  Show this help message and exit.
+    """ + c.BOLD + c.WHITE + """
+        -d, --debug""" + rst + """:  Turn on verbose log output.
+    """ + c.BOLD + c.WHITE + """
+        -V, --version""" + rst + """:  Print package version and License information.
+    """ + c.BOLD + c.WHITE + """
+        -h, --help""" + rst + """:  Show this help message and exit.
     """
