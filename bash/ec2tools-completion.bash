@@ -217,7 +217,7 @@ function _parse_compwords(){
     declare -a missing_words
 
     for key in "${four[@]}"; do
-        if [[ ! "$(echo "${compwords[@]}" | grep ${key##*-})" ]]; then
+        if [[ ! "$(echo "${compwords[@]}" | grep ${key##\-\-})" ]]; then
             missing_words=( "${missing_words[@]}" "$key" )
         fi
     done
@@ -256,7 +256,7 @@ function _machineimage_completions(){
 
     case "${initcmd}" in
 
-        '--details' | '--image' | '--filename' | '--format' | '--profile' | '--region')
+        '--image' | '--filename' | '--format' | '--profile' | '--region')
             ##
             ##  Return compreply with any of the 5 comp_words that
             ##  not already present on the command line
