@@ -41,6 +41,7 @@ cyn = c.CYAN
 bcy = c.BRIGHT_CYAN
 bbc = bd + c.BRIGHT_CYAN
 bbl = bd + c.BRIGHT_BLUE
+bgr = c.BLUE_GRAY
 highlight = bd + c.BRIGHT_BLUE
 frame = text
 btext = text + c.BOLD
