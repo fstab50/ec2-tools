@@ -420,11 +420,20 @@ def format_text(json_object, file=None):
     Returns:
         text object | empty string upon failure
     """
+    def recursion_dict(adict):
+        for k, v in adict.items():
+            if isinstance(v, dict):
+                recursion_dict(v)
+            else:
+                return k, v
 
     block = ''
 
     try:
         for k, v in json_object.items():
+            if isinstance(v, dict):
+                k, v = recursion_dict({k, v})
+
             # format k,v depending if writing to the screen (tty) or fs
             if is_tty() and file is None:
                 key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
@@ -507,13 +516,13 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
         # return appropriate response format
         if format == 'json' and not filename:
             if is_tty():
-                r = export_json_object(dict_obj=latest, logging=False)
+                r = export_json_object(latest, logging=False)
             else:
                 print(json.dumps(latest, indent=4))
                 return True
 
         elif format == 'json' and filename:
-            r = export_json_object(dict_obj=latest, filename=filename)
+            r = export_json_object(latest, filename=filename)
 
         elif format == 'text' and not filename:
             print(format_text(latest))
