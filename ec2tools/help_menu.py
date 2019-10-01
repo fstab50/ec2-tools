@@ -13,6 +13,8 @@ PKG_ACCENT = c.ORANGE
 PARAM_ACCENT = c.WHITE
 AMI = c.DARK_CYAN
 BD = c.BOLD
+IT = c.ITALIC
+UL = c.UNDERLINE
 
 synopsis_cmd = (
     rst + PKG_ACCENT + c.BOLD + PACKAGE + rst +
@@ -86,7 +88,7 @@ menu_body = c.BOLD + c.WHITE + """
                         - """ + bgr + """eu-central-1""" + rst + """    (Frankfurt, Germany)
 
             If the region parameter is omitted,  """ + PACKAGE + """ returns Amazon
-            Machine Images for all regions.
+            Machine Images for """ + UL + IT + "all regions" + rst + """.
     """ + c.BOLD + c.WHITE + """
         -d, --debug""" + rst + """:  Turn on verbose log output.
     """ + c.BOLD + c.WHITE + """
