@@ -269,7 +269,7 @@ def fedora(profile, os, region=None, detailed=False, debug=False):
                     {
                         'Name': 'name',
                         'Values': [
-                            'Fedora-*%s-*' % os
+                            'Fedora-*%s-*.x86_64-*' % os
                         ]
                     }
                 ])
@@ -554,7 +554,7 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
                     )
 
         elif imagetype.startswith('fedora'):
-            latest = redhat(
+            latest = fedora(
                         profile=profile,
                         os=os_version(imagetype),
                         region=rgn,
