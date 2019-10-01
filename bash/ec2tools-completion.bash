@@ -73,7 +73,7 @@ function _complete_machineimage_commands(){
     COMPREPLY=( "${formatted_cmds[@]}")
     return 0
     #
-    # <-- end function _complete_runmachine_commands -->
+    # <-- end function _complete_machineimage_commands -->
 }
 
 
@@ -115,7 +115,7 @@ function _complete_quantity_subcommands(){
 
 function _complete_runmachine_commands(){
     local cmds="$1"
-    local split='5'       # times to split screen width
+    local split='6'       # times to split screen width
     local ct="0"
     local IFS=$' \t\n'
     local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
@@ -217,7 +217,7 @@ function _parse_compwords(){
     declare -a missing_words
 
     for key in "${four[@]}"; do
-        if [[ ! "$(echo "${compwords[@]}" | grep ${key##*-})" ]]; then
+        if [[ ! "$(echo "${compwords[@]}" | grep ${key##\-\-})" ]]; then
             missing_words=( "${missing_words[@]}" "$key" )
         fi
     done
@@ -251,8 +251,8 @@ function _machineimage_completions(){
 
     # option strings
     commands='--debug --details --filename --format --image --help --profile --region --version'
-    image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
-                ubuntu14.04 ubuntu16.04 ubuntu18.04 windows2012 windows2016'
+    image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 fedora29 fedora30 redhat \
+                redhat7.4 redhat7.5 ubuntu14.04 ubuntu16.04 ubuntu18.04 windows2012 windows2016'
 
     case "${initcmd}" in
 
@@ -266,7 +266,7 @@ function _machineimage_completions(){
             subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
             numargs=$(_numargs "$subcommands")
 
-            if [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ] && (( "$numargs" > 2 )); then
+            if { [ "$cur" = "" ] || [ "$cur" = "-" ] || [ "$cur" = "--" ]; } && (( "$numargs" > 2 )); then
                 _complete_4_horsemen_subcommands "${subcommands}"
             else
                 COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
@@ -275,7 +275,9 @@ function _machineimage_completions(){
             ;;
 
     esac
+
     case "${cur}" in
+
         'machineimage')
             COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
             ;;
@@ -285,6 +287,7 @@ function _machineimage_completions(){
             ;;
 
     esac
+
     case "${prev}" in
 
         '--details')
@@ -293,7 +296,7 @@ function _machineimage_completions(){
             ##  not already present on the command line
             ##
             declare -a horsemen
-            horsemen=(  '--details' '--image' '--filename' '--format' '--profile' '--region' )
+            horsemen=(  '--image' '--filename' '--format' '--profile' '--region' )
             subcommands=$(_parse_compwords COMP_WORDS[@] horsemen[@])
             numargs=$(_numargs "$subcommands")
 
@@ -392,8 +395,8 @@ function _runmachine_completions(){
 
     # option strings
     commands='--debug --image --instance-size --help --quantity --profile --region --userdata --version'
-    image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 redhat redhat7.4 redhat7.5 \
-                ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
+    image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 fedora29 fedora30 redhat redhat7.4 \
+                redhat7.5 ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
 
     case "${initcmd}" in
 

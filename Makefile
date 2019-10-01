@@ -89,9 +89,9 @@ build: pre-build setup-venv    ## Build dist, increment version || force version
 build-sizes:	##  Create ec2 sizes.txt if 10 days age. FORCE=true trigger refresh
 	cp $(MODULE_PATH)/_version.py $(SCRIPTS)/
 	if [ -d $(VENV_DIR) ]; then . $(VENV_DIR)/bin/activate && \
-	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py $(FORCE); else \
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2sizes.py $(FORCE); else \
 	$(MAKE) setup-venv && . $(VENV_DIR)/bin/activate && \
-	$(PYTHON3_PATH) $(SCRIPTS)/ec2size_types.py $(FORCE); fi
+	$(PYTHON3_PATH) $(SCRIPTS)/ec2sizes.py $(FORCE); fi
 	rm -f $(SCRIPTS)/_version.py
 
 
