@@ -81,12 +81,13 @@ def help_menu():
       -i, --image""" + rst + """  (string):  Amazon  Machine  Image Operating System type
           Returns the latest AMI of the type specified from the list below
 
-                    """ + bd + """Amazon EC2 Machine Image types""" + rst + """:
-
+                            Amazon EC2 Machine Images
+                ---------------------------------------------------
                 - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
                 - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
                 - """ + AMI + """centos6""" + rst + """       :  CentOS 6 (RHEL 6+)
                 - """ + AMI + """centos7""" + rst + """       :  CentOS 7 (RHEL 7+)
+                - """ + AMI + """fedora29/30""" + rst + """   :  Fedora 29/30 (Community builds)
                 - """ + AMI + """redhat""" + rst + """        :  Latest Redhat Enterprise Linux
                 - """ + AMI + """redhat7.4""" + rst + """     :  Redhat Enterprise Linux 7.4
                 - """ + AMI + """redhat7.5""" + rst + """     :  Redhat Enterprise Linux 7.5
