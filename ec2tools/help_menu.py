@@ -13,6 +13,8 @@ PKG_ACCENT = c.ORANGE
 PARAM_ACCENT = c.WHITE
 AMI = c.DARK_CYAN
 BD = c.BOLD
+IT = c.ITALIC
+UL = c.UNDERLINE
 
 synopsis_cmd = (
     rst + PKG_ACCENT + c.BOLD + PACKAGE + rst +
@@ -48,20 +50,21 @@ menu_body = c.BOLD + c.WHITE + """
         -i, --image""" + rst + """  (string):  Amazon  Machine  Image Operating System type
             Returns the latest AMI of the type specified from the list below
 
-                      """ + bgr + """Amazon EC2 Machine Images (AMI)""" + rst + """:
-
-                  - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
-                  - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
-                  - """ + AMI + """centos6""" + rst + """       :  CentOS 6 (RHEL 6+)
-                  - """ + AMI + """centos7""" + rst + """       :  CentOS 7 (RHEL 7+)
-                  - """ + AMI + """redhat""" + rst + """        :  Latest Redhat Enterprise Linux
-                  - """ + AMI + """redhat7.4""" + rst + """     :  Redhat Enterprise Linux 7.4
-                  - """ + AMI + """redhat7.5""" + rst + """     :  Redhat Enterprise Linux 7.5
-                  - """ + AMI + """ubuntu14.04""" + rst + """   :  Ubuntu Linux 14.04
-                  - """ + AMI + """ubuntu16.04""" + rst + """   :  Ubuntu Linux 16.04
-                  - """ + AMI + """ubuntu18.04""" + rst + """   :  Ubuntu Linux 18.04
-                  - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
-                  - """ + AMI + """windows2016""" + rst + """   :  Microsoft Windows Server 2016
+                            Amazon EC2 Machine Images
+                ---------------------------------------------------
+                - """ + AMI + """amazonlinux1""" + rst + """  :  Amazon Linux v1 (2018)
+                - """ + AMI + """amazonlinux2""" + rst + """  :  Amazon Linux v2 (2017.12+)
+                - """ + AMI + """centos6""" + rst + """       :  CentOS 6 (RHEL 6+)
+                - """ + AMI + """centos7""" + rst + """       :  CentOS 7 (RHEL 7+)
+                - """ + AMI + """fedora29/30""" + rst + """   :  Fedora 29/30 (Community builds)
+                - """ + AMI + """redhat""" + rst + """        :  Latest Redhat Enterprise Linux
+                - """ + AMI + """redhat7.4""" + rst + """     :  Redhat Enterprise Linux 7.4
+                - """ + AMI + """redhat7.5""" + rst + """     :  Redhat Enterprise Linux 7.5
+                - """ + AMI + """ubuntu14.04""" + rst + """   :  Ubuntu Linux 14.04
+                - """ + AMI + """ubuntu16.04""" + rst + """   :  Ubuntu Linux 16.04
+                - """ + AMI + """ubuntu18.04""" + rst + """   :  Ubuntu Linux 18.04
+                - """ + AMI + """windows2012""" + rst + """   :  Microsoft Windows Server 2012 R2
+                - """ + AMI + """windows2016""" + rst + """   :  Microsoft Windows Server 2016
 
     """ + c.BOLD + c.WHITE + """
         -p, --profile""" + rst + """  (string):  Profile name of an IAM user present in the
@@ -85,7 +88,7 @@ menu_body = c.BOLD + c.WHITE + """
                         - """ + bgr + """eu-central-1""" + rst + """    (Frankfurt, Germany)
 
             If the region parameter is omitted,  """ + PACKAGE + """ returns Amazon
-            Machine Images for all regions.
+            Machine Images for """ + UL + IT + "all regions" + rst + """.
     """ + c.BOLD + c.WHITE + """
         -d, --debug""" + rst + """:  Turn on verbose log output.
     """ + c.BOLD + c.WHITE + """
