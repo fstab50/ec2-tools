@@ -73,7 +73,7 @@ function _complete_machineimage_commands(){
     COMPREPLY=( "${formatted_cmds[@]}")
     return 0
     #
-    # <-- end function _complete_runmachine_commands -->
+    # <-- end function _complete_machineimage_commands -->
 }
 
 
@@ -115,7 +115,7 @@ function _complete_quantity_subcommands(){
 
 function _complete_runmachine_commands(){
     local cmds="$1"
-    local split='5'       # times to split screen width
+    local split='6'       # times to split screen width
     local ct="0"
     local IFS=$' \t\n'
     local formatted_cmds=( $(compgen -W "${cmds}" -- "${cur}") )
