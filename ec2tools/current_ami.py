@@ -107,7 +107,7 @@ def amazonlinux1(profile, region=None, detailed=False, debug=False):
                     {
                         'Name': 'name',
                         'Values': [
-                            'amzn-ami-hvm-2018.??.?.2018????-x86_64-gp2'
+                            'amzn-ami-hvm-*-x86_64-gp2'
                         ]
                     }
                 ])
@@ -161,8 +161,8 @@ def amazonlinux2(profile, region=None, detailed=False, debug=False):
                     {
                         'Name': 'name',
                         'Values': [
-                            'amzn2-ami-hvm-????.??.?.2018????.?-x86_64-gp2',
-                            'amzn2-ami-hvm-????.??.?.2018????-x86_64-gp2'
+                            'amzn2-ami-hvm-????.??.?.*????.?-x86_64-*',
+                            'amzn2-ami-hvm-*-x86_64-gp2'
                         ]
                     }
                 ])
@@ -474,6 +474,24 @@ def os_version(imageType):
     return ''.join(re.split('(\d+)', imageType)[1:])
 
 
+class UnwrapDict():
+    def __init__(self, d):
+        self.dict = d
+        self.block = ''
+
+    def recursion(self, adict=None):
+        if adict is None:
+            adict = self.dict
+
+        for k, v in adict.items():
+            if isinstance(v, dict):
+                self.recursion(v)
+            else:
+                row = '\t{}\t{}\t\n'.format(k, v)
+                self.block += row
+        return self.block
+
+
 def format_text(json_object, file=None):
     """
         Formats json object into text format
@@ -485,20 +503,8 @@ def format_text(json_object, file=None):
         text object | empty string upon failure
 
     """
-    def recursion_dict(adict):
-        for k, v in adict.items():
-            if isinstance(v, dict):
-                recursion_dict(v)
-            else:
-                return k, v
-
-    block = ''
-
     try:
         for k, v in json_object.items():
-            if isinstance(v, dict):
-                k, v = recursion_dict({k, v})
-
             # format k,v depending if writing to the screen (tty) or fs
             if is_tty() and file is None:
                 key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
@@ -506,15 +512,17 @@ def format_text(json_object, file=None):
             else:
                 key = str(k)
                 value = str(v)
-            row = '%s \t%s\n' % (key, value)
-            block += row
+
+            unwrap = UnwrapDict({key: value})
+            block = unwrap.recursion()
+
     except KeyError as e:
         logger.exception(
             '%s: json_object does not appear to be json structure. Error (%s)' %
             (inspect.stack()[0][3], str(e))
             )
         return ''
-    return block.strip()
+    return block
 
 
 def main(profile, imagetype, format, details, debug, filename='', rgn=None):
