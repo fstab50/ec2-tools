@@ -14,6 +14,7 @@ from pyaws import Colors
 from pyaws.utils import stdout_message, export_json_object
 from ec2tools.help_menu import menu_body
 from ec2tools import about, logd, __version__
+import pdb
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -479,20 +480,37 @@ class UnwrapDict():
         self.dict = d
         self.block = ''
 
-    def recursion(self, adict=None):
+    def unwrap(self, adict=None):
         if adict is None:
             adict = self.dict
 
         for k, v in adict.items():
             if isinstance(v, dict):
-                self.recursion(v)
+                self.unwrap(v)
             else:
                 row = '\t{}\t{}\t\n'.format(k, v)
                 self.block += row
         return self.block
 
 
-def format_text(json_object, file=None):
+def print_text_metadata(ami_name, data, region):
+
+    print('{: >20}: {: <20}'.format('AMI Name', ami_name))
+    print('{: >20}: {: <20}'.format('AWS Region', region))
+
+    for row in [x[:90] for x in data]:
+        try:
+            if len(row.split('\t')[1:3]) == 0:
+                continue
+            else:
+                l, r = [x for x in row.split('\t')[1:3] if x is not '']
+                print("{: >20}: {: <20}".format(l, r))
+        except IndexError:
+            pass
+
+
+
+def format_text(json_object, file=None, debug=True):
     """
         Formats json object into text format
 
@@ -503,18 +521,31 @@ def format_text(json_object, file=None):
         text object | empty string upon failure
 
     """
+    name = ''
     try:
-        for k, v in json_object.items():
-            # format k,v depending if writing to the screen (tty) or fs
-            if is_tty() and file is None:
-                key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
-                value = Colors.GOLD3 + str(v) + Colors.RESET
-            else:
-                key = str(k)
-                value = str(v)
+        # AWS region code
+        region = [x for x in json_object][0]
 
-            unwrap = UnwrapDict({key: value})
-            block = unwrap.recursion()
+        export_json_object(json_object) if debug else print('')
+
+        for k, v in json_object[region].items():
+            # Extract ami human-readable name
+            if k == 'Name':
+                name = v
+        json_object[region].pop('Name')
+
+            ## format k,v depending if writing to the screen (tty) or fs
+            #if is_tty() and file is None:
+            #    key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
+            #    value = Colors.GOLD3 + str(v) + Colors.RESET
+            #else:
+            #    key = str(k)
+            #    value = str(v)
+
+        metadata = UnwrapDict(json_object)
+
+        for k, v in json_object.items():
+            data = metadata.unwrap(v).split('\n')
 
     except KeyError as e:
         logger.exception(
@@ -522,7 +553,7 @@ def format_text(json_object, file=None):
             (inspect.stack()[0][3], str(e))
             )
         return ''
-    return block
+    return data, region, name
 
 
 def main(profile, imagetype, format, details, debug, filename='', rgn=None):
@@ -609,7 +640,8 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
             r = export_json_object(latest, filename=filename)
 
         elif format == 'text' and not filename:
-            print(format_text(latest))
+            print_data, regioncode, ami_title = format_text(latest)
+            print_text_metadata(ami_title, print_data, regioncode)
             return True
 
         elif format == 'text' and filename:
