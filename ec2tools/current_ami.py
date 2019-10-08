@@ -14,7 +14,8 @@ from pyaws import Colors
 from pyaws.utils import stdout_message, export_json_object
 from ec2tools.help_menu import menu_body
 from ec2tools import about, logd, __version__
-import pdb
+from ec2tools.variables import bl, fs, rst
+from ec2tools.statics import local_config
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -40,6 +41,8 @@ COMMUNITY = '125523088429'      # community amis
 REDHAT = '679593333241'
 UBUNTU = '099720109477'
 MICROSOFT = '801119661308'
+
+max_field = local_config['RUNTIME']['MAX_FIELD_WIDTH']
 
 
 def debug_message(response, rgn, mode):
@@ -493,10 +496,10 @@ class UnwrapDict():
         return self.block
 
 
-def print_text_metadata(ami_name, data, region):
+def print_text_stdout(ami_name, data, region):
 
-    print('{: >20}: {: <20}'.format('AMI Name', ami_name))
-    print('{: >20}: {: <20}'.format('AWS Region', region))
+    print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'Name', rst, fs, ami_name, rst))
+    print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'AWS Region', rst, fs, region, rst))
 
     for row in [x[:90] for x in data]:
         try:
@@ -504,13 +507,12 @@ def print_text_metadata(ami_name, data, region):
                 continue
             else:
                 l, r = [x for x in row.split('\t')[1:3] if x is not '']
-                print("{: >20}: {: <20}".format(l, r))
+                print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
         except IndexError:
             pass
 
 
-
-def format_text(json_object, file=None, debug=True):
+def format_text(json_object, debug=False):
     """
         Formats json object into text format
 
@@ -641,11 +643,11 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
 
         elif format == 'text' and not filename:
             print_data, regioncode, ami_title = format_text(latest)
-            print_text_metadata(ami_title, print_data, regioncode)
+            print_text_stdout(ami_title, print_data, regioncode)
             return True
 
         elif format == 'text' and filename:
-            r = write_to_file(text=format_text(latest, filename), file=filename)
+            r = write_to_file(text=format_text(latest), file=filename)
 
     except Exception as e:
         logger.exception(

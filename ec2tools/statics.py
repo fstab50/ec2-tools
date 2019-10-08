@@ -78,6 +78,9 @@ else:
             "CONFIG_FILE": config_filepath,
             "LAUNCHCONFIG_DIR": launchconfig_dir,
             "USERDATA_DIR": userdata_dir
+        },
+        "RUNTIME": {
+            "MAX_FIELD_WIDTH":  max_cli_width
         }
     }
 
