@@ -14,7 +14,7 @@ from pyaws import Colors
 from pyaws.utils import stdout_message, export_json_object
 from ec2tools.help_menu import menu_body
 from ec2tools import about, logd, __version__
-from ec2tools.variables import bl, fs, rst
+from ec2tools.variables import bl, dbl, fs, rst
 from ec2tools.statics import local_config
 
 try:
@@ -501,13 +501,16 @@ def print_text_stdout(ami_name, data, region):
     print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'Name', rst, fs, ami_name, rst))
     print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'AWS Region', rst, fs, region, rst))
 
-    for row in [x[:90] for x in data]:
+    for row in [x[:max_field + 1] for x in data]:
         try:
             if len(row.split('\t')[1:3]) == 0:
                 continue
             else:
                 l, r = [x for x in row.split('\t')[1:3] if x is not '']
-                print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
+                if type(r) is bool:
+                    print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, dbl, r, rst))
+                else:
+                    print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
         except IndexError:
             pass
 

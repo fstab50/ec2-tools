@@ -43,7 +43,7 @@ else:
     LICENSE = 'GPL-3'
     LICENSE_DESC = 'General Public License Version 3'
 
-    # configuration info
+    # configuration parameters
     config_file = 'configuration.json'
     config_root = os_parityPath(user_home + '/' + '.config')
     config_dir = os_parityPath(config_root + '/' + PACKAGE)
@@ -57,6 +57,9 @@ else:
     log_filename = PACKAGE + '.log'
     log_dir = os_parityPath(user_home + '/' + 'logs')
     log_path = os_parityPath(log_dir + '/' + log_filename)
+
+    # runtime parameters
+    max_field_width = 90
 
     seed_config = {
         "PROJECT": {
@@ -80,7 +83,7 @@ else:
             "USERDATA_DIR": userdata_dir
         },
         "RUNTIME": {
-            "MAX_FIELD_WIDTH":  max_cli_width
+            "MAX_FIELD_WIDTH":  max_field_width
         }
     }
 
