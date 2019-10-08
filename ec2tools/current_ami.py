@@ -12,6 +12,7 @@ from botocore.exceptions import ClientError
 from pyaws.session import authenticated, boto3_session
 from pyaws import Colors
 from pyaws.utils import stdout_message, export_json_object
+from libtools import is_bool, bool_convert
 from ec2tools.help_menu import menu_body
 from ec2tools import about, logd, __version__
 from ec2tools.variables import bl, dbl, fs, rst
@@ -69,7 +70,7 @@ def help_menu():
         )
     sys.stdout.write(menu_body + '\n')
     sys.exit(exit_codes['EX_OK']['Code'])
-
+s
 
 def get_regions(profile):
     """ Return list of all regions """
@@ -507,7 +508,7 @@ def print_text_stdout(ami_name, data, region):
                 continue
             else:
                 l, r = [x for x in row.split('\t')[1:3] if x is not '']
-                if type(r) is bool:
+                if r == 'True' or 'False':
                     print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, dbl, r, rst))
                 else:
                     print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
