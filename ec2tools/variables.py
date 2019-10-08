@@ -40,6 +40,7 @@ title = c.BRIGHT_WHITE + c.BOLD
 cyn = c.CYAN
 bcy = c.BRIGHT_CYAN
 bbc = bd + c.BRIGHT_CYAN
+bl = c.BLUE
 bbl = bd + c.BRIGHT_BLUE
 bgr = c.BLUE_GRAY
 highlight = bd + c.BRIGHT_BLUE
