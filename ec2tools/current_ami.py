@@ -12,7 +12,7 @@ from botocore.exceptions import ClientError
 from pyaws.session import authenticated, boto3_session
 from pyaws import Colors
 from pyaws.utils import stdout_message, export_json_object
-from libtools import is_bool, bool_convert
+from libtools import bool_convert, bool_assignment
 from ec2tools.help_menu import menu_body
 from ec2tools import about, logd, __version__
 from ec2tools.variables import bl, dbl, fs, rst
@@ -70,7 +70,7 @@ def help_menu():
         )
     sys.stdout.write(menu_body + '\n')
     sys.exit(exit_codes['EX_OK']['Code'])
-s
+
 
 def get_regions(profile):
     """ Return list of all regions """
@@ -498,6 +498,12 @@ class UnwrapDict():
 
 
 def print_text_stdout(ami_name, data, region):
+    """Print ec2 metadata to cli standard out"""
+    # if no metadata, region: imageId
+    if ami_name is None:
+        print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'AWS Region', rst, fs, region, rst))
+        l, r = 'ImageId', data['ImageId']
+        return print("{}{: >17}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
 
     print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'Name', rst, fs, ami_name, rst))
     print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'AWS Region', rst, fs, region, rst))
@@ -507,8 +513,10 @@ def print_text_stdout(ami_name, data, region):
             if len(row.split('\t')[1:3]) == 0:
                 continue
             else:
+
                 l, r = [x for x in row.split('\t')[1:3] if x is not '']
-                if r == 'True' or 'False':
+
+                if bool_assignment(r) is not None:
                     print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, dbl, r, rst))
                 else:
                     print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
@@ -532,7 +540,11 @@ def format_text(json_object, debug=False):
         # AWS region code
         region = [x for x in json_object][0]
 
+        if isinstance(json_object[region], str):
+            return {"ImageId": json_object[region]}, region, None
+
         export_json_object(json_object) if debug else print('')
+
 
         for k, v in json_object[region].items():
             # Extract ami human-readable name
