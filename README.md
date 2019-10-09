@@ -169,7 +169,7 @@ Format:  `text`
 
 ```
 
-[![aml1](./assets/aml2-text.png)](https://rawgithub.com/fstab50/ec2tools/master/assets/aml2-text.png)
+[![aml1](./assets/aml2-text.png)](https://images.awspros.world/ec2tools/ec2tools-metadata-text.png)
 
 [back to the top](#top)
 

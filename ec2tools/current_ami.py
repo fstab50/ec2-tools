@@ -522,6 +522,16 @@ def print_text_stdout(ami_name, data, region):
                     print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
         except IndexError:
             pass
+    return True
+
+
+def print_text_allregions(data):
+    for k, v in data.items():
+        if is_tty():
+            print("{}{: >17}{}: {}{: <20}{}".format(bl, k, rst, fs, v, rst))
+        else:
+            print("{: >17}: {: <20}".format(k, v))
+    return True
 
 
 def format_text(json_object, debug=False):
@@ -540,8 +550,15 @@ def format_text(json_object, debug=False):
         # AWS region code
         region = [x for x in json_object][0]
 
-        if isinstance(json_object[region], str):
+        if isinstance(json_object[region], str) and len([x for x in json_object]) == 1:
+            # single region json, no metadata details
             return {"ImageId": json_object[region]}, region, None
+
+        elif isinstance(json_object[region], str) and len([x for x in json_object]) > 1:
+            # multiple region json, no metadata details
+            regions = [x for x in json_object]
+            image_ids = [x for x in json_object.values()]
+            return {"ImageId": json_object[region]}, regions, None
 
         export_json_object(json_object) if debug else print('', end='')
 
@@ -648,10 +665,14 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
         elif format == 'json' and filename:
             r = export_json_object(latest, filename=filename)
 
-        elif format == 'text' and not filename:
+        elif format == 'text' and not filename and len([x for x in latest]) == 1:
+            # single region
             print_data, regioncode, ami_title = format_text(latest)
-            print_text_stdout(ami_title, print_data, regioncode)
-            return True
+            return print_text_stdout(ami_title, print_data, regioncode)
+
+        elif format == 'text' and not filename and rgn is None:
+            # all regions
+            return print_text_allregions(latest)
 
         elif format == 'text' and filename:
             r = write_to_file(text=format_text(latest), file=filename)
@@ -733,8 +754,10 @@ def write_to_file(text, file):
 def init_cli():
     """ Collect parameters and call main """
     try:
+
         parser = argparse.ArgumentParser(add_help=False)
         args = options(parser)
+
     except Exception as e:
         help_menu()
         stdout_message(str(e), 'ERROR')
