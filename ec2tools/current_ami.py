@@ -543,22 +543,13 @@ def format_text(json_object, debug=False):
         if isinstance(json_object[region], str):
             return {"ImageId": json_object[region]}, region, None
 
-        export_json_object(json_object) if debug else print('')
-
+        export_json_object(json_object) if debug else print('', end='')
 
         for k, v in json_object[region].items():
             # Extract ami human-readable name
             if k == 'Name':
                 name = v
         json_object[region].pop('Name')
-
-            ## format k,v depending if writing to the screen (tty) or fs
-            #if is_tty() and file is None:
-            #    key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
-            #    value = Colors.GOLD3 + str(v) + Colors.RESET
-            #else:
-            #    key = str(k)
-            #    value = str(v)
 
         metadata = UnwrapDict(json_object)
 
