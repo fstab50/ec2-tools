@@ -35,6 +35,7 @@ import ec2tools
 requires = [
     'boto3>=1.9.1',
     'colorama==0.3.9',
+    'libtools>=0.2.6',
     'pyaws>=0.4.1',
     'Pygments>=2.4.0',
     'requests',
