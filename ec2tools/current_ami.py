@@ -12,9 +12,11 @@ from botocore.exceptions import ClientError
 from pyaws.session import authenticated, boto3_session
 from pyaws import Colors
 from pyaws.utils import stdout_message, export_json_object
+from libtools import bool_convert, bool_assignment
 from ec2tools.help_menu import menu_body
 from ec2tools import about, logd, __version__
-import pdb
+from ec2tools.variables import bl, dbl, fs, rst
+from ec2tools.statics import local_config
 
 try:
     from pyaws.core.oscodes_unix import exit_codes
@@ -40,6 +42,8 @@ COMMUNITY = '125523088429'      # community amis
 REDHAT = '679593333241'
 UBUNTU = '099720109477'
 MICROSOFT = '801119661308'
+
+max_field = local_config['RUNTIME']['MAX_FIELD_WIDTH']
 
 
 def debug_message(response, rgn, mode):
@@ -493,24 +497,34 @@ class UnwrapDict():
         return self.block
 
 
-def print_text_metadata(ami_name, data, region):
+def print_text_stdout(ami_name, data, region):
+    """Print ec2 metadata to cli standard out"""
+    # if no metadata, region: imageId
+    if ami_name is None:
+        print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'AWS Region', rst, fs, region, rst))
+        l, r = 'ImageId', data['ImageId']
+        return print("{}{: >17}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
 
-    print('{: >20}: {: <20}'.format('AMI Name', ami_name))
-    print('{: >20}: {: <20}'.format('AWS Region', region))
+    print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'Name', rst, fs, ami_name, rst))
+    print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'AWS Region', rst, fs, region, rst))
 
-    for row in [x[:90] for x in data]:
+    for row in [x[:max_field + 1] for x in data]:
         try:
             if len(row.split('\t')[1:3]) == 0:
                 continue
             else:
+
                 l, r = [x for x in row.split('\t')[1:3] if x is not '']
-                print("{: >20}: {: <20}".format(l, r))
+
+                if bool_assignment(r) is not None:
+                    print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, dbl, r, rst))
+                else:
+                    print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
         except IndexError:
             pass
 
 
-
-def format_text(json_object, file=None, debug=True):
+def format_text(json_object, debug=False):
     """
         Formats json object into text format
 
@@ -526,21 +540,16 @@ def format_text(json_object, file=None, debug=True):
         # AWS region code
         region = [x for x in json_object][0]
 
-        export_json_object(json_object) if debug else print('')
+        if isinstance(json_object[region], str):
+            return {"ImageId": json_object[region]}, region, None
+
+        export_json_object(json_object) if debug else print('', end='')
 
         for k, v in json_object[region].items():
             # Extract ami human-readable name
             if k == 'Name':
                 name = v
         json_object[region].pop('Name')
-
-            ## format k,v depending if writing to the screen (tty) or fs
-            #if is_tty() and file is None:
-            #    key = Colors.BOLD + Colors.BLUE + str(k) + Colors.RESET
-            #    value = Colors.GOLD3 + str(v) + Colors.RESET
-            #else:
-            #    key = str(k)
-            #    value = str(v)
 
         metadata = UnwrapDict(json_object)
 
@@ -641,11 +650,11 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
 
         elif format == 'text' and not filename:
             print_data, regioncode, ami_title = format_text(latest)
-            print_text_metadata(ami_title, print_data, regioncode)
+            print_text_stdout(ami_title, print_data, regioncode)
             return True
 
         elif format == 'text' and filename:
-            r = write_to_file(text=format_text(latest, filename), file=filename)
+            r = write_to_file(text=format_text(latest), file=filename)
 
     except Exception as e:
         logger.exception(
