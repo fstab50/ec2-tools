@@ -479,6 +479,23 @@ def os_version(imageType):
     return ''.join(re.split('(\d+)', imageType)[1:])
 
 
+class UnwrapDevices():
+    def __init__(self, d):
+        self.devices = d[0] if isinstance(d, list) else d
+        self.parent = ''
+
+    def unwrap(self, block):
+        for k, v in self.devices.items():
+            if isinstance(v, dict):
+                self.parent = k
+                #self.unwrap()
+            else:
+                #print('{: >20}: {} = {}'.format(self.parent, k, v))
+                row = '{: >20}: {} ({})\n'.format(self.parent, k, v)
+                block += row
+                return block
+
+
 class UnwrapDict():
     def __init__(self, d):
         self.dict = d
