@@ -541,6 +541,19 @@ class UnwrapDict():
         return self.block, self.rowdict
 
 
+def print_blockdevices(bd):
+    # print block device metadata
+    print("{}{: >20}{}:".format(bl, 'BlockDeviceMappings', rst), end='')
+
+    for index, row in enumerate(bd['BlockDeviceMappings']):
+        l, r = [x for x in row.split('\t') if x is not '']
+
+        if index == 0:
+            print(" {}{}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
+        else:
+            print("{: >27}{}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
+
+
 def print_text_stdout(ami_name, data, region, bdict):
     """Print ec2 metadata to cli standard out"""
     #  no metadata details, region: imageId
@@ -568,16 +581,7 @@ def print_text_stdout(ami_name, data, region, bdict):
         except IndexError:
             pass
 
-    # print block device metadata
-    print("{}{: >20}{}:".format(bl, 'BlockDeviceMappings', rst), end='')
-
-    for index, row in enumerate(bdict['BlockDeviceMappings']):
-        l, r = [x for x in row.split('\t') if x is not '']
-
-        if index == 0:
-            print(" {}{}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
-        else:
-            print("{: >27}{}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
+    print_blockdevices(bdict)
     return True
 
 
