@@ -534,7 +534,6 @@ class UnwrapDict():
             elif k == 'BlockDeviceMappings':
                 self.devicemappings = v
                 u = UnwrapDevices(v)
-                #row = '\t{}\t{}\t\n'.format('BlockDeviceMappings', u.unwrap(v[0]))
                 self.rowdict = {'BlockDeviceMappings': u.unwrap(v[0])}
             else:
                 row = '\t{}\t{}\t\n'.format(k, v)
