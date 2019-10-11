@@ -479,10 +479,50 @@ def os_version(imageType):
     return ''.join(re.split('(\d+)', imageType)[1:])
 
 
+class UnwrapDevices():
+    def __init__(self, d):
+        """
+        >>> BlockDevices = [
+                {
+                    'DeviceName': '/dev/xvda',
+                    'Ebs': {
+                        'DeleteOnTermination': True,
+                        'Encrypted': True,
+                        'SnapshotId': 'snap-048099b06face218e',
+                        'VolumeSize': 8,
+                        'VolumeType': 'gp2'
+                    }
+                }
+            ]
+        >>> u = UnwrapDevices(BlockDevices)
+        >>> u.unwrap(d)
+                 Ebs: DeviceName = /dev/xvda
+                 Ebs: DeleteOnTermination = True
+                 Ebs: Encrypted = True
+                 Ebs: SnapshotId = snap-048099b06face218e
+                 Ebs: VolumeSize = 8
+                 Ebs: VolumeType = gp2
+        """
+        self.devices = d[0] if isinstance(d, list) else d
+        self.parent = ''
+        self.blocklist = []
+
+    def unwrap(self, d={}):
+        for k, v in (d.items() or self.devices.items()):
+            if isinstance(v, dict):
+                self.parent = k
+                self.unwrap(v)
+            else:
+                row = '{}\t{}'.format(self.parent + ":" + k, str(v))
+                self.blocklist.append(row)
+        return self.blocklist
+
+
 class UnwrapDict():
     def __init__(self, d):
         self.dict = d
         self.block = ''
+        self.devicemappings = ''
 
     def unwrap(self, adict=None):
         if adict is None:
@@ -491,20 +531,38 @@ class UnwrapDict():
         for k, v in adict.items():
             if isinstance(v, dict):
                 self.unwrap(v)
+            elif k == 'BlockDeviceMappings':
+                self.devicemappings = v
+                u = UnwrapDevices(v)
+                self.rowdict = {'BlockDeviceMappings': u.unwrap(v[0])}
             else:
                 row = '\t{}\t{}\t\n'.format(k, v)
                 self.block += row
-        return self.block
+        return self.block, self.rowdict
 
 
-def print_text_stdout(ami_name, data, region):
+def print_blockdevices(bd):
+    # print block device metadata
+    print("{}{: >20}{}:".format(bl, 'BlockDeviceMappings', rst), end='')
+
+    for index, row in enumerate(bd['BlockDeviceMappings']):
+        l, r = [x for x in row.split('\t') if x is not '']
+
+        if index == 0:
+            print(" {}{}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
+        else:
+            print("{: >27}{}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
+
+
+def print_text_stdout(ami_name, data, region, bdict):
     """Print ec2 metadata to cli standard out"""
-    # if no metadata, region: imageId
+    #  no metadata details, region: imageId
     if ami_name is None:
         print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'AWS Region', rst, fs, region, rst))
         l, r = 'ImageId', data['ImageId']
         return print("{}{: >17}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
 
+    # metadata details in schema
     print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'Name', rst, fs, ami_name, rst))
     print('{}{: >20}{}: {}{: <20}{}'.format(bl, 'AWS Region', rst, fs, region, rst))
 
@@ -513,15 +571,27 @@ def print_text_stdout(ami_name, data, region):
             if len(row.split('\t')[1:3]) == 0:
                 continue
             else:
-
                 l, r = [x for x in row.split('\t')[1:3] if x is not '']
 
                 if bool_assignment(r) is not None:
+                    # boolean value; colorize it
                     print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, dbl, r, rst))
                 else:
                     print("{}{: >20}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
         except IndexError:
             pass
+
+    print_blockdevices(bdict)
+    return True
+
+
+def print_text_allregions(data):
+    for k, v in data.items():
+        if is_tty():
+            print("{}{: >17}{}: {}{: <20}{}".format(bl, k, rst, fs, v, rst))
+        else:
+            print("{: >17}: {: <20}".format(k, v))
+    return True
 
 
 def format_text(json_object, debug=False):
@@ -540,8 +610,15 @@ def format_text(json_object, debug=False):
         # AWS region code
         region = [x for x in json_object][0]
 
-        if isinstance(json_object[region], str):
+        if isinstance(json_object[region], str) and len([x for x in json_object]) == 1:
+            # single region json, no metadata details
             return {"ImageId": json_object[region]}, region, None
+
+        elif isinstance(json_object[region], str) and len([x for x in json_object]) > 1:
+            # multiple region json, no metadata details
+            regions = [x for x in json_object]
+            image_ids = [x for x in json_object.values()]
+            return {"ImageId": json_object[region]}, regions, None
 
         export_json_object(json_object) if debug else print('', end='')
 
@@ -554,7 +631,7 @@ def format_text(json_object, debug=False):
         metadata = UnwrapDict(json_object)
 
         for k, v in json_object.items():
-            data = metadata.unwrap(v).split('\n')
+            data, bddict = metadata.unwrap(v)
 
     except KeyError as e:
         logger.exception(
@@ -562,7 +639,7 @@ def format_text(json_object, debug=False):
             (inspect.stack()[0][3], str(e))
             )
         return ''
-    return data, region, name
+    return data.split('\n'), region, name, bddict
 
 
 def main(profile, imagetype, format, details, debug, filename='', rgn=None):
@@ -648,10 +725,14 @@ def main(profile, imagetype, format, details, debug, filename='', rgn=None):
         elif format == 'json' and filename:
             r = export_json_object(latest, filename=filename)
 
-        elif format == 'text' and not filename:
-            print_data, regioncode, ami_title = format_text(latest)
-            print_text_stdout(ami_title, print_data, regioncode)
-            return True
+        elif format == 'text' and not filename and len([x for x in latest]) == 1:
+            # single region
+            print_data, regioncode, ami_title, bddict = format_text(latest)
+            return print_text_stdout(ami_title, print_data, regioncode, bddict)
+
+        elif format == 'text' and not filename and rgn is None:
+            # all regions
+            return print_text_allregions(latest)
 
         elif format == 'text' and filename:
             r = write_to_file(text=format_text(latest), file=filename)
@@ -733,8 +814,10 @@ def write_to_file(text, file):
 def init_cli():
     """ Collect parameters and call main """
     try:
+
         parser = argparse.ArgumentParser(add_help=False)
         args = options(parser)
+
     except Exception as e:
         help_menu()
         stdout_message(str(e), 'ERROR')

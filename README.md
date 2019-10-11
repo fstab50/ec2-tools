@@ -23,7 +23,7 @@
 
 Scripts for use with Amazon Web Services' Elastic Compute Cluster (EC2)
 
-* [ec2tools](https://pypi.org/project/ec2tools), Version: 0.6.22
+* [ec2tools](https://pypi.org/project/ec2tools), Version: 0.6.23
 
 [back to the top](#top)
 
@@ -169,7 +169,7 @@ Format:  `text`
 
 ```
 
-[![aml1](./assets/aml2-text.png)](https://rawgithub.com/fstab50/ec2tools/master/assets/aml2-text.png)
+[![aml1](./assets/aml2-text.png)](https://images.awspros.world/ec2tools/ec2tools-metadata-text.png)
 
 [back to the top](#top)
 
