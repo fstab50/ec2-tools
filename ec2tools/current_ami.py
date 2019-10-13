@@ -503,19 +503,26 @@ class UnwrapDevices():
                  Ebs: VolumeSize = 8
                  Ebs: VolumeType = gp2
         """
-        self.devices = d[0] if isinstance(d, list) else d
+        self.devicelist = d if isinstance(d, list) else d[0]
         self.parent = ''
         self.blocklist = []
 
-    def unwrap(self, d={}):
-        for k, v in (d.items() or self.devices.items()):
+    def container(self, devicelist=[]):
+        for devices in self.devicelist:
+            self.unwrap(devices)
+        return self.blocklist
+
+    def unwrap(self, devices={}):
+        for k, v in devices.items():
             if isinstance(v, dict):
                 self.parent = k
                 self.unwrap(v)
             else:
+                self.parent = 'SSD' if ('ephem' or 'xvd') in str(v) else 'EBS'
+                self.parent = 'SSD' if ('xvd' in str(v) and k == 'DeviceName') else self.parent
                 row = '{}\t{}'.format(self.parent + ":" + k, str(v))
                 self.blocklist.append(row)
-        return self.blocklist
+            self.parent = ''
 
 
 class UnwrapDict():
@@ -534,7 +541,7 @@ class UnwrapDict():
             elif k == 'BlockDeviceMappings':
                 self.devicemappings = v
                 u = UnwrapDevices(v)
-                self.rowdict = {'BlockDeviceMappings': u.unwrap(v[0])}
+                self.rowdict = {'BlockDeviceMappings': u.container(v)}
             else:
                 row = '\t{}\t{}\t\n'.format(k, v)
                 self.block += row
