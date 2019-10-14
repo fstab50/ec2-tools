@@ -1,4 +1,21 @@
-#!/usr/bin/env python3
+"""
+Summary.
+
+    Format ec2 metadata as text
+
+Classes:
+    - UnwrapDict
+    - UnwrapDevices
+
+Module Functions:
+    - format_text
+    - def print_blockdevices(bd)
+    - print_text_stdout
+    - print_text_allregions(data)
+    - unwrap_dict(doc)
+    - write_to_file(text, file)
+
+"""
 
 import os
 import sys
@@ -19,6 +36,9 @@ try:
     from pyaws.core.oscodes_unix import exit_codes
 except Exception:
     from pyaws.core.oscodes_win import exit_codes    # non-specific os-safe codes
+
+# globals
+logger = logd.getLogger(__version__)
 
 max_field = local_config['RUNTIME']['MAX_FIELD_WIDTH']
 
