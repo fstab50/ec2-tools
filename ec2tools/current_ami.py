@@ -12,11 +12,9 @@ from botocore.exceptions import ClientError
 from pyaws.session import authenticated, boto3_session
 from pyaws import Colors
 from pyaws.utils import stdout_message, export_json_object
-from libtools import bool_convert, bool_assignment
 from ec2tools.text import format_text, print_text_stdout, print_text_allregions
 from ec2tools.help_menu import menu_body
 from ec2tools import about, logd, __version__
-from ec2tools.variables import bl, dbl, fs, rst
 from ec2tools.statics import local_config
 
 try:
