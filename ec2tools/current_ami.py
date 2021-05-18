@@ -30,7 +30,7 @@ VALID_AMI_TYPES = (
         'amazonlinux1', 'amazonlinux2',
         'redhat', 'redhat7.4', 'redhat7.5', 'redhat7.6',
         'ubuntu14.04', 'ubuntu16.04', 'ubuntu16.10', 'ubuntu18.04', 'ubuntu18.10',
-        'centos6', 'centos7', 'fedora29', 'fedora30',
+        'ubuntu20.04', 'ubuntu20.10', 'centos6', 'centos7', 'fedora29', 'fedora30',
         'windows2012', 'windowsServer2012', 'windows2016', 'windowsServer2016'
     )
 
