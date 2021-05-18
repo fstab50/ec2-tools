@@ -18,7 +18,10 @@ import urllib.error
 import requests
 from pyaws import Colors
 from pyaws.utils import stdout_message
-from init import logger
+from init import logd
+
+# create ;pgger
+logger = logd.getLogger('1.0')
 
 try:
 
