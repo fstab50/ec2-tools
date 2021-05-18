@@ -117,7 +117,7 @@ def print_blockdevices(bd):
     print("{}{: >20}{}:".format(bl, 'BlockDeviceMappings', rst), end='')
 
     for index, row in enumerate(bd['BlockDeviceMappings']):
-        l, r = [x for x in row.split('\t') if x is not '']
+        l, r = [x for x in row.split('\t') if x != '']
 
         if index == 0:
             print(" {}{}{}: {}{: <20}{}".format(bl, l, rst, fs, r, rst))
@@ -142,7 +142,7 @@ def print_text_stdout(ami_name, data, region, bdict):
             if len(row.split('\t')[1:3]) == 0:
                 continue
             else:
-                l, r = [x for x in row.split('\t')[1:3] if x is not '']
+                l, r = [x for x in row.split('\t')[1:3] if x != '']
 
                 if bool_assignment(r) is not None:
                     # boolean value; colorize it
