@@ -251,8 +251,8 @@ function _machineimage_completions(){
 
     # option strings
     commands='--debug --details --filename --format --image --help --profile --region --version'
-    image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 fedora29 fedora30 redhat \
-                redhat7.4 redhat7.5 ubuntu14.04 ubuntu16.04 ubuntu18.04 windows2012 windows2016'
+    image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 fedora29 fedora30 redhat redhat7.4 \
+        redhat7.5 ubuntu14.04 ubuntu16.04 ubuntu18.04 ubuntu20.04 ubuntu20.10 Windows2012 Windows2016'
 
     case "${initcmd}" in
 
@@ -396,7 +396,7 @@ function _runmachine_completions(){
     # option strings
     commands='--debug --image --instance-size --help --quantity --profile --region --userdata --version'
     image_subcommands='amazonlinux1 amazonlinux2 centos6 centos7 fedora29 fedora30 redhat redhat7.4 \
-                redhat7.5 ubuntu14.04 ubuntu16.04 ubuntu18.04 Windows2012 Windows2016'
+                redhat7.5 ubuntu14.04 ubuntu16.04 ubuntu18.04 ubuntu20.04 ubuntu20.10 Windows2012 Windows2016'
 
     case "${initcmd}" in
 
