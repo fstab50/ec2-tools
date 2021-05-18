@@ -43,7 +43,7 @@ requires = [
 ]
 
 
-_package = 'ec2tools'
+_project = 'ec2tools'
 _root = os.path.abspath(os.path.dirname(__file__))
 _comp_fname = 'ec2tools-completion.bash'
 
@@ -126,9 +126,9 @@ class PostInstall(install):
         """
         if self.valid_os_shell():
 
-            completion_file = user_home() + '/.bash_completion'
-            completion_dir = user_home() + '/.bash_completion.d'
-            config_dir = user_home() + '/.config/' + _package
+            completion_file = os.path.join(user_home(), '.bash_completion')
+            completion_dir = os.path.join(user_home(), '.bash_completion.d')
+            config_dir = os.path.join(user_home(), '.config', _project)
 
             if not os.path.exists(os_parityPath(completion_file)):
                 create_artifact(os_parityPath(completion_file), 'file')
@@ -137,12 +137,90 @@ class PostInstall(install):
             if not os.path.exists(os_parityPath(config_dir)):
                 create_artifact(os_parityPath(config_dir), 'dir')
 
-            if _root_user():
+            ## ensure installation of home directory artifacts (data_files) ##
+
+            # bash_completion; (overwrite if exists)
+            copyfile(
+                os_parityPath(os.path.join('bash', _comp_fname)),
+                os_parityPath(os.path.join(completion_dir, _comp_fname))
+            )
+            # configuration files: excluded file types
+            if not os.path.exists(os_parityPath(os.path.join(config_dir, _iam_script))):
                 copyfile(
-                        completion_dir + '/' + _comp_fname,
-                        '/etc/bash_completion.d/' + _comp_fname,
-                    )
-                os.remove(completion_dir + '/' + _comp_fname)
+                    os_parityPath(os.path.join('bash', _iam_script)),
+                    os_parityPath(os.path.join(config_dir, _iam_script))
+                )
+            # configuration files: excluded directories
+            if not os.path.exists(os_parityPath(os.path.join(config_dir, _rgn_script))):
+                copyfile(
+                    os_parityPath(os.path.join('bash', _rgn_script)),
+                    os_parityPath(os.path.join(config_dir, _rgn_script))
+                )
+        install.run(self)
+
+
+class PostInstallRoot(install):
+    """
+    Summary.
+
+        Postinstall script to place bash completion artifacts
+        on local filesystem
+
+    """
+    def valid_os_shell(self):
+        """
+        Summary.
+
+            Validates install environment for Linux and Bash shell
+
+        Returns:
+            Success | Failure, TYPE bool
+
+        """
+        if platform.system() == 'Windows':
+            return False
+        elif which('bash'):
+            return True
+        elif 'bash' in subprocess.getoutput('echo $SHELL'):
+            return True
+        return False
+
+    def run(self):
+        """
+        Summary.
+
+            Executes post installation configuration only if correct
+            environment detected
+
+        """
+        # bash shell + root user
+        if self.valid_os_shell():
+
+            completion_dir = '/etc/bash_completion.d'
+            config_dir = os.path.join(_install_root(), 'config')
+
+            if not os.path.exists(os_parityPath(config_dir)):
+                create_artifact(os_parityPath(config_dir), 'dir')
+
+            ## ensure installation of home directory artifacts (data_files) ##
+
+            # bash_completion; (overwrite if exists)
+            copyfile(
+                os_parityPath(os.path.join('bash', _comp_fname)),
+                os_parityPath(os.path.join(completion_dir, _comp_fname))
+            )
+            # configuration files: excluded file types
+            if not os.path.exists(os_parityPath(os.path.join(config_dir,  _iam_script))):
+                copyfile(
+                    os_parityPath(os.path.join('bash', _iam_script)),
+                    os_parityPath(os.path.join(config_dir, _iam_script))
+                )
+            # configuration files: excluded directories
+            if not os.path.exists(os_parityPath(os.path.join(config_dir, _rgn_script))):
+                copyfile(
+                    os_parityPath(os.path.join('bash', _rgn_script)),
+                    os_parityPath(os.path.join(config_dir, _rgn_script))
+                )
         install.run(self)
 
 
@@ -191,51 +269,118 @@ def user_home():
         raise e
 
 
-setup(
-    name='ec2tools',
-    version=ec2tools.__version__,
-    description='Scripts & Tools for use with Amazon Web Services EC2 Service',
-    long_description=read('DESCRIPTION.rst'),
-    url='https://github.com/fstab50/ec2tools',
-    author=ec2tools.__author__,
-    author_email=ec2tools.__email__,
-    license='Apache',
-    classifiers=[
-        'Topic :: System :: Systems Administration',
-        'Topic :: Utilities',
-        'Development Status :: 4 - Beta',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Operating System :: POSIX :: Linux',
-        'Operating System :: Microsoft :: Windows'
-    ],
-    keywords='aws amazon amazonlinux redhat centos ami tools',
-    packages=find_packages(exclude=['docs', 'scripts', 'assets']),
-    install_requires=requires,
-    python_requires='>=3.6, <4',
-    cmdclass={
-        'install': PostInstall
-    },
-    data_files=[
-        (
-            user_home() + '/' + '.config/' + _package + '/userdata',
-            ['userdata/python2_generic.py', 'userdata/userdata.sh']
-        ),
-        (
-            user_home() + '/' + '.bash_completion.d', ['bash/' + _comp_fname]
-        ),
-        (
-            user_home() + '/' + '.config/' + _package,
-            ['bash/iam_identities.py', 'bash/regions.py', 'bash/sizes.txt']
-        )
-    ],
-    entry_points={
-        'console_scripts': [
-            'machineimage=ec2tools.current_ami:init_cli',
-            'profileaccount=ec2tools.environment:init_cli',
-            'runmachine=ec2tools.launcher:init_cli',
-        ]
-    },
-    zip_safe=False
-)
+# branch install based on user priviledge level
+
+if _root_user():
+
+    setup(
+        name='ec2tools',
+        version=ec2tools.__version__,
+        description='Scripts & Tools for use with Amazon Web Services EC2 Service',
+        long_description=read('DESCRIPTION.rst'),
+        url='https://github.com/fstab50/ec2tools',
+        author=ec2tools.__author__,
+        author_email=ec2tools.__email__,
+        license='Apache',
+        classifiers=[
+            'Topic :: System :: Systems Administration',
+            'Topic :: Utilities',
+            'Development Status :: 4 - Beta',
+            'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+            'Operating System :: POSIX :: Linux',
+            'Operating System :: Microsoft :: Windows'
+        ],
+        keywords='aws amazon amazonlinux redhat centos ami tools',
+        packages=find_packages(exclude=['docs', 'scripts', 'assets']),
+        install_requires=requires,
+        python_requires='>=3.6, <4',
+        cmdclass={
+            'install': PostInstallRoot
+        },
+        data_files=[
+            (
+                os.path.join(user_home(), '.config', _project, 'userdata'),
+                ['python2_generic.py', 'userdata.sh']
+            ),
+            (
+                os.path.join('etc', 'bash_completion.d'),
+                [os.path.join('bash', _comp_fname)]
+            ),
+            (
+                os.path.join(user_home(), '.config', _project),
+                ['bash/iam_identities.py', 'bash/regions.py', 'bash/sizes.txt']
+            )
+        ],
+        entry_points={
+            'console_scripts': [
+                'machineimage=ec2tools.current_ami:init_cli',
+                'profileaccount=ec2tools.environment:init_cli',
+                'runmachine=ec2tools.launcher:init_cli',
+            ]
+        },
+        zip_safe=False
+    )
+
+else:
+
+    # non-priviledged user
+
+    setup(
+        name='ec2tools',
+        version=ec2tools.__version__,
+        description='Scripts & Tools for use with Amazon Web Services EC2 Service',
+        long_description=read('DESCRIPTION.rst'),
+        url='https://github.com/fstab50/ec2tools',
+        author=ec2tools.__author__,
+        author_email=ec2tools.__email__,
+        license='Apache',
+        classifiers=[
+            'Topic :: System :: Systems Administration',
+            'Topic :: Utilities',
+            'Development Status :: 4 - Beta',
+            'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+            'Operating System :: POSIX :: Linux',
+            'Operating System :: Microsoft :: Windows'
+        ],
+        keywords='aws amazon amazonlinux redhat centos ami tools',
+        packages=find_packages(exclude=['docs', 'scripts', 'assets']),
+        install_requires=requires,
+        python_requires='>=3.6, <4',
+        cmdclass={
+            'install': PostInstall
+        },
+        data_files=[
+            (
+                os.path.join(user_home(), '.config', _project, 'userdata'),
+                [
+                    os.path.join('userdata', 'python2_generic.py'),
+                    os.path.join('userdata', 'userdata.sh')
+                ]
+            ),
+            (
+                os.path.join(user_home(), '.bash_completion.d'), [os.path.join('bash', _comp_fname)]
+            ),
+            (
+                os.path.join(user_home(), '.config/', _project),
+                [
+                    os.path.join('bash', 'iam_identities.py'),
+                    os.path.join('bash', 'regions.py'),
+                    os.path.join('bash', 'sizes.txt')
+                ]
+            )
+        ],
+        entry_points={
+            'console_scripts': [
+                'machineimage=ec2tools.current_ami:init_cli',
+                'profileaccount=ec2tools.environment:init_cli',
+                'runmachine=ec2tools.launcher:init_cli',
+            ]
+        },
+        zip_safe=False
+    )
