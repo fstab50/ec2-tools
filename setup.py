@@ -23,6 +23,7 @@ import os
 import sys
 import platform
 import subprocess
+import inspect
 from setuptools import setup, find_packages
 from setuptools.command.develop import develop
 from setuptools.command.install import install
@@ -46,6 +47,8 @@ requires = [
 _project = 'ec2tools'
 _root = os.path.abspath(os.path.dirname(__file__))
 _comp_fname = 'ec2tools-completion.bash'
+_iamusers_fname = 'iam_identities.py'
+_rgn_script = 'regions.py'
 
 
 def _root_user():
@@ -70,6 +73,13 @@ def create_artifact(object_path, type):
             f1.write(sourcefile_content())
     elif type == 'dir':
         os.makedirs(object_path)
+
+
+def _install_root():
+    """Filsystem installed location of program modules"""
+    if not _root_user():
+        return os.path.abspath(os.path.dirname(ec2tools.__file__))
+    return os.path.join(inspect.getsourcefile(setup).split('setuptools')[0], _project)
 
 
 def os_parityPath(path):
@@ -145,10 +155,10 @@ class PostInstall(install):
                 os_parityPath(os.path.join(completion_dir, _comp_fname))
             )
             # configuration files: excluded file types
-            if not os.path.exists(os_parityPath(os.path.join(config_dir, _iam_script))):
+            if not os.path.exists(os_parityPath(os.path.join(config_dir, _iamusers_fname))):
                 copyfile(
-                    os_parityPath(os.path.join('bash', _iam_script)),
-                    os_parityPath(os.path.join(config_dir, _iam_script))
+                    os_parityPath(os.path.join('bash', _iamusers_fname)),
+                    os_parityPath(os.path.join(config_dir, _iamusers_fname))
                 )
             # configuration files: excluded directories
             if not os.path.exists(os_parityPath(os.path.join(config_dir, _rgn_script))):
@@ -210,10 +220,10 @@ class PostInstallRoot(install):
                 os_parityPath(os.path.join(completion_dir, _comp_fname))
             )
             # configuration files: excluded file types
-            if not os.path.exists(os_parityPath(os.path.join(config_dir,  _iam_script))):
+            if not os.path.exists(os_parityPath(os.path.join(config_dir,  _iamusers_fname))):
                 copyfile(
-                    os_parityPath(os.path.join('bash', _iam_script)),
-                    os_parityPath(os.path.join(config_dir, _iam_script))
+                    os_parityPath(os.path.join('bash', _iamusers_fname)),
+                    os_parityPath(os.path.join(config_dir, _iamusers_fname))
                 )
             # configuration files: excluded directories
             if not os.path.exists(os_parityPath(os.path.join(config_dir, _rgn_script))):
@@ -303,15 +313,22 @@ if _root_user():
         data_files=[
             (
                 os.path.join(user_home(), '.config', _project, 'userdata'),
-                ['python2_generic.py', 'userdata.sh']
+                [
+                    os.path.join('userdata', 'python2_generic.py'),
+                    os.path.join('userdata', 'userdata.sh')
+                ]
             ),
             (
                 os.path.join('etc', 'bash_completion.d'),
                 [os.path.join('bash', _comp_fname)]
             ),
             (
-                os.path.join(user_home(), '.config', _project),
-                ['bash/iam_identities.py', 'bash/regions.py', 'bash/sizes.txt']
+                os.path.join(user_home(), '.config/', _project),
+                [
+                    os.path.join('bash', 'iam_identities.py'),
+                    os.path.join('bash', 'regions.py'),
+                    os.path.join('bash', 'sizes.txt')
+                ]
             )
         ],
         entry_points={
