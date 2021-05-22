@@ -29,7 +29,7 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 from codecs import open
 from shutil import copy2 as copyfile
-from shutil import rmtree, which
+from shutil import which
 import ec2tools
 
 
@@ -323,10 +323,11 @@ if _root_user():
                 [os.path.join('bash', _comp_fname)]
             ),
             (
-                os.path.join(user_home(), '.config/', _project),
+                os.path.join(user_home(), '.config', _project),
                 [
                     os.path.join('bash', 'iam_identities.py'),
                     os.path.join('bash', 'regions.py'),
+                    os.path.join('bash', 'regions.list'),
                     os.path.join('bash', 'sizes.txt')
                 ]
             )
@@ -377,6 +378,7 @@ else:
                 os.path.join(user_home(), '.config', _project, 'userdata'),
                 [
                     os.path.join('userdata', 'python2_generic.py'),
+                    os.path.join('userdata', 'python3_generic.py'),
                     os.path.join('userdata', 'userdata.sh')
                 ]
             ),
@@ -384,10 +386,11 @@ else:
                 os.path.join(user_home(), '.bash_completion.d'), [os.path.join('bash', _comp_fname)]
             ),
             (
-                os.path.join(user_home(), '.config/', _project),
+                os.path.join(user_home(), '.config', _project),
                 [
                     os.path.join('bash', 'iam_identities.py'),
                     os.path.join('bash', 'regions.py'),
+                    os.path.join('bash', 'regions.list'),
                     os.path.join('bash', 'sizes.txt')
                 ]
             )
