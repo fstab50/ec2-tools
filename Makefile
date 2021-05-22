@@ -102,7 +102,7 @@ testpypi: build-sizes build ## Deploy to testpypi without regenerating prebuild 
 
 
 .PHONY: pypi
-pypi: clean build-sizes build ## Deploy to pypi without regenerating prebuild artifacts
+pypi: clean build ## Deploy to pypi without regenerating prebuild artifacts
 	@echo "Deploy $(bd)$(bbl)$(PROJECT)$(rst) to pypi.org"
 	. $(VENV_DIR)/bin/activate && twine upload --repository pypi dist/*
 
