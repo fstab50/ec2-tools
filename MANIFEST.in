@@ -1,17 +1,20 @@
 # include
-include README.md
+include README.rst
 include DESCRIPTION.rst
-include LICENSE
 include LICENSE.md
-recursive-include bash *
-recursive-include userdata *
-recursive-include ec2tools *
+include bash/ec2tools-completion.bash
+include bash/iam_identities.py
+include bash/regions.py
+include bash/regions.list
 
 # exclude
+global-exclude *.py[cod] __pycache__ *.so
 exclude .gitignore
 exclude .coverage
 exclude pytest.ini
+exclude readthedocs.yml
+exclude .environment.yml
+exclude .rtd-environment.yml
 recursive-exclude .git *
 recursive-exclude *.egg-info *
 recursive-exclude tests *
-recursive-exclude docs *
