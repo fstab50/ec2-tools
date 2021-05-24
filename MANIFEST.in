@@ -1,5 +1,5 @@
 # include
-include README.rst
+include README.md
 include DESCRIPTION.rst
 include LICENSE.md
 include bash/ec2tools-completion.bash
